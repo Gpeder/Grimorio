@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 
-/// Moldura com borda dourada e rótulo opcional.
-/// Com [width] vira avatar em destaque; sem [width] ocupa a célula do grid.
 class ImageFrame extends StatelessWidget {
   final String? imagePath;
   final String? label;

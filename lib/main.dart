@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:grimorio/home/home.dart';
+import 'package:grimorio/app/app_shell.dart';
 
 import 'app/theme/app_theme.dart';
 
@@ -17,7 +17,7 @@ class GrimorioApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.dark,
       themeMode: ThemeMode.dark,
-      home: const Home(),
+      home: const AppShell(),
     );
   }
 }

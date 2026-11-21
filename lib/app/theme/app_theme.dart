@@ -5,7 +5,6 @@ import 'app_spacing.dart';
 import 'app_typography.dart';
 
 abstract final class AppTheme {
-  // Mudanças no tema exigem hot RESTART (o hot reload não recalcula isso).
   static final ThemeData dark = _build();
 
   static ThemeData _build() {
@@ -41,7 +40,6 @@ abstract final class AppTheme {
       shape: const WidgetStatePropertyAll(shape),
     );
 
-    // Padrão dos botões de ação: canto 4, borda 2, alvo de toque >= 48dp.
     const alertBorder = BorderSide(color: AppColors.alerta, width: 2);
     const alertShape = RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(4)),
@@ -53,7 +51,6 @@ abstract final class AppTheme {
       fontWeight: FontWeight.bold,
     );
 
-    // Primário (ex.: "Criar primeiro herói"): preenchido com primary.
     final elevatedButtonStyle = ElevatedButton.styleFrom(
       backgroundColor: AppColors.primary,
       foregroundColor: AppColors.onSurface,
@@ -67,7 +64,6 @@ abstract final class AppTheme {
       textStyle: actionTextStyle,
     );
 
-    // Secundário (ex.: "Criar campanha"): contorno e texto em alerta.
     final outlinedButtonStyle =
         OutlinedButton.styleFrom(
           backgroundColor: Colors.transparent,
@@ -155,7 +151,6 @@ abstract final class AppTheme {
         indicatorColor: colorScheme.secondaryContainer,
         elevation: 0,
       ),
-      // Vale para Divider (horizontal) e VerticalDivider.
       dividerTheme: DividerThemeData(
         color: AppColors.secondary.withValues(alpha: 0.25),
         thickness: 1,
