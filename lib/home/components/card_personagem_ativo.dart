@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
+import 'package:grimorio/models/personages_model.dart';
 import 'package:grimorio/widgets/appcard.dart';
 import 'package:grimorio/widgets/button_info.dart';
 import 'package:grimorio/widgets/image_frame.dart';
@@ -9,7 +10,9 @@ import 'package:grimorio/widgets/progress_bar.dart';
 import 'package:pixelarticons/pixel.dart';
 
 class CardPersonagemAtivo extends StatelessWidget {
-  const CardPersonagemAtivo({super.key});
+  const CardPersonagemAtivo({super.key, required this.personagem});
+
+  final Character personagem;
 
   @override
   Widget build(BuildContext context) {
@@ -45,9 +48,9 @@ class CardPersonagemAtivo extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const ImageFrame(
+                    ImageFrame(
                       selected: true,
-                      imagePath: AppImages.especie01,
+                      imagePath: personagem.retrato,
                       width: 110,
                       height: 150,
                     ),
@@ -59,7 +62,7 @@ class CardPersonagemAtivo extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Elyndra',
+                            personagem.nome,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: textTheme.headlineMedium?.copyWith(
@@ -71,7 +74,9 @@ class CardPersonagemAtivo extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: Text(
-                                  'Clériga',
+                                  personagem.classes
+                                      .map((c) => c.nome)
+                                      .join(' / '),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: textTheme.bodyLarge?.copyWith(
@@ -81,7 +86,7 @@ class CardPersonagemAtivo extends StatelessWidget {
                               ),
                               const SizedBox(width: AppSpacing.small),
                               ButtonInfo(
-                                text: 'Nível 5',
+                                text: 'Nível ${personagem.nivel}',
                                 fontSize: 14,
                                 onPressed: () {},
                               ),
@@ -108,7 +113,10 @@ class CardPersonagemAtivo extends StatelessWidget {
                                 ],
                               ),
                               const SizedBox(height: 6),
-                              const ProgressBar(value: 6500, max: 14000),
+                              ProgressBar(
+                                value: personagem.xp,
+                                max: personagem.xpProximoNivel,
+                              ),
                             ],
                           ),
                         ],
@@ -119,7 +127,7 @@ class CardPersonagemAtivo extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.medium),
               Divider(height: AppSpacing.medium),
-              const _Atributos(),
+              _Atributos(personagem: personagem),
             ],
           ),
         ),
@@ -129,7 +137,9 @@ class CardPersonagemAtivo extends StatelessWidget {
 }
 
 class _Atributos extends StatelessWidget {
-  const _Atributos();
+  const _Atributos({required this.personagem});
+
+  final Character personagem;
 
   @override
   Widget build(BuildContext context) {
@@ -147,8 +157,8 @@ class _Atributos extends StatelessWidget {
             flex: 3,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Align(
+              children: [
+                const Align(
                   alignment: Alignment.centerLeft,
                   child: _Rotulo(
                     icone: Pixel.heart,
@@ -156,8 +166,12 @@ class _Atributos extends StatelessWidget {
                     texto: 'HP',
                   ),
                 ),
-                SizedBox(height: AppSpacing.small),
-                ProgressBar(value: 32, max: 38, color: AppColors.vida),
+                const SizedBox(height: AppSpacing.small),
+                ProgressBar(
+                  value: personagem.hpAtual,
+                  max: personagem.hpMax,
+                  color: AppColors.vida,
+                ),
               ],
             ),
           ),
@@ -174,7 +188,7 @@ class _Atributos extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.small),
               Text(
-                '16',
+                '${personagem.ca}',
                 textAlign: TextAlign.center,
                 style: textTheme.headlineMedium?.copyWith(
                   color: AppColors.onSurface,
@@ -201,17 +215,19 @@ class _Atributos extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.small),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                // Uma gema por círculo: cheia enquanto ainda há espaço livre.
+                Wrap(
+                  alignment: WrapAlignment.center,
                   children: [
-                    _Gema(cheia: true),
-                    _Gema(cheia: true),
-                    _Gema(cheia: false),
+                    for (final espaco in personagem.espacosDeMagia)
+                      _Gema(cheia: espaco.livres > 0),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '8 espaços',
+                  personagem.espacosDeMagia.isEmpty
+                      ? 'sem magia'
+                      : '${personagem.espacosLivres} espaços',
                   style: textTheme.bodyMedium?.copyWith(
                     color: AppColors.onSurface.withValues(alpha: 0.6),
                   ),

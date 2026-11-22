@@ -1,4 +1,5 @@
 import 'dart:ui' show lerpDouble;
+
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
@@ -8,7 +9,7 @@ import 'package:grimorio/widgets/avatar_circle.dart';
 class HomeAppbar extends StatelessWidget {
   const HomeAppbar({
     super.key,
-    this.avatarPath = AppImages.especie13,
+    this.avatarPath = AppImages.especieTieflingM,
     this.imagePath = AppImages.bg,
   });
 
@@ -64,10 +65,7 @@ class _Saudacao extends StatelessWidget {
 }
 
 class _ConteudoDaBarra extends StatelessWidget {
-  const _ConteudoDaBarra({
-    required this.avatarPath,
-    required this.imagePath,
-  });
+  const _ConteudoDaBarra({required this.avatarPath, required this.imagePath});
 
   final String? avatarPath;
   final String imagePath;

@@ -1,8 +1,4 @@
-// Caminhos de todas as imagens de `images/`.
-// Uso: Image.asset(AppImages.bg1)
-//
-// Ao adicionar uma imagem nova, crie a constante aqui e, se for uma pasta
-// nova, liste a pasta em `flutter: assets:` no pubspec.yaml.
+
 abstract final class AppImages {
   // Fundos
   static const bg = 'images/bg/bg.webp';
@@ -20,9 +16,12 @@ abstract final class AppImages {
   static const logo = 'images/logo/logo.webp';
 
   // Itens do menu
-  static const menuBolsa = 'images/itens_menu/bolsa.webp';
+  static const menuBolsa = 'images/itens_menu/mochila.webp';
   static const menuBussola = 'images/itens_menu/bussola.webp';
   static const menuMapa = 'images/itens_menu/mapa.webp';
+  static const menuBestiario = 'images/itens_menu/bestiario.webp';
+  static const menuGrimorio = 'images/itens_menu/livro_magia.webp';
+
 
   // Itens gerais
   static const bau = 'images/gerais/bau.webp';
@@ -88,24 +87,24 @@ abstract final class AppImages {
   static const pocao11 = 'images/pocoes/pocao_11.webp';
 
   // Espécies
-  static const especie01 = 'images/species/especie_01.webp';
-  static const especie02 = 'images/species/especie_02.webp';
-  static const especie03 = 'images/species/especie_03.webp';
-  static const especie04 = 'images/species/especie_04.webp';
-  static const especie05 = 'images/species/especie_05.webp';
-  static const especie06 = 'images/species/especie_06.webp';
-  static const especie07 = 'images/species/especie_07.webp';
-  static const especie08 = 'images/species/especie_08.webp';
-  static const especie09 = 'images/species/especie_09.webp';
-  static const especie10 = 'images/species/especie_10.webp';
-  static const especie11 = 'images/species/especie_11.webp';
-  static const especie12 = 'images/species/especie_12.webp';
-  static const especie13 = 'images/species/especie_13.webp';
-  static const especie14 = 'images/species/especie_14.webp';
-  static const especie15 = 'images/species/especie_15.webp';
-  static const especie16 = 'images/species/especie_16.webp';
-  static const especie17 = 'images/species/especie_17.webp';
-  static const especie18 = 'images/species/especie_18.webp';
+  static const especieAnaoF = 'images/species/anao_f.webp';
+  static const especieAnaoM = 'images/species/anao_m.webp';
+  static const especieDraconatoF = 'images/species/draconato_f.webp';
+  static const especieDraconatoM = 'images/species/draconato_m.webp';
+  static const especieElfoF = 'images/species/elfo_f.webp';
+  static const especieElfoM = 'images/species/elfo_m.webp';
+  static const especieGnomoF = 'images/species/gnomo_f.webp';
+  static const especieGnomoM = 'images/species/gnomo_m.webp';
+  static const especieHalflingF = 'images/species/halfling_f.webp';
+  static const especieHalflingM = 'images/species/halfling_m.webp';
+  static const especieHumanoF = 'images/species/humano_f.webp';
+  static const especieHumanoM = 'images/species/humano_h.webp';
+  static const especieMeioElfoF = 'images/species/meioelfo_f.webp';
+  static const especieMeioElfoM = 'images/species/meioelfo_m.webp';
+  static const especieOrcF = 'images/species/orc_f.webp';
+  static const especieOrcM = 'images/species/orc_h.webp';
+  static const especieTieflingF = 'images/species/tiefling_f.webp';
+  static const especieTieflingM = 'images/species/tiefling_m.webp';
 
   // Classes
   static const classeArtifice = 'images/classes/artifice.webp';
@@ -276,7 +275,6 @@ abstract final class AppImages {
   static const ladinoMentor = 'images/rougue/mentor.webp';
   static const ladinoTrapaceiroArcano = 'images/rougue/trapaceiro_arcano.webp';
 
-  // Listas (para grids e seletores)
   static const backgrounds = [
     bg,
     bg1,
@@ -305,24 +303,24 @@ abstract final class AppImages {
     classePatrulheiro,
   ];
   static const especies = [
-    especie01,
-    especie02,
-    especie03,
-    especie04,
-    especie05,
-    especie06,
-    especie07,
-    especie08,
-    especie09,
-    especie10,
-    especie11,
-    especie12,
-    especie13,
-    especie14,
-    especie15,
-    especie16,
-    especie17,
-    especie18,
+    especieAnaoF,
+    especieAnaoM,
+    especieDraconatoF,
+    especieDraconatoM,
+    especieElfoF,
+    especieElfoM,
+    especieGnomoF,
+    especieGnomoM,
+    especieHalflingF,
+    especieHalflingM,
+    especieHumanoF,
+    especieHumanoM,
+    especieMeioElfoF,
+    especieMeioElfoM,
+    especieOrcF,
+    especieOrcM,
+    especieTieflingF,
+    especieTieflingM,
   ];
   static const pocoes = [
     pocao1,
