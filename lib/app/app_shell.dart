@@ -41,14 +41,7 @@ class _AppShellState extends State<AppShell> {
           barDecoration: BoxDecoration(
             color: AppColors.surface,
             borderRadius: _radius,
-            border: Border.all(color: AppColors.secondary, width: 1.5),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black54,
-                blurRadius: 16,
-                offset: Offset(0, 6),
-              ),
-            ],
+            border: Border.all(color: AppColors.onSecondary, width: 1.5)
           ),
           iconDecoration: BoxDecoration(
             color: AppColors.surface,

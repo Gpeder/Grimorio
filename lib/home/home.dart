@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:grimorio/home/components/card_personagem_ativo.dart';
 import 'package:grimorio/home/components/home_appbar.dart';
 
 class Home extends StatelessWidget {
@@ -6,14 +7,15 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const HomeAppbar(),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [],
+    return const Scaffold(
+      body: CustomScrollView(
+        slivers: [
+          HomeAppbar(),
+          CardPersonagemAtivo(),
+          SliverToBoxAdapter(
+            child: SizedBox(height: 16),
           ),
-        ),
+        ],
       ),
     );
   }

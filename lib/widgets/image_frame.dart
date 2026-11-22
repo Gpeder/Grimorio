@@ -6,6 +6,7 @@ class ImageFrame extends StatelessWidget {
   final String? imagePath;
   final String? label;
   final double? width;
+  final double? height;
   final double aspectRatio;
   final bool selected;
   final VoidCallback? onTap;
@@ -15,6 +16,7 @@ class ImageFrame extends StatelessWidget {
     this.imagePath,
     this.label,
     this.width,
+    this.height,
     this.aspectRatio = 1,
     this.selected = false,
     this.onTap,
@@ -24,36 +26,38 @@ class ImageFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     final radius = BorderRadius.circular(10);
 
-    return SizedBox(
-      width: width,
-      child: AspectRatio(
-        aspectRatio: aspectRatio,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: radius,
-          child: Ink(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: radius,
-              border: Border.all(
-                color: AppColors.alerta,
-                width: selected ? 2.5 : 1.5,
-              ),
+    final frame = Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: radius,
+        child: Ink(
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: radius,
+            border: Border.all(
+              color: AppColors.alerta,
+              width: selected ? 2 : 1.5,
             ),
-            child: Column(
-              children: [
-                Expanded(
+          ),
+          child: Column(
+            children: [
+              Expanded(
+                child: SizedBox.expand(
                   child: imagePath == null
-                      ? const SizedBox.expand()
+                      ? null
                       : Image.asset(
                           imagePath!,
+                          fit: BoxFit.contain,
                           filterQuality: FilterQuality.none,
-                          errorBuilder: (_, _, _) => const SizedBox.expand(),
+                          errorBuilder: (_, _, _) => const SizedBox.shrink(),
                         ),
                 ),
-                if (label != null)
-                  Text(
+              ),
+              if (label != null) ...[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(6, 0, 6, 6),
+                  child: Text(
                     label!,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -62,11 +66,21 @@ class ImageFrame extends StatelessWidget {
                       fontSize: 11,
                     ),
                   ),
+                ),
               ],
-            ),
+            ],
           ),
         ),
       ),
+    );
+
+    if (height != null) {
+      return SizedBox(width: width, height: height, child: frame);
+    }
+
+    return SizedBox(
+      width: width,
+      child: AspectRatio(aspectRatio: aspectRatio, child: frame),
     );
   }
 }
