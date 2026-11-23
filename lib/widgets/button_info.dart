@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 
 class ButtonInfo extends StatelessWidget {
@@ -20,13 +19,13 @@ class ButtonInfo extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: Color(0xffb72a42).withValues(alpha: 0.4),
+          color: AppColors.vida.withValues(alpha: 0.4),
           borderRadius: BorderRadius.circular(4),
           border: Border.all(color: AppColors.secondary, width: 2),
         ),
         child: Text(
           text,
-          style: GoogleFonts.cinzel(
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
             color: AppColors.alerta,
             fontSize: fontSize,
             fontWeight: FontWeight.bold,

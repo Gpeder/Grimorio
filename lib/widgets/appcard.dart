@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
+import 'package:grimorio/app/theme/app_spacing.dart';
 
 class AppCard extends StatelessWidget {
   final Widget child;
@@ -13,7 +14,7 @@ class AppCard extends StatelessWidget {
     this.padding = const EdgeInsets.all(16),
   });
 
-  static const double _outerRadius = 10;
+  static const double _outerRadius = AppSpacing.radius;
   static const double _gap = 4;
   static const double _borderWidth = 1.5;
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
+import 'package:grimorio/app/theme/app_spacing.dart';
 
 class ImageBg extends StatelessWidget {
   final String imagePath;
@@ -20,7 +21,7 @@ class ImageBg extends StatelessWidget {
     this.overlayOpacity = 0.54,
   });
 
-  static const double _radius = 10;
+  static const double _radius = AppSpacing.radius;
   static const double _borderWidth = 1.5;
 
   @override

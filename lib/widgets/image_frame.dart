@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
+import 'package:grimorio/app/theme/app_spacing.dart';
 
 class ImageFrame extends StatelessWidget {
   final String? imagePath;
@@ -24,7 +24,7 @@ class ImageFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(10);
+    final radius = BorderRadius.circular(AppSpacing.radius);
 
     final frame = Material(
       type: MaterialType.transparency,
@@ -61,9 +61,8 @@ class ImageFrame extends StatelessWidget {
                     label!,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       color: AppColors.onSurface.withValues(alpha: 0.6),
-                      fontSize: 11,
                     ),
                   ),
                 ),

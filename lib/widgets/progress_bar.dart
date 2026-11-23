@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 
 class ProgressBar extends StatelessWidget {
@@ -57,7 +56,7 @@ class ProgressBar extends StatelessWidget {
                   fit: BoxFit.scaleDown,
                   child: Text(
                     '${_format(textValue ?? value)} / ${_format(textMax ?? max)}',
-                    style: GoogleFonts.inter(
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       fontSize: height * 0.55,
                       height: 1,
                       fontWeight: FontWeight.bold,

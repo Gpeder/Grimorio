@@ -1,8 +1,8 @@
 // `Characters` do Flutter (pacote characters) colide com a tela de personagens.
 import 'package:flutter/material.dart' hide Characters;
 import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
+import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/campaign/campaign.dart';
 import 'package:grimorio/characters/characters.dart';
 import 'package:grimorio/grimoire/grimoire.dart';
@@ -21,14 +21,12 @@ class _AppShellState extends State<AppShell> {
 
   static const _pages = <Widget>[Home(), Characters(), Campaign(), Grimoire()];
 
-  static const _radius = BorderRadius.all(Radius.circular(16));
+  static const _radius = BorderRadius.all(Radius.circular(AppSpacing.radius));
 
   @override
   Widget build(BuildContext context) {
-    final labelStyle = GoogleFonts.inter(
-      fontSize: 11,
-      fontWeight: FontWeight.w600,
-    );
+    final labelStyle = Theme.of(context).textTheme.labelSmall
+        ?.copyWith(fontWeight: FontWeight.w600);
 
     return Scaffold(
       body: BottomBar(
@@ -41,7 +39,7 @@ class _AppShellState extends State<AppShell> {
           barDecoration: BoxDecoration(
             color: AppColors.surface,
             borderRadius: _radius,
-            border: Border.all(color: AppColors.onSecondary, width: 1.5)
+            border: Border.all(color: AppColors.onSecondary, width: 1.5),
           ),
           iconDecoration: BoxDecoration(
             color: AppColors.surface,
@@ -53,7 +51,7 @@ class _AppShellState extends State<AppShell> {
             selectedColor: AppColors.alerta,
             iconSize: 24,
             labelStyle: labelStyle,
-            selectedLabelStyle: labelStyle.copyWith(
+            selectedLabelStyle: labelStyle?.copyWith(
               fontWeight: FontWeight.bold,
             ),
             haptics: BottomBarHaptics.selectionClick,
@@ -68,7 +66,9 @@ class _AppShellState extends State<AppShell> {
             scrollToStartOnReselect: true,
             indicator: BottomBarIndicator.pill(
               color: AppColors.primary.withValues(alpha: 0.35),
-              borderRadius: const BorderRadius.all(Radius.circular(10)),
+              borderRadius: const BorderRadius.all(
+                Radius.circular(AppSpacing.radiusSmall),
+              ),
             ),
             children: const [
               BottomBarItem(icon: Icon(Pixel.home), label: Text('Início')),
