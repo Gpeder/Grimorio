@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:grimorio/app/app_shell.dart';
 
 import 'app/theme/app_theme.dart';
 
 void main() {
-  runApp(const GrimorioApp());
+  runApp(const ProviderScope(child: GrimorioApp()));
 }
 
 class GrimorioApp extends StatelessWidget {

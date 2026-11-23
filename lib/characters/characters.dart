@@ -5,10 +5,6 @@ class Characters extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('Personagens'),
-      ),
-    );
+    return const Scaffold(body: Center(child: Text('Personagens')));
   }
 }
