@@ -54,7 +54,7 @@ class Home extends StatelessWidget {
               ],
             ),
           ),
-          const SliverPadding(padding: EdgeInsets.only(bottom: 96)),
+          const SliverPadding(padding: EdgeInsets.only(bottom: 20)),
         ],
       ),
     );
