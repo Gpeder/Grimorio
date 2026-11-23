@@ -19,7 +19,7 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final personagem = this.personagem;
-
+ 
     final secoes = <Widget>[
       if (personagem == null)
         const NotHero()
