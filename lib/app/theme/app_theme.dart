@@ -42,7 +42,7 @@ abstract final class AppTheme {
 
     const alertBorder = BorderSide(color: AppColors.alerta, width: 2);
     const alertShape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.all(Radius.circular(4)),
+      borderRadius: BorderRadius.all(Radius.circular(AppSpacing.radiusSmall)),
     );
     const actionPadding = EdgeInsets.symmetric(horizontal: 16, vertical: 12);
     const actionMinSize = Size(64, 48);

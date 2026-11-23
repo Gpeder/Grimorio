@@ -18,10 +18,10 @@ class CampaignActive extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         ),
         foregroundDecoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(color: AppColors.secondary, width: 1.5),
         ),
         child: ImageBg(

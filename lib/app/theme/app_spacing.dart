@@ -5,4 +5,5 @@ abstract final class AppSpacing {
 
   static const radius = 8.0;
   static const radiusSmall = 4.0;
+  static const radiusLarge = 12.0;
 }

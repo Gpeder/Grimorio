@@ -122,6 +122,7 @@ class _ConteudoDaBarra extends StatelessWidget {
                   AppImages.logo,
                   height: alturaDaLogo,
                   fit: BoxFit.contain,
+                  filterQuality: FilterQuality.none,
                 ),
               ),
             ],

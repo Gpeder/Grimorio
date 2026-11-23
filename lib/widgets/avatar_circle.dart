@@ -32,6 +32,7 @@ class AvatarCircle extends StatelessWidget {
                   height: size,
                   fit: BoxFit.cover,
                   alignment: Alignment.center,
+                  filterQuality: FilterQuality.none,
                   errorBuilder: (_, _, _) => _fallbackIcon(),
                 ),
         ),

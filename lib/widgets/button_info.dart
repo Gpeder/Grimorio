@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
+import 'package:grimorio/app/theme/app_spacing.dart';
 
 class ButtonInfo extends StatelessWidget {
   final String text;
@@ -20,7 +21,7 @@ class ButtonInfo extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
           color: AppColors.vida.withValues(alpha: 0.4),
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           border: Border.all(color: AppColors.secondary, width: 2),
         ),
         child: Text(

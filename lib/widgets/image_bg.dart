@@ -29,7 +29,11 @@ class ImageBg extends StatelessWidget {
     final content = Stack(
       fit: StackFit.expand,
       children: [
-        Image.asset(imagePath, fit: BoxFit.cover),
+        Image.asset(
+          imagePath,
+          fit: BoxFit.cover,
+          filterQuality: FilterQuality.none,
+        ),
         ColoredBox(color: Colors.black.withValues(alpha: overlayOpacity)),
         if (child != null) Padding(padding: padding, child: child),
       ],
