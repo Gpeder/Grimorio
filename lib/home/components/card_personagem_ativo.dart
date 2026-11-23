@@ -19,117 +19,114 @@ class CardPersonagemAtivo extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return SliverToBoxAdapter(
-      child: Padding(
+      child: AppCard(
         padding: const EdgeInsets.all(AppSpacing.medium),
-        child: AppCard(
-          padding: const EdgeInsets.all(AppSpacing.medium),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ButtonInfo(text: 'Personagem Ativo', onPressed: () {}),
+                TextButton(
+                  onPressed: () {},
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('detalhes'),
+                      Icon(Pixel.chevronright, size: 18),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.medium),
+
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  ButtonInfo(text: 'Personagem Ativo', onPressed: () {}),
-                  TextButton(
-                    onPressed: () {},
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
+                  ImageFrame(
+                    selected: true,
+                    imagePath: personagem.retrato,
+                    width: 110,
+                    height: 150,
+                  ),
+                  const SizedBox(width: AppSpacing.medium),
+
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('detalhes'),
-                        Icon(Pixel.chevronright, size: 18),
+                        Text(
+                          personagem.nome,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: textTheme.headlineMedium?.copyWith(
+                            color: AppColors.onSurface,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                personagem.classes
+                                    .map((c) => c.nome)
+                                    .join(' / '),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: textTheme.bodyLarge?.copyWith(
+                                  color: AppColors.alerta,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.small),
+                            ButtonInfo(
+                              text: 'Nível ${personagem.nivel}',
+                              fontSize: 14,
+                              onPressed: () {},
+                            ),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(
+                                  Pixel.sparkle,
+                                  size: 18,
+                                  color: AppColors.alerta,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'XP',
+                                  style: textTheme.labelLarge?.copyWith(
+                                    color: AppColors.secondary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            ProgressBar(
+                              value: personagem.xp,
+                              max: personagem.xpProximoNivel,
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: AppSpacing.medium),
-
-              IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    ImageFrame(
-                      selected: true,
-                      imagePath: personagem.retrato,
-                      width: 110,
-                      height: 150,
-                    ),
-                    const SizedBox(width: AppSpacing.medium),
-
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            personagem.nome,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: textTheme.headlineMedium?.copyWith(
-                              color: AppColors.onSurface,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  personagem.classes
-                                      .map((c) => c.nome)
-                                      .join(' / '),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: textTheme.bodyLarge?.copyWith(
-                                    color: AppColors.alerta,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: AppSpacing.small),
-                              ButtonInfo(
-                                text: 'Nível ${personagem.nivel}',
-                                fontSize: 14,
-                                onPressed: () {},
-                              ),
-                            ],
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Pixel.sparkle,
-                                    size: 18,
-                                    color: AppColors.alerta,
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    'XP',
-                                    style: textTheme.labelLarge?.copyWith(
-                                      color: AppColors.secondary,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 6),
-                              ProgressBar(
-                                value: personagem.xp,
-                                max: personagem.xpProximoNivel,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: AppSpacing.medium),
-              Divider(height: AppSpacing.medium),
-              _Atributos(personagem: personagem),
-            ],
-          ),
+            ),
+            const SizedBox(height: AppSpacing.medium),
+            Divider(height: AppSpacing.medium),
+            _Atributos(personagem: personagem),
+          ],
         ),
       ),
     );

@@ -13,67 +13,64 @@ class CampaingsActive extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.medium),
-        child: Container(
-          width: double.infinity,
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          foregroundDecoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.secondary, width: 1.5),
-          ),
-          child: ImageBg(
-            imagePath: AppImages.bg2,
-            overlayOpacity: 0.68,
-            child: Column(
-              crossAxisAlignment: .start,
-              children: [
-                Text(
-                  'Continuar campanha',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: textTheme.titleMedium?.copyWith(
-                    color: AppColors.alerta,
-                    fontWeight: FontWeight.w900,
-                  ),
+      child: Container(
+        width: double.infinity,
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        foregroundDecoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.secondary, width: 1.5),
+        ),
+        child: ImageBg(
+          imagePath: AppImages.bg2,
+          overlayOpacity: 0.68,
+          child: Column(
+            crossAxisAlignment: .start,
+            children: [
+              Text(
+                'Continuar campanha',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: textTheme.titleMedium?.copyWith(
+                  color: AppColors.alerta,
+                  fontWeight: FontWeight.w900,
                 ),
-                const SizedBox(height: AppSpacing.medium),
-                Text(
-                  'Sombras de valfenda',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: textTheme.headlineSmall?.copyWith(
-                    color: AppColors.onSurface,
-                    fontWeight: FontWeight.w900,
-                  ),
+              ),
+              const SizedBox(height: AppSpacing.medium),
+              Text(
+                'Sombras de valfenda',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: textTheme.headlineSmall?.copyWith(
+                  color: AppColors.onSurface,
+                  fontWeight: FontWeight.w900,
                 ),
-                const SizedBox(height: AppSpacing.small),
-                Text(
-                  'Capítulo 3: A floresta sombria',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: AppColors.onSurface,
-                    fontWeight: FontWeight.w600,
-                  ),
+              ),
+              const SizedBox(height: AppSpacing.small),
+              Text(
+                'Capítulo 3: A floresta sombria',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: textTheme.bodyMedium?.copyWith(
+                  color: AppColors.onSurface,
+                  fontWeight: FontWeight.w600,
                 ),
-                const SizedBox(height: AppSpacing.small),
-                const ProgressBar(value: 100, max: 200, height: 20),
-                const SizedBox(height: AppSpacing.small),
-                Text(
-                  'Sessão 7 - última em 12/11',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: AppColors.onSurface.withValues(alpha: 0.8),
-                  ),
+              ),
+              const SizedBox(height: AppSpacing.small),
+              const ProgressBar(value: 100, max: 200, height: 20),
+              const SizedBox(height: AppSpacing.small),
+              Text(
+                'Sessão 7 - última em 12/11',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: textTheme.bodySmall?.copyWith(
+                  color: AppColors.onSurface.withValues(alpha: 0.8),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

@@ -16,59 +16,56 @@ class NotHero extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.medium),
-        child: AppCard(
-          padding: const EdgeInsets.all(AppSpacing.large),
-          child: Column(
-            mainAxisSize: .min,
-            children: [
-              Text(
-                'PRIMEIRO ACESSO',
-                textAlign: TextAlign.center,
-                style: textTheme.labelMedium?.copyWith(
-                  color: AppColors.alerta,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1.2,
-                ),
+      child: AppCard(
+        padding: const EdgeInsets.all(AppSpacing.large),
+        child: Column(
+          mainAxisSize: .min,
+          children: [
+            Text(
+              'PRIMEIRO ACESSO',
+              textAlign: TextAlign.center,
+              style: textTheme.labelMedium?.copyWith(
+                color: AppColors.alerta,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.2,
               ),
-              const SizedBox(height: AppSpacing.medium),
-              const ImageFrame(imagePath: AppImages.moeda, width: 80, height: 80),
-              const SizedBox(height: AppSpacing.medium),
-              Text(
-                'Sua jornada começa aqui.',
-                textAlign: TextAlign.center,
-                style: textTheme.titleLarge?.copyWith(
-                  color: AppColors.onSurface,
-                  fontWeight: FontWeight.w700,
-                ),
+            ),
+            const SizedBox(height: AppSpacing.medium),
+            const ImageFrame(imagePath: AppImages.moeda, width: 80, height: 80),
+            const SizedBox(height: AppSpacing.medium),
+            Text(
+              'Sua jornada começa aqui.',
+              textAlign: TextAlign.center,
+              style: textTheme.titleLarge?.copyWith(
+                color: AppColors.onSurface,
+                fontWeight: FontWeight.w700,
               ),
-              const SizedBox(height: AppSpacing.large),
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: onCriarHeroi ?? () {},
-                      child: const FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text('Criar primeiro herói', maxLines: 1),
-                      ),
+            ),
+            const SizedBox(height: AppSpacing.large),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: onCriarHeroi ?? () {},
+                    child: const FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text('Criar primeiro herói', maxLines: 1),
                     ),
                   ),
-                  const SizedBox(width: AppSpacing.small),
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: onCriarCampanha ?? () {},
-                      child: const FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text('Criar campanha', maxLines: 1),
-                      ),
+                ),
+                const SizedBox(width: AppSpacing.small),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: onCriarCampanha ?? () {},
+                    child: const FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text('Criar campanha', maxLines: 1),
                     ),
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
