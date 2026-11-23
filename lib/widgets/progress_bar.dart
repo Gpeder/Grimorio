@@ -9,6 +9,11 @@ class ProgressBar extends StatelessWidget {
   final double height;
   final bool showText;
 
+  /// Valores exibidos no texto, quando diferentes dos usados para o
+  /// preenchimento da barra.
+  final num? textValue;
+  final num? textMax;
+
   const ProgressBar({
     super.key,
     required this.value,
@@ -16,6 +21,8 @@ class ProgressBar extends StatelessWidget {
     this.color = AppColors.exp,
     this.height = 24,
     this.showText = true,
+    this.textValue,
+    this.textMax,
   });
 
   @override
@@ -49,7 +56,7 @@ class ProgressBar extends StatelessWidget {
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    '${_format(value)} / ${_format(max)}',
+                    '${_format(textValue ?? value)} / ${_format(textMax ?? max)}',
                     style: GoogleFonts.inter(
                       fontSize: height * 0.55,
                       height: 1,

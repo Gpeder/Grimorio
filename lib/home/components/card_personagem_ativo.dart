@@ -112,8 +112,12 @@ class CardPersonagemAtivo extends StatelessWidget {
                             ),
                             const SizedBox(height: 6),
                             ProgressBar(
-                              value: personagem.xp,
-                              max: personagem.xpProximoNivel,
+                              value: personagem.xp - personagem.xpNivelAtual,
+                              max:
+                                  personagem.xpProximoNivel -
+                                  personagem.xpNivelAtual,
+                              textValue: personagem.xp,
+                              textMax: personagem.xpProximoNivel,
                             ),
                           ],
                         ),
@@ -141,6 +145,10 @@ class _Atributos extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final espacos = personagem.espacosDeMagia;
+    final maiorCirculo = espacos.isEmpty
+        ? null
+        : espacos.reduce((a, b) => a.circulo >= b.circulo ? a : b);
     final divisoria = VerticalDivider(
       width: AppSpacing.large,
       color: AppColors.secondary.withValues(alpha: 0.25),
@@ -212,12 +220,13 @@ class _Atributos extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.small),
-                // Uma gema por círculo: cheia enquanto ainda há espaço livre.
+                // Uma gema por espaço do maior círculo: cheia = livre, vazia = usado.
                 Wrap(
                   alignment: WrapAlignment.center,
                   children: [
-                    for (final espaco in personagem.espacosDeMagia)
-                      _Gema(cheia: espaco.livres > 0),
+                    if (maiorCirculo != null)
+                      for (var i = 0; i < maiorCirculo.total; i++)
+                        _Gema(cheia: i < maiorCirculo.livres),
                   ],
                 ),
                 const SizedBox(height: 4),

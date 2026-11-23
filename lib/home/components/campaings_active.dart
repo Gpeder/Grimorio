@@ -60,7 +60,12 @@ class CampaingsActive extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.small),
-              const ProgressBar(value: 100, max: 200, height: 20),
+              const ProgressBar(
+                value: 30,
+                max: 100,
+                height: 6,
+                showText: false,
+              ),
               const SizedBox(height: AppSpacing.small),
               Text(
                 'Sessão 7 - última em 12/11',

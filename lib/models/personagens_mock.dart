@@ -8,7 +8,7 @@ const personagemAtivoMock = Character(
   especie: 'Humana',
   classes: [
     CharacterClass(
-      apiKey: 'cleric',
+      apiKey: 'srd_cleric',
       nome: 'Clériga',
       nivel: 5,
       dadoDeVida: 8,

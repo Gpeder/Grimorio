@@ -186,6 +186,7 @@ class Character {
   int get nivel => classes.fold(0, (s, c) => s + c.nivel);
   int get bonusProficiencia => 2 + ((nivel - 1) ~/ 4);
   int get iniciativa => atributos.mod(Ability.destreza);
+  int get xpNivelAtual => xpPorNivel[nivel - 1];
   int get xpProximoNivel => nivel >= 20 ? xpPorNivel.last : xpPorNivel[nivel];
 
   double get progressoXp {
