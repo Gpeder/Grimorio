@@ -3,6 +3,8 @@ import 'package:grimorio/home/components/campaings_active.dart';
 import 'package:grimorio/home/components/card_personagem_ativo.dart';
 import 'package:grimorio/home/components/home_appbar.dart';
 import 'package:grimorio/home/components/menu_actions.dart';
+import 'package:grimorio/home/components/mission_active.dart';
+import 'package:grimorio/home/components/not_hero.dart';
 import 'package:grimorio/models/personagens_mock.dart';
 
 class Home extends StatelessWidget {
@@ -19,6 +21,8 @@ class Home extends StatelessWidget {
           const CardPersonagemAtivo(personagem: personagem),
           const MenuActions(),
           const CampaingsActive(),
+          const MissionActive(),
+          const NotHero()
         ],
       ),
     );
