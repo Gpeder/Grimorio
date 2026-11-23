@@ -3,7 +3,7 @@ import 'dart:ui' show lerpDouble;
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
-import 'package:grimorio/widgets/Image_bg.dart';
+import 'package:grimorio/widgets/image_bg.dart';
 import 'package:grimorio/widgets/avatar_circle.dart';
 
 class HomeAppbar extends StatelessWidget {

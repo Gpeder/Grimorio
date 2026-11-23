@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/models/personages_model.dart';
+import 'package:grimorio/models/character.dart';
 import 'package:grimorio/widgets/appcard.dart';
 import 'package:grimorio/widgets/button_info.dart';
 import 'package:grimorio/widgets/image_frame.dart';

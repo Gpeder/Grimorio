@@ -1,5 +1,5 @@
 import 'package:grimorio/app/theme/app_images.dart';
-import 'package:grimorio/models/personages_model.dart';
+import 'package:grimorio/models/character.dart';
 
 const personagemAtivoMock = Character(
   id: 'elyndra',

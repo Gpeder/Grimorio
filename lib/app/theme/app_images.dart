@@ -1,4 +1,3 @@
-
 abstract final class AppImages {
   // Fundos
   static const bg = 'images/bg/bg.webp';
@@ -21,7 +20,6 @@ abstract final class AppImages {
   static const menuMapa = 'images/itens_menu/mapa.webp';
   static const menuBestiario = 'images/itens_menu/bestiario.webp';
   static const menuGrimorio = 'images/itens_menu/livro_magia.webp';
-
 
   // Itens gerais
   static const bau = 'images/gerais/bau.webp';
@@ -98,11 +96,11 @@ abstract final class AppImages {
   static const especieHalflingF = 'images/species/halfling_f.webp';
   static const especieHalflingM = 'images/species/halfling_m.webp';
   static const especieHumanoF = 'images/species/humano_f.webp';
-  static const especieHumanoM = 'images/species/humano_h.webp';
+  static const especieHumanoM = 'images/species/humano_m.webp';
   static const especieMeioElfoF = 'images/species/meioelfo_f.webp';
   static const especieMeioElfoM = 'images/species/meioelfo_m.webp';
   static const especieOrcF = 'images/species/orc_f.webp';
-  static const especieOrcM = 'images/species/orc_h.webp';
+  static const especieOrcM = 'images/species/orc_m.webp';
   static const especieTieflingF = 'images/species/tiefling_f.webp';
   static const especieTieflingM = 'images/species/tiefling_m.webp';
 
@@ -129,7 +127,7 @@ abstract final class AppImages {
       'images/artifice/ferreiro_batalha.webp';
 
   // Subclasses: Bárbaro
-  static const barbaroBeserker = 'images/barbaro/beserker.webp';
+  static const barbaroBerserker = 'images/barbaro/berserker.webp';
   static const barbaroBesta = 'images/barbaro/besta.webp';
   static const barbaroGigante = 'images/barbaro/gigante.webp';
   static const barbaroGuardiaoAncestral =
@@ -146,7 +144,7 @@ abstract final class AppImages {
   static const bardoColegioValentia = 'images/bardo/colegio_valentia.webp';
   static const bardoConhecimento = 'images/bardo/conhecimento.webp';
   static const bardoCriacao = 'images/bardo/criacao.webp';
-  static const bardoDanca = 'images/bardo/dança.webp';
+  static const bardoDanca = 'images/bardo/danca.webp';
   static const bardoEspadas = 'images/bardo/espadas.webp';
   static const bardoSussurros = 'images/bardo/sussurros.webp';
 
@@ -167,7 +165,7 @@ abstract final class AppImages {
   static const clericoDominioLuz = 'images/clerico/dominio_luz.webp';
   static const clericoDominioTrapaca = 'images/clerico/dominio_trapaca.webp';
   static const clericoDominioVida = 'images/clerico/dominio_vida.webp';
-  static const clericoDomioGuerra = 'images/clerico/domio_guerra.webp';
+  static const clericoDominioGuerra = 'images/clerico/dominio_guerra.webp';
   static const clericoForja = 'images/clerico/forja.webp';
   static const clericoMorte = 'images/clerico/morte.webp';
   static const clericoNatureza = 'images/clerico/natureza.webp';
@@ -257,23 +255,23 @@ abstract final class AppImages {
   static const patrulheiroCacador = 'images/patrulheiro/cacador.webp';
   static const patrulheiroGuardiaoEnxame =
       'images/patrulheiro/guardiao_enxame.webp';
-  static const patrulheiroMatadorMostros =
-      'images/patrulheiro/matador_mostros.webp';
+  static const patrulheiroMatadorMonstros =
+      'images/patrulheiro/matador_monstros.webp';
   static const patrulheiroMestreFeras = 'images/patrulheiro/mestre_feras.webp';
   static const patrulheiroPerseguidorSombrio =
       'images/patrulheiro/perseguidor_sombrio.webp';
 
   // Subclasses: Ladino
-  static const ladinoAssasino = 'images/rougue/assasino.webp';
-  static const ladinoBatedor = 'images/rougue/batedor.webp';
-  static const ladinoEspadachim = 'images/rougue/espadachim.webp';
-  static const ladinoEspiao = 'images/rougue/espiao.webp';
-  static const ladinoFantasma = 'images/rougue/fantasma.webp';
-  static const ladinoInquisitivo = 'images/rougue/inquisitivo.webp';
-  static const ladinoLadrao = 'images/rougue/ladrao.webp';
-  static const ladinoLaminaAlma = 'images/rougue/lamina_alma.webp';
-  static const ladinoMentor = 'images/rougue/mentor.webp';
-  static const ladinoTrapaceiroArcano = 'images/rougue/trapaceiro_arcano.webp';
+  static const ladinoAssassino = 'images/ladino/assassino.webp';
+  static const ladinoBatedor = 'images/ladino/batedor.webp';
+  static const ladinoEspadachim = 'images/ladino/espadachim.webp';
+  static const ladinoEspiao = 'images/ladino/espiao.webp';
+  static const ladinoFantasma = 'images/ladino/fantasma.webp';
+  static const ladinoInquisitivo = 'images/ladino/inquisitivo.webp';
+  static const ladinoLadrao = 'images/ladino/ladrao.webp';
+  static const ladinoLaminaAlma = 'images/ladino/lamina_alma.webp';
+  static const ladinoMentor = 'images/ladino/mentor.webp';
+  static const ladinoTrapaceiroArcano = 'images/ladino/trapaceiro_arcano.webp';
 
   static const backgrounds = [
     bg,

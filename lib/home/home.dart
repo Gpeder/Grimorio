@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/home/components/campaings_active.dart';
+import 'package:grimorio/home/components/campaign_active.dart';
 import 'package:grimorio/home/components/card_personagem_ativo.dart';
 import 'package:grimorio/home/components/home_appbar.dart';
 import 'package:grimorio/home/components/menu_actions.dart';
 import 'package:grimorio/home/components/mission_active.dart';
 import 'package:grimorio/home/components/not_hero.dart';
-import 'package:grimorio/models/personages_model.dart';
-import 'package:grimorio/models/personagens_mock.dart';
+import 'package:grimorio/models/character.dart';
+import 'package:grimorio/models/character_mock.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key, this.personagem = personagemAtivoMock});
@@ -26,7 +26,7 @@ class Home extends StatelessWidget {
       else ...[
         CardPersonagemAtivo(personagem: personagem),
         const MenuActions(),
-        const CampaingsActive(),
+        const CampaignActive(),
         const MissionActive(),
       ],
     ];

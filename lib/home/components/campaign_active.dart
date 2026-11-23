@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/widgets/Image_bg.dart';
+import 'package:grimorio/widgets/image_bg.dart';
 import 'package:grimorio/widgets/progress_bar.dart';
 
-class CampaingsActive extends StatelessWidget {
-  const CampaingsActive({super.key});
+class CampaignActive extends StatelessWidget {
+  const CampaignActive({super.key});
 
   @override
   Widget build(BuildContext context) {
