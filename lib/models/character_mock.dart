@@ -34,5 +34,8 @@ const personagemAtivoMock = Character(
     SpellSlot(circulo: 2, total: 3),
     SpellSlot(circulo: 3, total: 2, usados: 2),
   ],
+  campanhaId: 'sombras-de-valfenda',
   ativo: true,
 );
+
+const personagensMock = [personagemAtivoMock];
