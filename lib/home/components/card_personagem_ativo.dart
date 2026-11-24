@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
+import 'package:grimorio/characters/ficha/ficha.dart';
 import 'package:grimorio/models/character.dart';
 import 'package:grimorio/widgets/appcard.dart';
 import 'package:grimorio/widgets/button_info.dart';
@@ -29,7 +30,13 @@ class CardPersonagemAtivo extends StatelessWidget {
               children: [
                 ButtonInfo(text: 'Personagem Ativo', onPressed: () {}),
                 TextButton(
-                  onPressed: () {},
+                  // A Home ainda é mock: o resultado da ficha é ignorado.
+                  onPressed: () => Navigator.of(context, rootNavigator: true)
+                      .push<Character>(
+                        MaterialPageRoute(
+                          builder: (_) => Ficha(personagem: personagem),
+                        ),
+                      ),
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

@@ -11,16 +11,26 @@ class CardPersonagem extends StatelessWidget {
     super.key,
     required this.personagem,
     this.nomeCampanha,
+    this.onTap,
   });
 
   final Character personagem;
   final String? nomeCampanha;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final classes = personagem.classes.map((c) => c.nome).join(' / ');
 
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppSpacing.radius),
+      child: _conteudo(textTheme, classes),
+    );
+  }
+
+  Widget _conteudo(TextTheme textTheme, String classes) {
     return AppCard(
       padding: const EdgeInsets.all(AppSpacing.small),
       child: Column(

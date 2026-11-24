@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' hide Characters;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/app/theme/app_theme.dart';
 import 'package:grimorio/characters/characters.dart';
+import 'package:grimorio/characters/ficha/ficha.dart';
 import 'package:grimorio/characters/new_hero/new_hero.dart';
 import 'package:grimorio/models/character.dart';
 import 'package:grimorio/models/hero_options.dart';
@@ -214,6 +215,31 @@ void main() {
       expect(find.text('Lyra'), findsOneWidget);
       expect(find.text('Lyra despertou!'), findsOneWidget);
       expect(find.text('ATIVA'), findsOneWidget);
+
+      // A ficha abre com o antecedente e as magias escolhidas.
+      await tester.tap(find.text('Lyra'));
+      await tester.pumpAndSettle();
+      expect(find.byType(Ficha), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.text('Acólito'),
+        300,
+        scrollable: find
+            .descendant(
+              of: find.byType(Ficha),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      expect(find.text('Neutro e Bom'), findsOneWidget);
+
+      await tester.drag(find.text('Resumo'), const Offset(-200, 0));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Magias'));
+      await tester.pumpAndSettle();
+      expect(find.text('Raio Guia'), findsOneWidget);
+      expect(find.text('Bênção'), findsOneWidget);
+      expect(find.text('Chama Sagrada'), findsOneWidget);
     });
   });
 }

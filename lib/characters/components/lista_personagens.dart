@@ -10,12 +10,13 @@ class ListaPersonagens extends StatelessWidget {
     super.key,
     required this.personagens,
     required this.campanhas,
+    this.onAbrir,
   });
 
   final List<Character> personagens;
   final List<Campaign> campanhas;
+  final ValueChanged<Character>? onAbrir;
 
-  /// Largura mínima de cada card antes de ganhar mais uma coluna.
   static const _larguraDoCard = 170.0;
 
   String? _nomeCampanha(String? id) {
@@ -61,6 +62,9 @@ class ListaPersonagens extends StatelessWidget {
                     final i when i < personagens.length => CardPersonagem(
                       personagem: personagens[i],
                       nomeCampanha: _nomeCampanha(personagens[i].campanhaId),
+                      onTap: onAbrir == null
+                          ? null
+                          : () => onAbrir!(personagens[i]),
                     ),
                     _ => const SizedBox.shrink(),
                   },

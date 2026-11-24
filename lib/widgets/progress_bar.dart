@@ -8,8 +8,6 @@ class ProgressBar extends StatelessWidget {
   final double height;
   final bool showText;
 
-  /// Valores exibidos no texto, quando diferentes dos usados para o
-  /// preenchimento da barra.
   final num? textValue;
   final num? textMax;
 

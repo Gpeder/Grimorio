@@ -13,6 +13,7 @@ import 'package:grimorio/characters/new_hero/components/passo_revisao.dart';
 import 'package:grimorio/models/character.dart';
 import 'package:grimorio/models/hero_options.dart';
 import 'package:grimorio/models/hero_options_mock.dart';
+import 'package:grimorio/widgets/snack_bar.dart';
 
 class NewHero extends StatefulWidget {
   const NewHero({super.key});
@@ -67,7 +68,6 @@ class _NewHeroState extends State<NewHero> {
   String historia = '';
 
   bool _saindo = false;
-
 
   bool get _temAlgo => especie != null || classe != null;
 
@@ -234,7 +234,6 @@ class _NewHeroState extends State<NewHero> {
     return null;
   }
 
-
   void _alternar<T>(Set<T> conjunto, T valor) {
     setState(() {
       if (!conjunto.remove(valor)) conjunto.add(valor);
@@ -353,10 +352,20 @@ class _NewHeroState extends State<NewHero> {
     if (descartar ?? false) _sair();
   }
 
-  void _avisar(String texto) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(texto)));
+  void _avisar(String texto, {Snackbar tipo = Snackbar.info}) =>
+      mostrarAviso(context, texto, tipo: tipo);
+
+  void _mudarValor(Ability a, int? v) {
+    if (modo == ModoAtributos.compra && (v ?? 8) > (base[a] ?? 8)) {
+      final gastos = pontosGastos([
+        for (final b in Ability.values) b == a ? v : base[b] ?? 8,
+      ]);
+      if (gastos == null || gastos > limiteCompra) {
+        _avisar('Sem pontos disponíveis', tipo: Snackbar.erro);
+        return;
+      }
+    }
+    setState(() => base[a] = v);
   }
 
   Character _montarPersonagem() {
@@ -397,6 +406,12 @@ class _NewHeroState extends State<NewHero> {
       inventario: [for (final i in _itens) i.paraInventario()],
       moedas: Moedas(ouro: _usaOuro ? ouro ?? 0 : 0),
       ativo: true,
+      antecedente: antecedente?.nome,
+      alinhamento: alinhamento,
+      idiomas: {...especie.idiomas, ...idiomas},
+      historia: historia.trim(),
+      magias: {...truques, ...magias, ..._magiasTravadas},
+      magiasPreparadas: {...magias, ..._magiasTravadas},
     );
   }
 
@@ -427,7 +442,6 @@ class _NewHeroState extends State<NewHero> {
     };
     return '$base${_escudo ? ' + escudo 2' : ''} = $_ca.';
   }
-
 
   Widget _conteudo() {
     final especie = this.especie;
@@ -462,7 +476,7 @@ class _NewHeroState extends State<NewHero> {
         bonusLivres: especie?.bonusLivres ?? 0,
         escolhidosLivres: bonusMeioElfo,
         onModo: _mudarModo,
-        onValor: (a, v) => setState(() => base[a] = v),
+        onValor: _mudarValor,
         onBonusLivre: (a) => _alternar(bonusMeioElfo, a),
       ),
       4 => PassoAntecedente(

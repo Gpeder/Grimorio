@@ -52,7 +52,6 @@ const alinhamentosMock = [
   'Caótico e Mau',
 ];
 
-
 const especiesMock = [
   SpeciesOption(
     key: 'srd_dwarf',
@@ -211,7 +210,6 @@ const especiesMock = [
   ),
 ];
 
-
 const antecedentesMock = [
   BackgroundOption(
     key: 'srd_acolyte',
@@ -245,10 +243,11 @@ const antecedentesMock = [
   ),
 ];
 
-
 const _maca = EquipmentItem(
   key: 'maca',
   nome: 'Maça',
+  dano: '1d6',
+  tipoDano: 'contundente',
   imagem: AppImages.arma02,
   pesoKg: 2,
   slot: EquipSlot.maoPrincipal,
@@ -256,6 +255,8 @@ const _maca = EquipmentItem(
 const _martelo = EquipmentItem(
   key: 'martelo_guerra',
   nome: 'Martelo de guerra',
+  dano: '1d8',
+  tipoDano: 'contundente',
   imagem: AppImages.arma03,
   pesoKg: 1,
   slot: EquipSlot.maoPrincipal,
@@ -287,6 +288,9 @@ const _cotaMalha = EquipmentItem(
 const _bestaLeve = EquipmentItem(
   key: 'besta_leve',
   nome: 'Besta leve + 20 virotes',
+  dano: '1d8',
+  tipoDano: 'perfurante',
+  atributoAtaque: Ability.destreza,
   imagem: AppImages.arma04,
   pesoKg: 3.5,
 );
@@ -341,7 +345,6 @@ const _simboloSagrado = EquipmentItem(
   pesoKg: 0.5,
   slot: EquipSlot.colar,
 );
-
 
 const _luz = SpellOption(
   key: 'luz',
@@ -703,7 +706,6 @@ const _magiasFeiticeiro = [
   ),
 ];
 
-
 const classesMock = [
   ClassOption(
     key: 'srd_barbarian',
@@ -854,6 +856,8 @@ const classesMock = [
         EquipmentItem(
           key: 'espada_longa',
           nome: 'Espada longa',
+          dano: '1d8',
+          tipoDano: 'cortante',
           imagem: AppImages.arma01,
           pesoKg: 1.5,
           slot: EquipSlot.maoPrincipal,
@@ -861,6 +865,8 @@ const classesMock = [
         EquipmentItem(
           key: 'machado_grande',
           nome: 'Machado grande',
+          dano: '1d12',
+          tipoDano: 'cortante',
           imagem: AppImages.arma03,
           pesoKg: 3.5,
           slot: EquipSlot.maoPrincipal,
@@ -871,6 +877,8 @@ const classesMock = [
         EquipmentItem(
           key: 'machadinhas',
           nome: 'Duas machadinhas',
+          dano: '1d6',
+          tipoDano: 'cortante',
           imagem: AppImages.arma02,
           pesoKg: 2,
         ),
@@ -978,6 +986,9 @@ const classesMock = [
         EquipmentItem(
           key: 'rapieira',
           nome: 'Rapieira',
+          dano: '1d8',
+          tipoDano: 'perfurante',
+          atributoAtaque: Ability.destreza,
           imagem: AppImages.arma01,
           pesoKg: 1,
           slot: EquipSlot.maoPrincipal,
@@ -985,6 +996,9 @@ const classesMock = [
         EquipmentItem(
           key: 'espada_curta',
           nome: 'Espada curta',
+          dano: '1d6',
+          tipoDano: 'perfurante',
+          atributoAtaque: Ability.destreza,
           imagem: AppImages.arma02,
           pesoKg: 1,
           slot: EquipSlot.maoPrincipal,
@@ -994,12 +1008,18 @@ const classesMock = [
         EquipmentItem(
           key: 'arco_curto',
           nome: 'Arco curto + aljava',
+          dano: '1d6',
+          tipoDano: 'perfurante',
+          atributoAtaque: Ability.destreza,
           imagem: AppImages.arma04,
           pesoKg: 1,
         ),
         EquipmentItem(
           key: 'espada_curta_2',
           nome: 'Espada curta',
+          dano: '1d6',
+          tipoDano: 'perfurante',
+          atributoAtaque: Ability.destreza,
           imagem: AppImages.arma02,
           pesoKg: 1,
         ),
@@ -1015,6 +1035,9 @@ const classesMock = [
       EquipmentItem(
         key: 'adagas',
         nome: 'Duas adagas',
+        dano: '1d4',
+        tipoDano: 'perfurante',
+        atributoAtaque: Ability.destreza,
         imagem: AppImages.arma03,
         pesoKg: 1,
       ),
@@ -1131,6 +1154,8 @@ const classesMock = [
         EquipmentItem(
           key: 'bordao',
           nome: 'Bordão',
+          dano: '1d6',
+          tipoDano: 'contundente',
           imagem: AppImages.arma04,
           pesoKg: 2,
           slot: EquipSlot.maoPrincipal,
@@ -1138,6 +1163,9 @@ const classesMock = [
         EquipmentItem(
           key: 'adaga',
           nome: 'Adaga',
+          dano: '1d4',
+          tipoDano: 'perfurante',
+          atributoAtaque: Ability.destreza,
           imagem: AppImages.arma03,
           pesoKg: 0.5,
           slot: EquipSlot.maoPrincipal,
@@ -1169,3 +1197,17 @@ const classesMock = [
     ],
   ),
 ];
+
+ Todas as magias das listas de classe. Uma magia pode aparecer em mais de
+ uma lista; [magiaPorKey] devolve a primeira.
+const magiasMock = [
+  ..._magiasClerigo,
+  ..._magiasMago,
+  ..._magiasBardo,
+  ..._magiasBruxo,
+  ..._magiasDruida,
+  ..._magiasFeiticeiro,
+];
+
+SpellOption? magiaPorKey(String key) =>
+    magiasMock.where((m) => m.key == key).firstOrNull;

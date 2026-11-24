@@ -3,11 +3,13 @@ import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/characters/components/botao_novo_heroi.dart';
 import 'package:grimorio/characters/components/characters_header.dart';
 import 'package:grimorio/characters/components/lista_personagens.dart';
+import 'package:grimorio/characters/ficha/ficha.dart';
 import 'package:grimorio/characters/new_hero/new_hero.dart';
 import 'package:grimorio/models/campaign.dart';
 import 'package:grimorio/models/campaign_mock.dart';
 import 'package:grimorio/models/character.dart';
 import 'package:grimorio/models/character_mock.dart';
+import 'package:grimorio/widgets/snack_bar.dart';
 
 class Characters extends StatefulWidget {
   const Characters({
@@ -44,8 +46,26 @@ class _CharactersState extends State<Characters> {
         novo,
       ];
     });
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text('${novo.nome} despertou!')));
+    mostrarAviso(
+      context,
+      '${novo.nome} despertou!',
+      tipo: Snackbar.sucesso,
+      acimaDaBarra: true,
+    );
+  }
+
+  Future<void> _abrirFicha(Character p) async {
+    final atualizado = await Navigator.of(
+      context,
+      rootNavigator: true,
+    ).push<Character>(MaterialPageRoute(builder: (_) => Ficha(personagem: p)));
+    if (atualizado == null || !mounted) return;
+
+    setState(() {
+      _personagens = [
+        for (final c in _personagens) c.id == atualizado.id ? atualizado : c,
+      ];
+    });
   }
 
   @override
@@ -60,6 +80,7 @@ class _CharactersState extends State<Characters> {
             if (p.nome.toLowerCase().contains(busca)) p,
         ],
         campanhas: widget.campanhas,
+        onAbrir: _abrirFicha,
       ),
     ];
 

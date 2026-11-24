@@ -1,3 +1,5 @@
+import 'package:grimorio/models/hero_options_mock.dart';
+
 enum Ability {
   forca('FOR'),
   destreza('DES'),
@@ -82,7 +84,6 @@ class CharacterClass {
   final String? subclasse;
 }
 
-/// Espaços de magia
 class SpellSlot {
   const SpellSlot({
     required this.circulo,
@@ -120,6 +121,13 @@ class InventoryItem {
     this.quantidade = 1,
     this.pesoKg = 0,
     this.equipadoEm,
+    this.slot,
+    this.dano,
+    this.tipoDano,
+    this.atributoAtaque,
+    this.consumivel = false,
+    this.descricao,
+    this.bonusCa = 0,
   });
 
   final String id;
@@ -129,7 +137,44 @@ class InventoryItem {
   final double pesoKg;
   final EquipSlot? equipadoEm;
 
+   Onde o item pode ser equipado. Se nulo, vale o [equipadoEm].
+  final EquipSlot? slot;
+
+   Dado de dano da arma, ex.: '1d6'.
+  final String? dano;
+  final String? tipoDano;
+
+   Atributo do ataque; nulo = FOR.
+  final Ability? atributoAtaque;
+  final bool consumivel;
+  final String? descricao;
+
+   Somado à CA enquanto equipado (escudo = 2).
+  final int bonusCa;
+
   bool get equipado => equipadoEm != null;
+  bool get arma => dano != null;
+  EquipSlot? get slotEquipavel => slot ?? equipadoEm;
+
+  InventoryItem copyWith({
+    int? quantidade,
+    EquipSlot? equipadoEm,
+    bool desequipar = false,
+  }) => InventoryItem(
+    id: id,
+    nome: nome,
+    imagem: imagem,
+    quantidade: quantidade ?? this.quantidade,
+    pesoKg: pesoKg,
+    equipadoEm: desequipar ? null : equipadoEm ?? this.equipadoEm,
+    slot: slotEquipavel,
+    dano: dano,
+    tipoDano: tipoDano,
+    atributoAtaque: atributoAtaque,
+    consumivel: consumivel,
+    descricao: descricao,
+    bonusCa: bonusCa,
+  );
 }
 
 class Condition {
@@ -137,6 +182,46 @@ class Condition {
   final String nome;
   final int? rodadas;
 }
+
+class Nota {
+  Nota({
+    required String id,
+    required String titulo,
+    required String texto,
+    required DateTime data,
+  }) : this.fixa(
+         id: id,
+         titulo: titulo,
+         texto: texto,
+         dataMs: data.millisecondsSinceEpoch,
+       );
+
+   Versão `const`, para mocks: a data vai em milissegundos.
+  const Nota.fixa({
+    required this.id,
+    required this.titulo,
+    required this.texto,
+    required this.dataMs,
+  });
+
+  final String id;
+  final String titulo;
+  final String texto;
+  final int dataMs;
+
+  DateTime get data => DateTime.fromMillisecondsSinceEpoch(dataMs);
+}
+
+const _atributoMagiaPorClasse = {
+  'cleric': Ability.sabedoria,
+  'druid': Ability.sabedoria,
+  'ranger': Ability.sabedoria,
+  'wizard': Ability.inteligencia,
+  'bard': Ability.carisma,
+  'sorcerer': Ability.carisma,
+  'warlock': Ability.carisma,
+  'paladin': Ability.carisma,
+};
 
 class Character {
   const Character({
@@ -160,6 +245,14 @@ class Character {
     this.moedas = const Moedas(),
     this.campanhaId,
     this.ativo = false,
+    this.antecedente,
+    this.alinhamento,
+    this.idiomas = const {},
+    this.historia = '',
+    this.magias = const {},
+    this.magiasPreparadas = const {},
+    this.inspiracao = false,
+    this.notas = const [],
   });
 
   final String id;
@@ -182,6 +275,16 @@ class Character {
   final Moedas moedas;
   final String? campanhaId;
   final bool ativo;
+  final String? antecedente;
+  final String? alinhamento;
+  final Set<String> idiomas;
+  final String historia;
+
+   Keys de `SpellOption` (truques + magias).
+  final Set<String> magias;
+  final Set<String> magiasPreparadas;
+  final bool inspiracao;
+  final List<Nota> notas;
 
   int get nivel => classes.fold(0, (s, c) => s + c.nivel);
   int get bonusProficiencia => 2 + ((nivel - 1) ~/ 4);
@@ -209,6 +312,147 @@ class Character {
 
   String get classeResumo =>
       classes.map((c) => '${c.nome} ${c.nivel}').join(' / ');
+
+  Ability? get atributoMagia => classes.isEmpty
+      ? null
+      : _atributoMagiaPorClasse[classes.first.apiKey.replaceFirst('srd_', '')];
+
+  int get _modMagia {
+    final atributo = atributoMagia;
+    return atributo == null ? 0 : atributos.mod(atributo);
+  }
+
+  int get ataqueMagico => bonusProficiencia + _modMagia;
+
+  int get cdMagia => 8 + bonusProficiencia + _modMagia;
+
+  int bonusPericia(String nome) {
+    final pericia = periciasMock.firstWhere((p) => p.nome == nome);
+    return atributos.mod(pericia.atributo) +
+        (pericias.contains(nome) ? bonusProficiencia : 0);
+  }
+
+  int get percepcaoPassiva => 10 + bonusPericia('Percepção');
+
+  int _modArma(InventoryItem item) =>
+      atributos.mod(item.atributoAtaque ?? Ability.forca);
+
+  int ataqueArma(InventoryItem item) => _modArma(item) + bonusProficiencia;
+
+  String danoArma(InventoryItem item) {
+    final dado = item.dano ?? '';
+    final mod = _modArma(item);
+    if (mod == 0) return dado;
+    return mod > 0 ? '$dado + $mod' : '$dado − ${-mod}';
+  }
+
+  List<InventoryItem> itensEm(EquipSlot slot) => [
+    for (final i in inventario)
+      if (i.equipadoEm == slot) i,
+  ];
+
+   Bônus de CA dos itens equipados (escudo).
+  int get bonusCaEquipado =>
+      inventario.fold(0, (s, i) => s + (i.equipado ? i.bonusCa : 0));
+
+  Character recuperarEspaco(int circulo) => copyWith(
+    espacosDeMagia: [
+      for (final e in espacosDeMagia)
+        e.circulo == circulo && e.usados > 0
+            ? e.copyWith(usados: e.usados - 1)
+            : e,
+    ],
+  );
+
+  Character alternarInspiracao() => copyWith(inspiracao: !inspiracao);
+
+  Character adicionarCondicao(Condition condicao) =>
+      copyWith(condicoes: [...condicoes, condicao]);
+
+  Character removerCondicao(String nome) => copyWith(
+    condicoes: [
+      for (final c in condicoes)
+        if (c.nome != nome) c,
+    ],
+  );
+
+  Character alternarPreparada(String key) => copyWith(
+    magiasPreparadas: magiasPreparadas.contains(key)
+        ? magiasPreparadas.difference({key})
+        : {...magiasPreparadas, key},
+  );
+
+   Equipa no slot do item. Dois anéis cabem; nos outros slots, o item
+   que estava lá volta para a mochila.
+  Character equipar(String itemId) {
+    final item = inventario.where((i) => i.id == itemId).firstOrNull;
+    final slot = item?.slotEquipavel;
+    if (item == null || slot == null || item.equipado) return this;
+
+    final ocupantes = itensEm(slot);
+    final limite = slot == EquipSlot.anel ? 2 : 1;
+    final sai = ocupantes.length >= limite ? ocupantes.first : null;
+
+    return copyWith(
+      ca: ca + item.bonusCa - (sai?.bonusCa ?? 0),
+      inventario: [
+        for (final i in inventario)
+          if (i.id == itemId)
+            i.copyWith(equipadoEm: slot)
+          else if (i.id == sai?.id)
+            i.copyWith(desequipar: true)
+          else
+            i,
+      ],
+    );
+  }
+
+  Character desequipar(String itemId) {
+    final item = inventario.where((i) => i.id == itemId).firstOrNull;
+    if (item == null || !item.equipado) return this;
+    return copyWith(
+      ca: ca - item.bonusCa,
+      inventario: [
+        for (final i in inventario)
+          i.id == itemId ? i.copyWith(desequipar: true) : i,
+      ],
+    );
+  }
+
+  Character usarItem(String itemId) => copyWith(
+    inventario: [
+      for (final i in inventario)
+        if (i.id != itemId || !i.consumivel)
+          i
+        else if (i.quantidade > 1)
+          i.copyWith(quantidade: i.quantidade - 1),
+    ],
+  );
+
+  Character removerItem(String itemId) {
+    final item = inventario.where((i) => i.id == itemId).firstOrNull;
+    if (item == null) return this;
+    return copyWith(
+      ca: ca - (item.equipado ? item.bonusCa : 0),
+      inventario: [
+        for (final i in inventario)
+          if (i.id != itemId) i,
+      ],
+    );
+  }
+
+  Character definirMoedas(Moedas valor) => copyWith(moedas: valor);
+
+  Character definirHpTemp(int valor) => copyWith(hpTemp: valor < 0 ? 0 : valor);
+
+  Character adicionarNota(Nota nota) => copyWith(notas: [...notas, nota]);
+
+  Character removerNota(String id) => copyWith(
+    notas: [
+      for (final n in notas)
+        if (n.id != id) n,
+    ],
+  );
 
   Character receberDano(int valor) {
     final absorvido = valor.clamp(0, hpTemp);
@@ -240,37 +484,63 @@ class Character {
   Character ganharXp(int valor) => copyWith(xp: xp + valor);
 
   Character copyWith({
+    String? id,
+    String? nome,
+    String? retrato,
+    String? especie,
+    List<CharacterClass>? classes,
+    AbilityScores? atributos,
     int? xp,
     int? hpMax,
     int? hpAtual,
     int? hpTemp,
     int? ca,
+    double? deslocamentoM,
+    Set<Ability>? salvaguardas,
+    Set<String>? pericias,
     List<SpellSlot>? espacosDeMagia,
     List<InventoryItem>? inventario,
     List<Condition>? condicoes,
     Moedas? moedas,
+    String? campanhaId,
     bool? ativo,
+    String? antecedente,
+    String? alinhamento,
+    Set<String>? idiomas,
+    String? historia,
+    Set<String>? magias,
+    Set<String>? magiasPreparadas,
+    bool? inspiracao,
+    List<Nota>? notas,
   }) => Character(
-    id: id,
-    nome: nome,
-    retrato: retrato,
-    especie: especie,
-    classes: classes,
-    atributos: atributos,
+    id: id ?? this.id,
+    nome: nome ?? this.nome,
+    retrato: retrato ?? this.retrato,
+    especie: especie ?? this.especie,
+    classes: classes ?? this.classes,
+    atributos: atributos ?? this.atributos,
     xp: xp ?? this.xp,
     hpMax: hpMax ?? this.hpMax,
     hpAtual: hpAtual ?? this.hpAtual,
     hpTemp: hpTemp ?? this.hpTemp,
     ca: ca ?? this.ca,
-    deslocamentoM: deslocamentoM,
-    salvaguardas: salvaguardas,
-    pericias: pericias,
+    deslocamentoM: deslocamentoM ?? this.deslocamentoM,
+    salvaguardas: salvaguardas ?? this.salvaguardas,
+    pericias: pericias ?? this.pericias,
     espacosDeMagia: espacosDeMagia ?? this.espacosDeMagia,
     inventario: inventario ?? this.inventario,
     condicoes: condicoes ?? this.condicoes,
     moedas: moedas ?? this.moedas,
-    campanhaId: campanhaId,
+    campanhaId: campanhaId ?? this.campanhaId,
     ativo: ativo ?? this.ativo,
+    antecedente: antecedente ?? this.antecedente,
+    alinhamento: alinhamento ?? this.alinhamento,
+    idiomas: idiomas ?? this.idiomas,
+    historia: historia ?? this.historia,
+    magias: magias ?? this.magias,
+    magiasPreparadas: magiasPreparadas ?? this.magiasPreparadas,
+    inspiracao: inspiracao ?? this.inspiracao,
+    notas: notas ?? this.notas,
   );
 }
 

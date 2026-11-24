@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:grimorio/models/character.dart';
 
-
 const nomeAtributo = {
   Ability.forca: 'Força',
   Ability.destreza: 'Destreza',
@@ -101,6 +100,11 @@ class EquipmentItem {
     this.pesoKg = 0,
     this.slot,
     this.armadura,
+    this.dano,
+    this.tipoDano,
+    this.atributoAtaque,
+    this.consumivel = false,
+    this.descricao,
   });
 
   final String key;
@@ -109,13 +113,26 @@ class EquipmentItem {
   final double pesoKg;
   final EquipSlot? slot;
   final TipoArmadura? armadura;
+  final String? dano;
+  final String? tipoDano;
+  final Ability? atributoAtaque;
+  final bool consumivel;
+  final String? descricao;
 
+   Arma sem slot pode ser equipada depois na mão principal.
   InventoryItem paraInventario() => InventoryItem(
     id: key,
     nome: nome,
     imagem: imagem,
     pesoKg: pesoKg,
     equipadoEm: slot,
+    slot: slot ?? (dano != null ? EquipSlot.maoPrincipal : null),
+    dano: dano,
+    tipoDano: tipoDano,
+    atributoAtaque: atributoAtaque,
+    consumivel: consumivel,
+    descricao: descricao,
+    bonusCa: armadura == TipoArmadura.escudo ? 2 : 0,
   );
 }
 
@@ -139,7 +156,7 @@ class SpellOption {
   final String key;
   final String nome;
 
-  /// 0 = truque.
+   0 = truque.
   final int circulo;
   final String escola;
 
@@ -235,7 +252,6 @@ class SkillOption {
   final String nome;
   final Ability atributo;
 }
-
 
 String sinal(int v) => v >= 0 ? '+$v' : '$v';
 

@@ -3,10 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-/// Linha com um [leading] quadrado cuja altura acompanha a altura do [child].
-///
-/// O lado do quadrado é igual à altura do conteúdo, já descontando do conteúdo
-/// a largura que o próprio quadrado ocupa.
 class SquareLeadingRow extends MultiChildRenderObjectWidget {
   SquareLeadingRow({
     super.key,
@@ -56,8 +52,6 @@ class RenderSquareLeadingRow extends RenderBox
     }
   }
 
-  /// Encontra o lado do quadrado: quanto maior o quadrado, mais estreito fica
-  /// o conteúdo (e possivelmente mais alto). Repete até estabilizar.
   double _side(double width, double Function(double contentWidth) heightFor) {
     var side = 0.0;
     for (var i = 0; i < 8; i++) {
