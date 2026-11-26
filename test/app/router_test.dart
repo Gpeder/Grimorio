@@ -110,7 +110,9 @@ void main() {
     expect(find.byType(Magias), findsOneWidget);
   });
 
-  testWidgets('item do grimório não tem tela de detalhe', (tester) async {
+  testWidgets('item do grimório que não existe é não encontrado', (
+    tester,
+  ) async {
     await abrir(tester, '${Rotas.grimorio}/${TipoCompendio.itens}/xyz');
     expect(find.text('Não encontrado'), findsOneWidget);
   });

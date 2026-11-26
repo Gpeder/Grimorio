@@ -33,6 +33,17 @@ void main() {
       expect(m.atributos?.forca, 21);
       expect(m.deslocamento['swim'], 40);
       expect(m.acoes, isNotEmpty);
+      expect(m.idiomas, 'Deep Speech, telepathy 120 ft.');
+      expect(m.sentidos, {'darkvision': 120});
+      expect(m.percepcaoPassiva, 20);
+      expect(m.salvaguardas['constitution'], 6);
+      expect(m.pericias['history'], 12);
+      expect(m.imunidades, isNull);
+      expect(
+        m.acoesDo(AcaoSrd.lendaria).map((a) => a.nome),
+        contains('Tail Swipe'),
+      );
+      expect(m.acoesDo(AcaoSrd.acao).first.nome, 'Multiattack');
       expect(
         m.imagem,
         startsWith('https://api.open5e.com/static/img/object_illustrations/'),
@@ -64,6 +75,12 @@ void main() {
       expect(c.dadoDeVida, 'D12');
       expect(c.salvaguardas, ['Constitution', 'Strength']);
       expect(c.subclasse, isFalse);
+      expect(c.pvPrimeiroNivel, '12 + your Constitution modifier');
+      expect(c.proficienciaNoNivel(1), '+2');
+      expect(c.proficienciaNoNivel(5), '+3');
+      expect(c.noNivel(1), containsAll(['Rage', 'Unarmored Defense']));
+      expect(c.temEspacos, isFalse);
+      expect(c.textoDo(CaracteristicaSrd.proficiencias), contains('Armor'));
       expect(ClasseSrd.fromJson(c.toJson()).toJson(), c.toJson());
     });
 
@@ -78,6 +95,9 @@ void main() {
       final c = CondicaoSrd.fromJson(primeiro('condicoes.json'));
       expect(c.nome, 'Blinded');
       expect(c.descricao, contains('blinded creature'));
+      // so o texto do srd 2014, sem o de outros documentos
+      expect(c.descricao, contains("can't see and automatically fails"));
+      expect(c.descricao, isNot(contains('it automatically fails')));
       expect(c.icone, startsWith('https://api.open5e.com/static/'));
       expect(CondicaoSrd.fromJson(c.toJson()).toJson(), c.toJson());
     });

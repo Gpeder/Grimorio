@@ -79,6 +79,8 @@ ApiClient clienteFalso(DioFalso adapter) =>
     ApiClient(dio: Dio()..httpClientAdapter = adapter);
 
 // pagina com n copias do primeiro item, keys e nomes diferentes
+// sem document e desc curta: acima de 50 kb o dio decodifica num isolate
+// e o relogio falso do teste nunca termina
 Map<String, dynamic> paginaFalsa(
   String arquivo, {
   int n = 30,
@@ -96,6 +98,8 @@ Map<String, dynamic> paginaFalsa(
       for (var i = 0; i < n; i++)
         {
           ...item,
+          'document': null,
+          'desc': 'desc',
           'key': '${item['key']}-p$pagina-$i',
           'name': '${item['name']} $pagina.$i',
         },

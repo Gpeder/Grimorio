@@ -9,36 +9,7 @@ import 'package:grimorio/widgets/etiqueta.dart';
 
 import '../../helpers/app_teste.dart';
 import '../../helpers/dio_falso.dart';
-
-// api inteira com as fixtures
-DioFalso apiSrd() => DioFalso({
-  ApiRotas.magias: RespostaFalsa(json: fixture('magias.json')),
-  ApiRotas.monstros: RespostaFalsa(json: fixture('monstros.json')),
-  ApiRotas.itens: RespostaFalsa(json: fixture('itens.json')),
-  ApiRotas.itensMagicos: RespostaFalsa(json: fixture('itens_magicos.json')),
-  ApiRotas.classes: RespostaFalsa(json: fixture('classes.json')),
-  ApiRotas.especies: RespostaFalsa(json: fixture('especies.json')),
-  ApiRotas.condicoes: RespostaFalsa(json: fixture('condicoes.json')),
-});
-
-Future<void> abrirGrimorio(
-  WidgetTester tester,
-  DioFalso dio, {
-  String rota = Rotas.grimorio,
-}) async {
-  tester.view.physicalSize = const Size(1080, 2400);
-  tester.view.devicePixelRatio = 3;
-  addTearDown(tester.view.reset);
-  await tester.pumpWidget(appDeTeste(rota, dio: dio));
-  await tester.pumpAndSettle();
-}
-
-Future<void> tocar(WidgetTester tester, Finder alvo) async {
-  await tester.ensureVisible(alvo);
-  await tester.pumpAndSettle();
-  await tester.tap(alvo);
-  await tester.pumpAndSettle();
-}
+import '../../helpers/grimorio_teste.dart';
 
 Finder filtro(String rotulo) => find.widgetWithText(Etiqueta, rotulo);
 
@@ -196,5 +167,132 @@ void main() {
     expect(find.text('Sem conexão. Confira a internet'), findsOneWidget);
     expect(find.textContaining('Dio'), findsNothing);
     expect(find.textContaining('Exception'), findsNothing);
+  });
+
+  testWidgets('busca espera 400 ms e faz uma chamada só', (tester) async {
+    final dio = apiSrd();
+    await abrirGrimorio(tester, dio, rota: '${Rotas.grimorio}/magias');
+    final antes = dio.pedidos.length;
+
+    final campo = find.byType(TextField);
+    for (final t in ['f', 'fi', 'fir', 'fire']) {
+      await tester.enterText(campo, t);
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    expect(dio.pedidos, hasLength(antes));
+
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pumpAndSettle();
+    expect(dio.pedidos, hasLength(antes + 1));
+    expect(dio.ultimo.queryParameters[ApiRotas.filtroBusca], 'fire');
+
+    // menos de 2 letras volta para a lista sem busca
+    await tester.enterText(campo, 'f');
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pumpAndSettle();
+    expect(
+      dio.ultimo.queryParameters.containsKey(ApiRotas.filtroBusca),
+      isFalse,
+    );
+  });
+
+  testWidgets('busca sem resultado mostra o texto buscado', (tester) async {
+    final dio = DioFalso(
+      {ApiRotas.magias: RespostaFalsa(json: fixture('magias.json'))},
+      (p) => p.queryParameters[ApiRotas.filtroBusca] == 'xyz'
+          ? const RespostaFalsa(json: {'count': 0, 'next': null, 'results': []})
+          : null,
+    );
+    await abrirGrimorio(tester, dio, rota: '${Rotas.grimorio}/magias');
+
+    await tester.enterText(find.byType(TextField), 'xyz');
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(EstadoVazio), findsOneWidget);
+    expect(find.text('Nada encontrado para "xyz"'), findsOneWidget);
+    // busca continua na tela para corrigir
+    expect(find.byType(TextField), findsOneWidget);
+  });
+
+  testWidgets('erro de conexão: Tentar de novo chama de novo', (tester) async {
+    final dio = DioFalso({
+      ApiRotas.magias: const RespostaFalsa.falha(
+        DioExceptionType.connectionError,
+      ),
+    });
+    await abrirGrimorio(tester, dio, rota: '${Rotas.grimorio}/magias');
+
+    expect(find.text('Sem conexão. Confira a internet'), findsOneWidget);
+    expect(filtro('Truques'), findsOneWidget);
+    final antes = dio.pedidos.length;
+
+    dio.respostas[ApiRotas.magias] = RespostaFalsa(
+      json: fixture('magias.json'),
+    );
+    await tocar(tester, find.text('Tentar de novo'));
+
+    expect(dio.pedidos, hasLength(antes + 1));
+    expect(find.text('Acid Arrow'), findsOneWidget);
+  });
+
+  testWidgets('rolar até o fim carrega a página 2; erro mantém a 1', (
+    tester,
+  ) async {
+    var pagina2 = const RespostaFalsa(status: 500, json: {});
+    final dio = DioFalso(
+      {},
+      (p) => switch (p.queryParameters[ApiRotas.pagina]) {
+        null => RespostaFalsa(json: paginaFalsa('magias.json')),
+        2 => pagina2,
+        _ => null,
+      },
+    );
+    await abrirGrimorio(tester, dio, rota: '${Rotas.grimorio}/magias');
+    expect(find.text('Acid Arrow 1.0'), findsOneWidget);
+
+    await tester.drag(find.byType(ListView), const Offset(0, -6000));
+    await tester.pumpAndSettle();
+
+    expect(dio.ultimo.queryParameters[ApiRotas.pagina], 2);
+    expect(
+      find.text('O servidor está com problema. Tente de novo'),
+      findsOneWidget,
+    );
+    expect(find.text('Tentar de novo'), findsOneWidget);
+    expect(find.text('Acid Arrow 1.29'), findsOneWidget);
+
+    // tentar de novo soma a pagina 2 aos itens
+    pagina2 = RespostaFalsa(
+      json: paginaFalsa('magias.json', n: 5, pagina: 2, temMais: false),
+    );
+    await tocar(tester, find.text('Tentar de novo'));
+    await tester.drag(find.byType(ListView), const Offset(0, -3000));
+    await tester.pumpAndSettle();
+    expect(find.text('Acid Arrow 2.4'), findsOneWidget);
+    expect(dio.pedidos, hasLength(3));
+    expect(find.text('Tentar de novo'), findsNothing);
+  });
+
+  testWidgets('nenhuma tela mostra erro técnico', (tester) async {
+    for (final tipo in [
+      TipoCompendio.magias,
+      TipoCompendio.bestiario,
+      TipoCompendio.itens,
+      TipoCompendio.classes,
+      TipoCompendio.especies,
+      TipoCompendio.condicoes,
+    ]) {
+      for (final dio in [
+        apiSrd(),
+        DioFalso({}, (_) => const RespostaFalsa(status: 500, texto: 'x')),
+        DioFalso({}, (_) => const RespostaFalsa(json: {'results': 'quebrado'})),
+      ]) {
+        await abrirGrimorio(tester, dio, rota: '${Rotas.grimorio}/$tipo');
+        for (final tecnico in ['Exception', 'Dio', 'Null', 'null']) {
+          expect(find.textContaining(tecnico), findsNothing, reason: tipo);
+        }
+      }
+    }
   });
 }

@@ -82,7 +82,8 @@ class GerenciadorMonstro {
         .map(
           (grupo) => grupo
               .split(RegExp(r',\s*'))
-              .where((p) => p.trim().isNotEmpty)
+              .map((p) => p.trim())
+              .where((p) => p.isNotEmpty)
               .map(traduzir)
               .join(', '),
         )
