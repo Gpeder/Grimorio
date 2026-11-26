@@ -2,6 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/model/character.dart';
 import 'package:grimorio/model/character_mock.dart';
 
+import 'ida_e_volta.dart';
+
 const _atributos = AbilityScores(
   forca: 10,
   destreza: 10,
@@ -131,6 +133,71 @@ void main() {
     test('mod negativo', () {
       final p = _personagem().copyWith(atributos: comForca(8));
       expect(p.danoArma(maca), '1d6 − 1');
+    });
+  });
+
+  group('json', () {
+    test('todos os personagens do mock voltam iguais', () {
+      for (final p in todosPersonagensMock) {
+        confereIdaEVolta(p, (x) => x.toJson(), Character.fromJson);
+      }
+    });
+
+    test('as partes do personagem voltam iguais', () {
+      final p = personagemAtivoMock;
+      confereIdaEVolta(p.atributos, (x) => x.toJson(), AbilityScores.fromJson);
+      confereIdaEVolta(
+        p.classes.first,
+        (x) => x.toJson(),
+        CharacterClass.fromJson,
+      );
+      confereIdaEVolta(
+        p.espacosDeMagia.first,
+        (x) => x.toJson(),
+        SpellSlot.fromJson,
+      );
+      confereIdaEVolta(
+        p.inventario.first,
+        (x) => x.toJson(),
+        InventoryItem.fromJson,
+      );
+      confereIdaEVolta(
+        p.condicoes.first,
+        (x) => x.toJson(),
+        Condition.fromJson,
+      );
+      confereIdaEVolta(p.notas.first, (x) => x.toJson(), Nota.fromJson);
+      confereIdaEVolta(p.moedas, (x) => x.toJson(), Moedas.fromJson);
+    });
+
+    test('usa chaves em snake_case', () {
+      final json = personagemAtivoMock.toJson();
+      expect(json, contains('hp_max'));
+      expect(json, contains('campanha_id'));
+      expect(json['classes'].first, contains('dado_de_vida'));
+    });
+
+    test('opcional null e enum inválido não quebram', () {
+      final json = pelaRede(personagemAtivoMock.toJson())
+        ..['campanha_id'] = null
+        ..['antecedente'] = null
+        ..['salvaguardas'] = ['sorte', 'sabedoria'];
+      (json['inventario'] as List).first['equipado_em'] = 'bolso';
+
+      final p = Character.fromJson(json);
+      expect(p.campanhaId, isNull);
+      expect(p.antecedente, isNull);
+      expect(p.salvaguardas, {Ability.sabedoria});
+      expect(p.inventario.first.equipadoEm, isNull);
+    });
+
+    test('lista que falta vira vazia', () {
+      final json = pelaRede(personagemAtivoMock.toJson())
+        ..remove('inventario')
+        ..remove('notas');
+      final p = Character.fromJson(json);
+      expect(p.inventario, isEmpty);
+      expect(p.notas, isEmpty);
     });
   });
 }

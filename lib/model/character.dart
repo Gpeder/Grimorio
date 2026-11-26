@@ -1,4 +1,5 @@
 import 'package:grimorio/model/hero_options_mock.dart';
+import 'package:grimorio/model/json.dart';
 
 enum Ability {
   forca('FOR'),
@@ -65,6 +66,40 @@ class AbilityScores {
   };
 
   int mod(Ability a) => modificador(valor(a));
+
+  factory AbilityScores.fromJson(Map<String, dynamic> json) => AbilityScores(
+    forca: (json['forca'] as num?)?.toInt() ?? 0,
+    destreza: (json['destreza'] as num?)?.toInt() ?? 0,
+    constituicao: (json['constituicao'] as num?)?.toInt() ?? 0,
+    inteligencia: (json['inteligencia'] as num?)?.toInt() ?? 0,
+    sabedoria: (json['sabedoria'] as num?)?.toInt() ?? 0,
+    carisma: (json['carisma'] as num?)?.toInt() ?? 0,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'forca': forca,
+    'destreza': destreza,
+    'constituicao': constituicao,
+    'inteligencia': inteligencia,
+    'sabedoria': sabedoria,
+    'carisma': carisma,
+  };
+
+  AbilityScores copyWith({
+    int? forca,
+    int? destreza,
+    int? constituicao,
+    int? inteligencia,
+    int? sabedoria,
+    int? carisma,
+  }) => AbilityScores(
+    forca: forca ?? this.forca,
+    destreza: destreza ?? this.destreza,
+    constituicao: constituicao ?? this.constituicao,
+    inteligencia: inteligencia ?? this.inteligencia,
+    sabedoria: sabedoria ?? this.sabedoria,
+    carisma: carisma ?? this.carisma,
+  );
 }
 
 // Classe e nivel
@@ -82,6 +117,36 @@ class CharacterClass {
   final int nivel;
   final int dadoDeVida;
   final String? subclasse;
+
+  factory CharacterClass.fromJson(Map<String, dynamic> json) => CharacterClass(
+    apiKey: json['api_key'] as String? ?? '',
+    nome: json['nome'] as String? ?? '',
+    nivel: (json['nivel'] as num?)?.toInt() ?? 0,
+    dadoDeVida: (json['dado_de_vida'] as num?)?.toInt() ?? 0,
+    subclasse: json['subclasse'] as String?,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'api_key': apiKey,
+    'nome': nome,
+    'nivel': nivel,
+    'dado_de_vida': dadoDeVida,
+    'subclasse': subclasse,
+  };
+
+  CharacterClass copyWith({
+    String? apiKey,
+    String? nome,
+    int? nivel,
+    int? dadoDeVida,
+    String? subclasse,
+  }) => CharacterClass(
+    apiKey: apiKey ?? this.apiKey,
+    nome: nome ?? this.nome,
+    nivel: nivel ?? this.nivel,
+    dadoDeVida: dadoDeVida ?? this.dadoDeVida,
+    subclasse: subclasse ?? this.subclasse,
+  );
 }
 
 class SpellSlot {
@@ -97,8 +162,23 @@ class SpellSlot {
 
   int get livres => total - usados;
 
-  SpellSlot copyWith({int? usados}) =>
-      SpellSlot(circulo: circulo, total: total, usados: usados ?? this.usados);
+  factory SpellSlot.fromJson(Map<String, dynamic> json) => SpellSlot(
+    circulo: (json['circulo'] as num?)?.toInt() ?? 0,
+    total: (json['total'] as num?)?.toInt() ?? 0,
+    usados: (json['usados'] as num?)?.toInt() ?? 0,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'circulo': circulo,
+    'total': total,
+    'usados': usados,
+  };
+
+  SpellSlot copyWith({int? circulo, int? total, int? usados}) => SpellSlot(
+    circulo: circulo ?? this.circulo,
+    total: total ?? this.total,
+    usados: usados ?? this.usados,
+  );
 }
 
 enum EquipSlot {
@@ -152,24 +232,67 @@ class InventoryItem {
   bool get arma => dano != null;
   EquipSlot? get slotEquipavel => slot ?? equipadoEm;
 
+  factory InventoryItem.fromJson(Map<String, dynamic> json) => InventoryItem(
+    id: json['id'] as String? ?? '',
+    nome: json['nome'] as String? ?? '',
+    imagem: json['imagem'] as String? ?? '',
+    quantidade: (json['quantidade'] as num?)?.toInt() ?? 1,
+    pesoKg: (json['peso_kg'] as num?)?.toDouble() ?? 0,
+    equipadoEm: lerEnumOuNulo(EquipSlot.values, json['equipado_em']),
+    slot: lerEnumOuNulo(EquipSlot.values, json['slot']),
+    dano: json['dano'] as String?,
+    tipoDano: json['tipo_dano'] as String?,
+    atributoAtaque: lerEnumOuNulo(Ability.values, json['atributo_ataque']),
+    consumivel: json['consumivel'] as bool? ?? false,
+    descricao: json['descricao'] as String?,
+    bonusCa: (json['bonus_ca'] as num?)?.toInt() ?? 0,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'nome': nome,
+    'imagem': imagem,
+    'quantidade': quantidade,
+    'peso_kg': pesoKg,
+    'equipado_em': equipadoEm?.name,
+    'slot': slot?.name,
+    'dano': dano,
+    'tipo_dano': tipoDano,
+    'atributo_ataque': atributoAtaque?.name,
+    'consumivel': consumivel,
+    'descricao': descricao,
+    'bonus_ca': bonusCa,
+  };
+
   InventoryItem copyWith({
+    String? id,
+    String? nome,
+    String? imagem,
     int? quantidade,
+    double? pesoKg,
     EquipSlot? equipadoEm,
+    EquipSlot? slot,
+    String? dano,
+    String? tipoDano,
+    Ability? atributoAtaque,
+    bool? consumivel,
+    String? descricao,
+    int? bonusCa,
     bool desequipar = false,
   }) => InventoryItem(
-    id: id,
-    nome: nome,
-    imagem: imagem,
+    id: id ?? this.id,
+    nome: nome ?? this.nome,
+    imagem: imagem ?? this.imagem,
     quantidade: quantidade ?? this.quantidade,
-    pesoKg: pesoKg,
+    pesoKg: pesoKg ?? this.pesoKg,
     equipadoEm: desequipar ? null : equipadoEm ?? this.equipadoEm,
-    slot: slotEquipavel,
-    dano: dano,
-    tipoDano: tipoDano,
-    atributoAtaque: atributoAtaque,
-    consumivel: consumivel,
-    descricao: descricao,
-    bonusCa: bonusCa,
+    slot: slot ?? slotEquipavel,
+    dano: dano ?? this.dano,
+    tipoDano: tipoDano ?? this.tipoDano,
+    atributoAtaque: atributoAtaque ?? this.atributoAtaque,
+    consumivel: consumivel ?? this.consumivel,
+    descricao: descricao ?? this.descricao,
+    bonusCa: bonusCa ?? this.bonusCa,
   );
 }
 
@@ -177,6 +300,16 @@ class Condition {
   const Condition({required this.nome, this.rodadas});
   final String nome;
   final int? rodadas;
+
+  factory Condition.fromJson(Map<String, dynamic> json) => Condition(
+    nome: json['nome'] as String? ?? '',
+    rodadas: (json['rodadas'] as num?)?.toInt(),
+  );
+
+  Map<String, dynamic> toJson() => {'nome': nome, 'rodadas': rodadas};
+
+  Condition copyWith({String? nome, int? rodadas}) =>
+      Condition(nome: nome ?? this.nome, rodadas: rodadas ?? this.rodadas);
 }
 
 class Nota {
@@ -205,6 +338,28 @@ class Nota {
   final int dataMs;
 
   DateTime get data => DateTime.fromMillisecondsSinceEpoch(dataMs);
+
+  factory Nota.fromJson(Map<String, dynamic> json) => Nota.fixa(
+    id: json['id'] as String? ?? '',
+    titulo: json['titulo'] as String? ?? '',
+    texto: json['texto'] as String? ?? '',
+    dataMs: (json['data_ms'] as num?)?.toInt() ?? 0,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'titulo': titulo,
+    'texto': texto,
+    'data_ms': dataMs,
+  };
+
+  Nota copyWith({String? id, String? titulo, String? texto, int? dataMs}) =>
+      Nota.fixa(
+        id: id ?? this.id,
+        titulo: titulo ?? this.titulo,
+        texto: texto ?? this.texto,
+        dataMs: dataMs ?? this.dataMs,
+      );
 }
 
 const _atributoMagiaPorClasse = {
@@ -350,6 +505,101 @@ class Character {
   int get bonusCaEquipado =>
       inventario.fold(0, (s, i) => s + (i.equipado ? i.bonusCa : 0));
 
+  factory Character.fromJson(Map<String, dynamic> json) => Character(
+    id: json['id'] as String? ?? '',
+    nome: json['nome'] as String? ?? '',
+    retrato: json['retrato'] as String? ?? '',
+    especie: json['especie'] as String? ?? '',
+    classes: [
+      for (final e in (json['classes'] as List? ?? const []))
+        CharacterClass.fromJson(e as Map<String, dynamic>),
+    ],
+    atributos: AbilityScores.fromJson(
+      json['atributos'] as Map<String, dynamic>,
+    ),
+    xp: (json['xp'] as num?)?.toInt() ?? 0,
+    hpMax: (json['hp_max'] as num?)?.toInt() ?? 0,
+    hpAtual: (json['hp_atual'] as num?)?.toInt() ?? 0,
+    ca: (json['ca'] as num?)?.toInt() ?? 0,
+    deslocamentoM: (json['deslocamento_m'] as num?)?.toDouble() ?? 0,
+    hpTemp: (json['hp_temp'] as num?)?.toInt() ?? 0,
+    salvaguardas: {
+      for (final e in (json['salvaguardas'] as List? ?? const []))
+        ?lerEnumOuNulo(Ability.values, e),
+    },
+    pericias: {
+      for (final e in (json['pericias'] as List? ?? const [])) e as String,
+    },
+    espacosDeMagia: [
+      for (final e in (json['espacos_de_magia'] as List? ?? const []))
+        SpellSlot.fromJson(e as Map<String, dynamic>),
+    ],
+    inventario: [
+      for (final e in (json['inventario'] as List? ?? const []))
+        InventoryItem.fromJson(e as Map<String, dynamic>),
+    ],
+    condicoes: [
+      for (final e in (json['condicoes'] as List? ?? const []))
+        Condition.fromJson(e as Map<String, dynamic>),
+    ],
+    moedas: json['moedas'] == null
+        ? const Moedas()
+        : Moedas.fromJson(json['moedas'] as Map<String, dynamic>),
+    campanhaId: json['campanha_id'] as String?,
+    donoId: json['dono_id'] as String?,
+    ativo: json['ativo'] as bool? ?? false,
+    antecedente: json['antecedente'] as String?,
+    alinhamento: json['alinhamento'] as String?,
+    idiomas: {
+      for (final e in (json['idiomas'] as List? ?? const [])) e as String,
+    },
+    historia: json['historia'] as String? ?? '',
+    magias: {
+      for (final e in (json['magias'] as List? ?? const [])) e as String,
+    },
+    magiasPreparadas: {
+      for (final e in (json['magias_preparadas'] as List? ?? const []))
+        e as String,
+    },
+    inspiracao: json['inspiracao'] as bool? ?? false,
+    notas: [
+      for (final e in (json['notas'] as List? ?? const []))
+        Nota.fromJson(e as Map<String, dynamic>),
+    ],
+  );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'nome': nome,
+    'retrato': retrato,
+    'especie': especie,
+    'classes': [for (final e in classes) e.toJson()],
+    'atributos': atributos.toJson(),
+    'xp': xp,
+    'hp_max': hpMax,
+    'hp_atual': hpAtual,
+    'ca': ca,
+    'deslocamento_m': deslocamentoM,
+    'hp_temp': hpTemp,
+    'salvaguardas': [for (final e in salvaguardas) e.name],
+    'pericias': [...pericias],
+    'espacos_de_magia': [for (final e in espacosDeMagia) e.toJson()],
+    'inventario': [for (final e in inventario) e.toJson()],
+    'condicoes': [for (final e in condicoes) e.toJson()],
+    'moedas': moedas.toJson(),
+    'campanha_id': campanhaId,
+    'dono_id': donoId,
+    'ativo': ativo,
+    'antecedente': antecedente,
+    'alinhamento': alinhamento,
+    'idiomas': [...idiomas],
+    'historia': historia,
+    'magias': [...magias],
+    'magias_preparadas': [...magiasPreparadas],
+    'inspiracao': inspiracao,
+    'notas': [for (final e in notas) e.toJson()],
+  };
+
   Character copyWith({
     String? id,
     String? nome,
@@ -360,9 +610,9 @@ class Character {
     int? xp,
     int? hpMax,
     int? hpAtual,
-    int? hpTemp,
     int? ca,
     double? deslocamentoM,
+    int? hpTemp,
     Set<Ability>? salvaguardas,
     Set<String>? pericias,
     List<SpellSlot>? espacosDeMagia,
@@ -390,9 +640,9 @@ class Character {
     xp: xp ?? this.xp,
     hpMax: hpMax ?? this.hpMax,
     hpAtual: hpAtual ?? this.hpAtual,
-    hpTemp: hpTemp ?? this.hpTemp,
     ca: ca ?? this.ca,
     deslocamentoM: deslocamentoM ?? this.deslocamentoM,
+    hpTemp: hpTemp ?? this.hpTemp,
     salvaguardas: salvaguardas ?? this.salvaguardas,
     pericias: pericias ?? this.pericias,
     espacosDeMagia: espacosDeMagia ?? this.espacosDeMagia,
@@ -419,4 +669,22 @@ class Moedas {
   final int ouro;
   final int prata;
   final int cobre;
+
+  factory Moedas.fromJson(Map<String, dynamic> json) => Moedas(
+    ouro: (json['ouro'] as num?)?.toInt() ?? 0,
+    prata: (json['prata'] as num?)?.toInt() ?? 0,
+    cobre: (json['cobre'] as num?)?.toInt() ?? 0,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'ouro': ouro,
+    'prata': prata,
+    'cobre': cobre,
+  };
+
+  Moedas copyWith({int? ouro, int? prata, int? cobre}) => Moedas(
+    ouro: ouro ?? this.ouro,
+    prata: prata ?? this.prata,
+    cobre: cobre ?? this.cobre,
+  );
 }

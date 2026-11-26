@@ -1,3 +1,5 @@
+import 'package:grimorio/model/json.dart';
+
 enum EdicaoRegras {
   srd2014('SRD 5.1 (2014)'),
   srd2024('SRD 5.2 (2024)');
@@ -60,6 +62,36 @@ class Usuario {
   final bool confirmarApagar;
   final DateTime? compendioAtualizadoEm;
 
+  factory Usuario.fromJson(Map<String, dynamic> json) => Usuario(
+    id: json['id'] as String? ?? '',
+    nome: json['nome'] as String? ?? '',
+    email: json['email'] as String? ?? '',
+    avatar: json['avatar'] as String?,
+    papel: lerEnum(PapelMesa.values, json['papel'], PapelMesa.jogador),
+    edicao: lerEnum(EdicaoRegras.values, json['edicao'], EdicaoRegras.srd2014),
+    magia: lerEnum(SistemaMagia.values, json['magia'], SistemaMagia.espacos),
+    subida: lerEnum(SubidaNivel.values, json['subida'], SubidaNivel.xp),
+    dicasBonus: json['dicas_bonus'] as bool? ?? true,
+    vibrar: json['vibrar'] as bool? ?? true,
+    confirmarApagar: json['confirmar_apagar'] as bool? ?? true,
+    compendioAtualizadoEm: lerDataOuNulo(json['compendio_atualizado_em']),
+  );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'nome': nome,
+    'email': email,
+    'avatar': avatar,
+    'papel': papel.name,
+    'edicao': edicao.name,
+    'magia': magia.name,
+    'subida': subida.name,
+    'dicas_bonus': dicasBonus,
+    'vibrar': vibrar,
+    'confirmar_apagar': confirmarApagar,
+    'compendio_atualizado_em': compendioAtualizadoEm?.toIso8601String(),
+  };
+
   Usuario copyWith({
     String? id,
     String? nome,
@@ -73,21 +105,18 @@ class Usuario {
     bool? vibrar,
     bool? confirmarApagar,
     DateTime? compendioAtualizadoEm,
-  }) {
-    return Usuario(
-      id: id ?? this.id,
-      nome: nome ?? this.nome,
-      email: email ?? this.email,
-      avatar: avatar ?? this.avatar,
-      papel: papel ?? this.papel,
-      edicao: edicao ?? this.edicao,
-      magia: magia ?? this.magia,
-      subida: subida ?? this.subida,
-      dicasBonus: dicasBonus ?? this.dicasBonus,
-      vibrar: vibrar ?? this.vibrar,
-      confirmarApagar: confirmarApagar ?? this.confirmarApagar,
-      compendioAtualizadoEm:
-          compendioAtualizadoEm ?? this.compendioAtualizadoEm,
-    );
-  }
+  }) => Usuario(
+    id: id ?? this.id,
+    nome: nome ?? this.nome,
+    email: email ?? this.email,
+    avatar: avatar ?? this.avatar,
+    papel: papel ?? this.papel,
+    edicao: edicao ?? this.edicao,
+    magia: magia ?? this.magia,
+    subida: subida ?? this.subida,
+    dicasBonus: dicasBonus ?? this.dicasBonus,
+    vibrar: vibrar ?? this.vibrar,
+    confirmarApagar: confirmarApagar ?? this.confirmarApagar,
+    compendioAtualizadoEm: compendioAtualizadoEm ?? this.compendioAtualizadoEm,
+  );
 }
