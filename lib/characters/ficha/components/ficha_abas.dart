@@ -12,25 +12,32 @@ const abasFicha = [
 ];
 
 class FichaAbas extends StatelessWidget {
-  const FichaAbas({super.key, required this.aba, required this.onAba});
+  const FichaAbas({
+    super.key,
+    required this.aba,
+    required this.onAba,
+    this.abas = abasFicha,
+  });
 
   final int aba;
   final ValueChanged<int> onAba;
+  final List<String> abas;
 
   @override
   Widget build(BuildContext context) {
     return SliverPersistentHeader(
       pinned: true,
-      delegate: _Delegate(aba: aba, onAba: onAba),
+      delegate: _Delegate(aba: aba, onAba: onAba, abas: abas),
     );
   }
 }
 
 class _Delegate extends SliverPersistentHeaderDelegate {
-  _Delegate({required this.aba, required this.onAba});
+  _Delegate({required this.aba, required this.onAba, required this.abas});
 
   final int aba;
   final ValueChanged<int> onAba;
+  final List<String> abas;
 
   static const _altura = 48.0;
 
@@ -41,7 +48,8 @@ class _Delegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => _altura;
 
   @override
-  bool shouldRebuild(_Delegate old) => old.aba != aba || old.onAba != onAba;
+  bool shouldRebuild(_Delegate old) =>
+      old.aba != aba || old.onAba != onAba || old.abas != abas;
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlaps) {
@@ -61,7 +69,7 @@ class _Delegate extends SliverPersistentHeaderDelegate {
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.small),
         child: Row(
           children: [
-            for (var i = 0; i < abasFicha.length; i++)
+            for (var i = 0; i < abas.length; i++)
               InkWell(
                 onTap: () => onAba(i),
                 child: Container(
@@ -79,7 +87,7 @@ class _Delegate extends SliverPersistentHeaderDelegate {
                     ),
                   ),
                   child: Text(
-                    abasFicha[i],
+                    abas[i],
                     style: textTheme.labelLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: i == aba

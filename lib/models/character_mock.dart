@@ -76,6 +76,7 @@ const personagemAtivoMock = Character(
   condicoes: [Condition(nome: 'Envenenada', rodadas: 2)],
   moedas: Moedas(ouro: 12, prata: 34, cobre: 8),
   campanhaId: 'sombras-de-valfenda',
+  donoId: 'u_gustavo',
   ativo: true,
   antecedente: 'Acólito',
   alinhamento: 'Neutro e Bom',
@@ -122,4 +123,110 @@ const personagemAtivoMock = Character(
   ],
 );
 
+const thorgarMock = Character(
+  id: 'thorgar',
+  nome: 'Thorgar',
+  retrato: AppImages.especieAnaoM,
+  especie: 'Anão',
+  classes: [
+    CharacterClass(
+      apiKey: 'srd_barbarian',
+      nome: 'Bárbaro',
+      nivel: 5,
+      dadoDeVida: 12,
+    ),
+  ],
+  atributos: AbilityScores(
+    forca: 18,
+    destreza: 12,
+    constituicao: 16,
+    inteligencia: 8,
+    sabedoria: 12,
+    carisma: 10,
+  ),
+  xp: 7800,
+  hpMax: 61,
+  hpAtual: 52,
+  ca: 15,
+  deslocamentoM: 7.5,
+  salvaguardas: {Ability.forca, Ability.constituicao},
+  pericias: {'Atletismo', 'Intimidação'},
+  campanhaId: 'sombras-de-valfenda',
+  donoId: 'u_ana',
+);
+
+const mirelaMock = Character(
+  id: 'mirela',
+  nome: 'Mirela',
+  retrato: AppImages.especieTieflingF,
+  especie: 'Tiefling',
+  classes: [
+    CharacterClass(
+      apiKey: 'srd_warlock',
+      nome: 'Bruxa',
+      nivel: 5,
+      dadoDeVida: 8,
+    ),
+  ],
+  atributos: AbilityScores(
+    forca: 8,
+    destreza: 14,
+    constituicao: 14,
+    inteligencia: 12,
+    sabedoria: 10,
+    carisma: 18,
+  ),
+  xp: 14200,
+  hpMax: 38,
+  hpAtual: 23,
+  ca: 13,
+  deslocamentoM: 9,
+  salvaguardas: {Ability.sabedoria, Ability.carisma},
+  pericias: {'Arcanismo', 'Enganação'},
+  espacosDeMagia: [SpellSlot(circulo: 3, total: 2, usados: 1)],
+  campanhaId: 'sombras-de-valfenda',
+  donoId: 'u_caio',
+);
+
+const kaelMock = Character(
+  id: 'kael',
+  nome: 'Kael',
+  retrato: AppImages.especieHumanoM,
+  especie: 'Humano',
+  classes: [
+    CharacterClass(
+      apiKey: 'srd_rogue',
+      nome: 'Ladino',
+      nivel: 1,
+      dadoDeVida: 8,
+    ),
+  ],
+  atributos: AbilityScores(
+    forca: 10,
+    destreza: 16,
+    constituicao: 12,
+    inteligencia: 13,
+    sabedoria: 12,
+    carisma: 14,
+  ),
+  xp: 0,
+  hpMax: 9,
+  hpAtual: 9,
+  ca: 14,
+  deslocamentoM: 9,
+  salvaguardas: {Ability.destreza, Ability.inteligencia},
+  pericias: {'Furtividade', 'Prestidigitação'},
+  campanhaId: 'o-trono-de-cinzas',
+  donoId: 'u_lia',
+);
+
+// Só os heróis do usuário (donoId 'u_gustavo'): é o que a aba Heróis mostra.
 const personagensMock = [personagemAtivoMock];
+
+// Todos os heróis das campanhas, inclusive os de outros jogadores.
+const todosPersonagensMock = [
+  personagemAtivoMock,
+  thorgarMock,
+  mirelaMock,
+  kaelMock,
+];

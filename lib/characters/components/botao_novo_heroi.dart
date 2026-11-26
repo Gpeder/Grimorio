@@ -6,7 +6,7 @@ class BotaoNovoHeroi extends StatelessWidget {
 
   final VoidCallback? onPressed;
 
-  static const _acimaDaBarra = 80.0;
+  static const _acimaDaBarra = 110.0;
 
   @override
   Widget build(BuildContext context) {

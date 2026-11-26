@@ -239,6 +239,7 @@ class Character {
     this.condicoes = const [],
     this.moedas = const Moedas(),
     this.campanhaId,
+    this.donoId,
     this.ativo = false,
     this.antecedente,
     this.alinhamento,
@@ -269,6 +270,7 @@ class Character {
   final List<Condition> condicoes;
   final Moedas moedas;
   final String? campanhaId;
+  final String? donoId;
   final bool ativo;
   final String? antecedente;
   final String? alinhamento;
@@ -432,6 +434,32 @@ class Character {
     );
   }
 
+  // Item repetido soma na quantidade em vez de criar outra linha.
+  Character receberItem(InventoryItem item) {
+    final existe = inventario.any((i) => i.id == item.id);
+    if (!existe) return copyWith(inventario: [...inventario, item]);
+    return copyWith(
+      inventario: [
+        for (final i in inventario)
+          i.id == item.id
+              ? i.copyWith(quantidade: i.quantidade + item.quantidade)
+              : i,
+      ],
+    );
+  }
+
+  Character removerUmaUnidade(String itemId) {
+    final item = inventario.where((i) => i.id == itemId).firstOrNull;
+    if (item == null) return this;
+    if (item.quantidade <= 1) return removerItem(itemId);
+    return copyWith(
+      inventario: [
+        for (final i in inventario)
+          i.id == itemId ? i.copyWith(quantidade: i.quantidade - 1) : i,
+      ],
+    );
+  }
+
   Character definirMoedas(Moedas valor) => copyWith(moedas: valor);
 
   Character definirHpTemp(int valor) => copyWith(hpTemp: valor < 0 ? 0 : valor);
@@ -494,6 +522,7 @@ class Character {
     List<Condition>? condicoes,
     Moedas? moedas,
     String? campanhaId,
+    String? donoId,
     bool? ativo,
     String? antecedente,
     String? alinhamento,
@@ -523,6 +552,7 @@ class Character {
     condicoes: condicoes ?? this.condicoes,
     moedas: moedas ?? this.moedas,
     campanhaId: campanhaId ?? this.campanhaId,
+    donoId: donoId ?? this.donoId,
     ativo: ativo ?? this.ativo,
     antecedente: antecedente ?? this.antecedente,
     alinhamento: alinhamento ?? this.alinhamento,

@@ -15,12 +15,12 @@ class Characters extends StatefulWidget {
   const Characters({
     super.key,
     this.personagens = personagensMock,
-    this.campanhas = campanhasMock,
+    this.campanhas,
     this.onNovoHeroi,
   });
 
   final List<Character> personagens;
-  final List<Campaign> campanhas;
+  final List<Campaign>? campanhas;
   final VoidCallback? onNovoHeroi;
 
   @override
@@ -79,7 +79,7 @@ class _CharactersState extends State<Characters> {
           for (final p in _personagens)
             if (p.nome.toLowerCase().contains(busca)) p,
         ],
-        campanhas: widget.campanhas,
+        campanhas: widget.campanhas ?? campanhasMock,
         onAbrir: _abrirFicha,
       ),
     ];

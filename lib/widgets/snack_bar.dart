@@ -37,7 +37,7 @@ void mostrarAviso(
         AppSpacing.medium,
         0,
         AppSpacing.medium,
-        acimaDaBarra ? 96 : AppSpacing.medium,
+        acimaDaBarra ? 110 : AppSpacing.medium,
       ),
       content: Container(
         decoration: BoxDecoration(

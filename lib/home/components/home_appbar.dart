@@ -1,10 +1,12 @@
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
+import 'package:grimorio/app/app_shell.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/widgets/image_bg.dart';
 import 'package:grimorio/widgets/avatar_circle.dart';
+import 'package:pixelarticons/pixel.dart';
 
 class HomeAppbar extends StatelessWidget {
   const HomeAppbar({
@@ -123,6 +125,21 @@ class _ConteudoDaBarra extends StatelessWidget {
                   height: alturaDaLogo,
                   fit: BoxFit.contain,
                   filterQuality: FilterQuality.none,
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: IconButton(
+                    tooltip: 'Ajustes',
+                    onPressed: () =>
+                        AppShell.irPara(context, AppShell.abaAjustes),
+                    icon: const Icon(
+                      Pixel.settingscog,
+                      color: AppColors.secondary,
+                    ),
+                  ),
                 ),
               ),
             ],

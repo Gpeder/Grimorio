@@ -410,7 +410,8 @@ const _raioDeFogo = SpellOption(
   componentes: 'V, S',
   duracao: 'Instantânea',
   descricao: 'Você arremessa um cisco de fogo numa criatura ou objeto dentro do alcance. Faça um ataque mágico à distância; se acertar, o alvo sofre 1d10 de dano de fogo. Um objeto inflamável atingido pega fogo se não estiver sendo vestido ou carregado.',
-  superior: 'O dano aumenta em 1d10 nos níveis 5 (2d10), 11 (3d10) e 17 (4d10).',
+  superior:
+      'O dano aumenta em 1d10 nos níveis 5 (2d10), 11 (3d10) e 17 (4d10).',
   classes: ['Feiticeiro', 'Mago'],
 );
 const _raioDeGelo = SpellOption(
@@ -466,7 +467,15 @@ const _detectarMagia = SpellOption(
   componentes: 'V, S',
   duracao: 'Concentração, até 10 minutos',
   descricao: 'Você sente a presença de magia a até 9 metros. Se sentir, pode usar sua ação para ver uma aura tênue ao redor de qualquer criatura ou objeto visível na área que carregue magia e descobrir a escola dela, se houver. A magia atravessa a maioria das barreiras, mas é bloqueada por 30 cm de pedra, 2,5 cm de metal comum, uma folha fina de chumbo ou 90 cm de madeira ou terra.',
-  classes: ['Bardo', 'Clérigo', 'Druida', 'Feiticeiro', 'Mago', 'Paladino', 'Patrulheiro'],
+  classes: [
+    'Bardo',
+    'Clérigo',
+    'Druida',
+    'Feiticeiro',
+    'Mago',
+    'Paladino',
+    'Patrulheiro',
+  ],
   concentracao: true,
   ritual: true,
 );
@@ -506,7 +515,8 @@ const _sono = SpellOption(
   linha: '1 ação · 27 m',
   tempo: '1 ação',
   alcance: '27 m',
-  componentes: 'V, S, M (uma pitada de areia fina, pétalas de rosa ou um grilo)',
+  componentes:
+      'V, S, M (uma pitada de areia fina, pétalas de rosa ou um grilo)',
   duracao: '1 minuto',
   descricao: 'A magia põe criaturas num sono mágico numa esfera de 6 metros de raio. Role 5d8: o total é quantos pontos de vida de criaturas ela afeta, começando pela de menos PV atuais. Cada criatura afetada cai inconsciente até a magia acabar, sofrer dano ou alguém usar uma ação para acordá-la. Mortos-vivos e criaturas imunes a enfeitiçamento não são afetados.',
   superior: '+2d8 para cada círculo acima do 1º.',
