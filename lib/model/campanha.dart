@@ -130,9 +130,6 @@ class Campanha {
   );
 }
 
-// volta das telas de campanha
-typedef RetornoCampanha = ({Campanha campanha, List<Personagem> herois});
-
 typedef RetornoMissao = ({
   Missao missao,
   List<Personagem> herois,

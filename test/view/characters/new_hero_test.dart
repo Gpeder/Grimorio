@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart' hide Characters;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:grimorio/app/theme/app_theme.dart';
 import 'package:grimorio/view/characters/characters.dart';
 import 'package:grimorio/view/characters/ficha/ficha.dart';
 import 'package:grimorio/view/characters/new_hero/new_hero.dart';
+
+import '../../helpers/app_teste.dart';
 
 void main() {
   group('tela', () {
@@ -24,18 +25,14 @@ void main() {
         tester.widget(find.widgetWithText(ElevatedButton, 'Continuar'));
 
     testWidgets('abre no passo 1 com o Continuar desabilitado', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(theme: AppTheme.dark, home: const NewHero()),
-      );
+      await tester.pumpWidget(telaDeTeste(const NewHero()));
 
       expect(find.text('PASSO 1 DE 9'), findsOneWidget);
       expect(continuar(tester).onPressed, isNull);
     });
 
     testWidgets('escolher Elfo libera o Continuar', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(theme: AppTheme.dark, home: const NewHero()),
-      );
+      await tester.pumpWidget(telaDeTeste(const NewHero()));
 
       await tester.tap(find.text('Elfo'));
       await tester.pump();
@@ -46,9 +43,7 @@ void main() {
     testWidgets('cria um Clérigo Elfo e ele aparece como ativo', (
       tester,
     ) async {
-      await tester.pumpWidget(
-        MaterialApp(theme: AppTheme.dark, home: const Characters()),
-      );
+      await tester.pumpWidget(telaDeTeste(const Characters()));
 
       Future<void> tocar(String texto) async {
         final alvo = find.text(texto).first;

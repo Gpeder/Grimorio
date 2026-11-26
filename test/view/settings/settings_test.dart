@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:grimorio/app/theme/app_theme.dart';
 import 'package:grimorio/model/campanha_mock.dart';
 import 'package:grimorio/model/personagem_mock.dart';
 import 'package:grimorio/model/usuario.dart';
@@ -9,15 +8,15 @@ import 'package:grimorio/view/settings/components/ajuste_tile.dart';
 import 'package:grimorio/view/settings/components/perfil_card.dart';
 import 'package:grimorio/view/settings/settings.dart';
 
+import '../../helpers/app_teste.dart';
+
 void main() {
   Future<void> abrir(WidgetTester tester) async {
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
 
-    await tester.pumpWidget(
-      MaterialApp(theme: AppTheme.dark, home: const Settings()),
-    );
+    await tester.pumpWidget(telaDeTeste(const Settings()));
   }
 
   Future<void> tocar(WidgetTester tester, Finder alvo) async {

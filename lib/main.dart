@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:grimorio/app/app_shell.dart';
-
-import 'app/theme/app_theme.dart';
+import 'package:grimorio/app/providers/app_providers.dart';
+import 'package:grimorio/app/theme/app_theme.dart';
 
 void main() {
-  runApp(const ProviderScope(child: GrimorioApp()));
+  runApp(const GrimorioApp());
 }
 
 class GrimorioApp extends StatelessWidget {
@@ -13,12 +12,14 @@ class GrimorioApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Grimório RPG',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark,
-      themeMode: ThemeMode.dark,
-      home: const AppShell(),
+    return AppProviders(
+      child: MaterialApp(
+        title: 'Grimório RPG',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.dark,
+        themeMode: ThemeMode.dark,
+        home: const AppShell(),
+      ),
     );
   }
 }

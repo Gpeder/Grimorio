@@ -50,12 +50,4 @@ class GerenciadorCampanhas {
   List<Campanha> trocar(List<Campanha> campanhas, Campanha nova) => [
     for (final c in campanhas) c.id == nova.id ? nova : c,
   ];
-
-  List<Personagem> trocarHerois(
-    List<Personagem> personagens,
-    List<Personagem> alterados,
-  ) {
-    final porId = {for (final h in alterados) h.id: h};
-    return [for (final p in personagens) porId[p.id] ?? p];
-  }
 }

@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/controller/campaign/gerenciador_campanhas.dart';
+import 'package:grimorio/controller/campaign/campanhas_provider.dart';
+import 'package:grimorio/controller/characters/personagens_provider.dart';
+import 'package:grimorio/controller/settings/usuario_provider.dart';
 import 'package:grimorio/model/campanha.dart';
-import 'package:grimorio/model/campanha_mock.dart';
 import 'package:grimorio/model/personagem.dart';
-import 'package:grimorio/model/personagem_mock.dart';
-import 'package:grimorio/model/usuario_mock.dart';
 import 'package:grimorio/view/campaign/components/campanha_card.dart';
 import 'package:grimorio/view/campaign/components/codigo_dialog.dart';
 import 'package:grimorio/view/campaign/components/nova_campanha_sheet.dart';
@@ -16,6 +15,7 @@ import 'package:grimorio/view/campaign/mestre/campanha_mestre.dart';
 import 'package:grimorio/widgets/image_frame.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
 import 'package:pixelarticons/pixel.dart';
+import 'package:provider/provider.dart';
 
 class Campaign extends StatefulWidget {
   const Campaign({super.key});
@@ -25,22 +25,20 @@ class Campaign extends StatefulWidget {
 }
 
 class _CampanhaState extends State<Campaign> {
-  late List<Campanha> _campanhas = [...campanhasMock];
-  late List<Personagem> _personagens = [...todosPersonagensMock];
-
   static const _acimaDaBarra = 110.0;
-  static const _gerenciador = GerenciadorCampanhas();
 
   void _aviso(String texto, {Snackbar tipo = Snackbar.info}) =>
       mostrarAviso(context, texto, tipo: tipo, acimaDaBarra: true);
 
   List<Personagem> _heroisDe(Campanha c) =>
-      _gerenciador.heroisDe(c, _personagens);
+      context.read<PersonagensProvider>().daCampanha(c);
+
+  String get _usuarioId => context.read<UsuarioProvider>().usuario.id;
 
   Future<void> _entrarComCodigo() async {
     final codigo = await pedirCodigo(context);
     if (codigo == null || !mounted) return;
-    final campanha = _gerenciador.buscarPorCodigo(_campanhas, codigo);
+    final campanha = context.read<CampanhasProvider>().buscarPorCodigo(codigo);
     if (campanha == null) {
       _aviso('Código não encontrado', tipo: Snackbar.erro);
     } else {
@@ -51,41 +49,30 @@ class _CampanhaState extends State<Campaign> {
   Future<void> _novaCampanha() async {
     final nova = await pedirNovaCampanha(context);
     if (nova == null || !mounted) return;
-    final campanha = _gerenciador.criar(
+    final campanha = context.read<CampanhasProvider>().criar(
       nome: nova.nome,
       capitulo: nova.capitulo,
-      mestreId: usuarioMock.id,
-      agora: DateTime.now(),
+      mestreId: _usuarioId,
     );
-    setState(() => _campanhas = [..._campanhas, campanha]);
     _aviso('${campanha.nome} criada', tipo: Snackbar.sucesso);
   }
 
-  Future<void> _abrir(Campanha c) async {
-    final herois = _heroisDe(c);
-    final tela = c.papelDe(usuarioMock.id) == PapelCampanha.mestre
-        ? CampanhaMestre(campanha: c, herois: herois)
-        : CampanhaHeroi(
-            campanha: c,
-            heroi: _gerenciador.heroiDoUsuario(herois, usuarioMock.id),
-            grupo: herois,
-          );
-
-    final r = await Navigator.of(
+  void _abrir(Campanha c) {
+    final tela = c.papelDe(_usuarioId) == PapelCampanha.mestre
+        ? CampanhaMestre(campanhaId: c.id)
+        : CampanhaHeroi(campanhaId: c.id);
+    Navigator.of(
       context,
       rootNavigator: true,
-    ).push<RetornoCampanha>(MaterialPageRoute(builder: (_) => tela));
-    if (r == null || !mounted) return;
-
-    setState(() {
-      _campanhas = _gerenciador.trocar(_campanhas, r.campanha);
-      _personagens = _gerenciador.trocarHerois(_personagens, r.herois);
-    });
+    ).push<void>(MaterialPageRoute(builder: (_) => tela));
   }
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final campanhas = context.watch<CampanhasProvider>().campanhas;
+    context.watch<PersonagensProvider>();
+    final usuarioId = context.watch<UsuarioProvider>().usuario.id;
 
     return Scaffold(
       floatingActionButton: Padding(
@@ -120,13 +107,13 @@ class _CampanhaState extends State<Campaign> {
               label: const Text('Entrar com código do Mestre'),
             ),
             const SizedBox(height: AppSpacing.large),
-            if (_campanhas.isEmpty)
+            if (campanhas.isEmpty)
               const _Vazio()
             else
-              for (final c in _campanhas) ...[
+              for (final c in campanhas) ...[
                 CampanhaCard(
                   campanha: c,
-                  papel: c.papelDe(usuarioMock.id),
+                  papel: c.papelDe(usuarioId),
                   herois: _heroisDe(c),
                   onTap: () => _abrir(c),
                 ),

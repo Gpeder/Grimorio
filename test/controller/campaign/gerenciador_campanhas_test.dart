@@ -44,11 +44,4 @@ void main() {
     expect(herois, isNotEmpty);
     expect(herois.every((h) => h.campanhaId == c.id), isTrue);
   });
-
-  test('trocarHerois mantém quem não mudou', () {
-    final kael = todosPersonagensMock.last.copyWith(xp: 1);
-    final lista = campanhas.trocarHerois(todosPersonagensMock, [kael]);
-    expect(lista, hasLength(todosPersonagensMock.length));
-    expect(lista.last.xp, 1);
-  });
 }

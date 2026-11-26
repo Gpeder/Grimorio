@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
+import 'package:grimorio/controller/campaign/campanhas_provider.dart';
+import 'package:grimorio/controller/campaign/gerenciador_campanhas.dart';
 import 'package:grimorio/controller/campaign/gerenciador_visibilidade.dart';
+import 'package:grimorio/controller/characters/personagens_provider.dart';
+import 'package:grimorio/controller/settings/usuario_provider.dart';
 import 'package:grimorio/model/campanha.dart';
 import 'package:grimorio/model/personagem.dart';
 import 'package:grimorio/model/usuario_mock.dart';
@@ -14,26 +18,20 @@ import 'package:grimorio/view/campaign/heroi/components/missoes_heroi_tab.dart';
 import 'package:grimorio/view/campaign/missao/detalhes_missao.dart';
 import 'package:grimorio/view/characters/ficha/components/ficha_tabs.dart';
 import 'package:grimorio/view/characters/ficha/ficha.dart';
+import 'package:grimorio/widgets/estado_nao_encontrado.dart';
 import 'package:pixelarticons/pixel.dart';
+import 'package:provider/provider.dart';
 
 const _abas = ['Missões', 'Grupo', 'Diário'];
 
 class CampanhaHeroi extends StatefulWidget {
   const CampanhaHeroi({
     super.key,
-    required this.campanha,
-    required this.heroi,
-    this.grupo = const [],
+    required this.campanhaId,
     this.modoPrevia = false,
   });
 
-  final Campanha campanha;
-
-  // heroi do usuario
-  final Personagem? heroi;
-
-  // todos da campanha
-  final List<Personagem> grupo;
+  final String campanhaId;
 
   // ver como herói do mestre, so leitura
   final bool modoPrevia;
@@ -45,26 +43,35 @@ class CampanhaHeroi extends StatefulWidget {
 class _CampanhaHeroiState extends State<CampanhaHeroi> {
   static const _papel = PapelCampanha.heroi;
 
-  late Personagem? _heroi = widget.heroi;
   int _aba = 0;
 
-  Campanha get _c => widget.campanha;
+  static const _campanhas = GerenciadorCampanhas();
 
-  void _sair() => Navigator.pop<RetornoCampanha>(context, (
-    campanha: _c,
-    herois: [?_heroi],
-  ));
+  Campanha get _c =>
+      context.read<CampanhasProvider>().porId(widget.campanhaId)!;
 
-  Future<void> _abrirFicha(Personagem heroi) async {
-    final atualizado = await Navigator.of(context).push<Personagem>(
-      MaterialPageRoute(builder: (_) => Ficha(personagem: heroi)),
-    );
-    if (atualizado == null || !mounted) return;
-    setState(() => _heroi = atualizado);
+  // todos da campanha
+  List<Personagem> get _grupo =>
+      context.read<PersonagensProvider>().daCampanha(_c);
+
+  // na previa o mestre ve o primeiro heroi
+  Personagem? get _heroi => widget.modoPrevia
+      ? _grupo.firstOrNull
+      : _campanhas.heroiDoUsuario(
+          _grupo,
+          context.read<UsuarioProvider>().usuario.id,
+        );
+
+  void _sair() => Navigator.pop(context);
+
+  void _abrirFicha(Personagem heroi) {
+    Navigator.of(
+      context,
+    ).push<void>(MaterialPageRoute(builder: (_) => Ficha(personagem: heroi)));
   }
 
   void _abrirMissao(Missao m) {
-    Navigator.of(context).push<RetornoMissao>(
+    Navigator.of(context).push<void>(
       MaterialPageRoute(
         builder: (_) => DetalhesMissao(
           missao: m,
@@ -85,7 +92,7 @@ class _CampanhaHeroiState extends State<CampanhaHeroi> {
     ),
     1 => GrupoTab(
       outros: [
-        for (final h in widget.grupo)
+        for (final h in _grupo)
           if (h.id != _heroi?.id) h,
       ],
     ),
@@ -97,6 +104,10 @@ class _CampanhaHeroiState extends State<CampanhaHeroi> {
 
   @override
   Widget build(BuildContext context) {
+    // reconstroi quando campanha ou herois mudam
+    final c = context.watch<CampanhasProvider>().porId(widget.campanhaId);
+    context.watch<PersonagensProvider>();
+    if (c == null) return const EstadoNaoEncontrado();
     final heroi = _heroi;
     final previa = widget.modoPrevia;
 
@@ -163,7 +174,7 @@ class _CampanhaHeroiState extends State<CampanhaHeroi> {
       );
     }
 
-    return PopScope<RetornoCampanha>(
+    return PopScope<void>(
       canPop: false,
       onPopInvokedWithResult: (saiu, _) {
         if (!saiu) _sair();

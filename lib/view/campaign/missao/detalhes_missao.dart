@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
+import 'package:grimorio/controller/campaign/campanhas_provider.dart';
 import 'package:grimorio/controller/campaign/formatos.dart';
 import 'package:grimorio/controller/campaign/gerenciador_missoes.dart';
 import 'package:grimorio/controller/campaign/gerenciador_visibilidade.dart';
+import 'package:grimorio/controller/characters/personagens_provider.dart';
 import 'package:grimorio/model/campanha.dart';
 import 'package:grimorio/model/compendio.dart';
 import 'package:grimorio/model/personagem.dart';
@@ -17,6 +19,7 @@ import 'package:grimorio/view/characters/ficha/components/numero_dialog.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
 import 'package:pixelarticons/pixel.dart';
+import 'package:provider/provider.dart';
 
 class DetalhesMissao extends StatefulWidget {
   const DetalhesMissao({
@@ -50,7 +53,17 @@ class _DetalhesMissaoState extends State<DetalhesMissao> {
 
   bool get _mestre => widget.papel == PapelCampanha.mestre;
 
-  void _sair() => Navigator.pop<RetornoMissao>(context, _missoes.retorno);
+  // mestre grava a missao e os herois na mesa
+  void _sair() {
+    if (_mestre) {
+      context.read<CampanhasProvider>().naMesa(
+        _m.campanhaId,
+        context.read<PersonagensProvider>(),
+        (mesa) => mesa.aplicarMissao(_missoes.retorno),
+      );
+    }
+    Navigator.pop(context);
+  }
 
   Future<void> _acaoEntrada(EntradaMissao e, AcaoEntrada acao) async {
     switch (acao) {
@@ -138,7 +151,7 @@ class _DetalhesMissaoState extends State<DetalhesMissao> {
     final envolvidos = _visibilidade.envolvidos(_m, widget.npcs, papel);
     final rodape = _mestre && _m.ativa;
 
-    return PopScope<RetornoMissao>(
+    return PopScope<void>(
       canPop: false,
       onPopInvokedWithResult: (saiu, _) {
         if (!saiu) _sair();

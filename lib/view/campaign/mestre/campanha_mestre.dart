@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
+import 'package:grimorio/controller/campaign/campanhas_provider.dart';
 import 'package:grimorio/controller/campaign/formatos.dart';
 import 'package:grimorio/controller/campaign/gerenciador_mesa.dart';
+import 'package:grimorio/controller/characters/personagens_provider.dart';
 import 'package:grimorio/model/campanha.dart';
 import 'package:grimorio/model/personagem.dart';
 import 'package:grimorio/view/campaign/components/campanha_header.dart';
@@ -18,22 +20,17 @@ import 'package:grimorio/view/campaign/mestre/components/sessoes_tab.dart';
 import 'package:grimorio/view/campaign/missao/detalhes_missao.dart';
 import 'package:grimorio/view/characters/ficha/components/ficha_tabs.dart';
 import 'package:grimorio/view/characters/ficha/components/titulo_secao.dart';
+import 'package:grimorio/widgets/estado_nao_encontrado.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
 import 'package:pixelarticons/pixel.dart';
+import 'package:provider/provider.dart';
 
 const _abas = ['Mesa', 'Missões', 'Mundo', 'Sessões', 'Notas'];
 
 class CampanhaMestre extends StatefulWidget {
-  const CampanhaMestre({
-    super.key,
-    required this.campanha,
-    this.herois = const [],
-  });
+  const CampanhaMestre({super.key, required this.campanhaId});
 
-  final Campanha campanha;
-
-  // herois da campanha
-  final List<Personagem> herois;
+  final String campanhaId;
 
   @override
   State<CampanhaMestre> createState() => _CampanhaMestreState();
@@ -42,17 +39,19 @@ class CampanhaMestre extends StatefulWidget {
 class _CampanhaMestreState extends State<CampanhaMestre> {
   static const _papel = PapelCampanha.mestre;
 
-  late final _mesa = GerenciadorMesa(
-    campanha: widget.campanha,
-    herois: widget.herois,
-  );
   int _aba = 0;
 
-  Campanha get _c => _mesa.campanha;
-  List<Personagem> get _herois => _mesa.herois;
+  // dados sempre do provider
+  Campanha get _c =>
+      context.read<CampanhasProvider>().porId(widget.campanhaId)!;
+  List<Personagem> get _herois =>
+      context.read<PersonagensProvider>().daCampanha(_c);
 
-  void _sair() =>
-      Navigator.pop<RetornoCampanha>(context, (campanha: _c, herois: _herois));
+  void _naMesa(void Function(GerenciadorMesa mesa) acao) => context
+      .read<CampanhasProvider>()
+      .naMesa(widget.campanhaId, context.read<PersonagensProvider>(), acao);
+
+  void _sair() => Navigator.pop(context);
 
   void _aviso(String texto, {Snackbar tipo = Snackbar.info}) =>
       mostrarAviso(context, texto, tipo: tipo);
@@ -61,7 +60,7 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
 
   void _iniciarSessao() {
     var numero = 0;
-    setState(() => numero = _mesa.iniciarSessao());
+    _naMesa((mesa) => numero = mesa.iniciarSessao());
     _aviso('Sessão $numero iniciada', tipo: Snackbar.sucesso);
   }
 
@@ -74,7 +73,7 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
       builder: (_) => _EncerrarSheet(numero: numero),
     );
     if (resumo == null || !mounted) return;
-    setState(() => _mesa.encerrarSessao(resumo));
+    _naMesa((mesa) => mesa.encerrarSessao(resumo));
     _aviso('Sessão $numero encerrada', tipo: Snackbar.sucesso);
   }
 
@@ -83,7 +82,7 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
   Future<void> _darXp(Set<String> marcados) async {
     final r = await pedirXp(context, herois: _herois, marcados: marcados);
     if (r == null || !mounted) return;
-    setState(() => _mesa.darXp(r.valor, r.heroiIds));
+    _naMesa((mesa) => mesa.darXp(r.valor, r.heroiIds));
     _aviso('+${formatarMilhar(r.valor)} XP entregue', tipo: Snackbar.sucesso);
   }
 
@@ -91,20 +90,20 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
     final r = await pedirItem(context, herois: _herois, heroiId: heroi.id);
     final destino = r?.heroiId;
     if (r == null || destino == null || !mounted) return;
-    setState(() => _mesa.darItem(r.item, destino));
+    _naMesa((mesa) => mesa.darItem(r.item, destino));
     _aviso('${r.item.nome} entregue', tipo: Snackbar.sucesso);
   }
 
   void _desfazer(RegistroMesa r) {
     if (r.personagemId == null) return;
-    setState(() => _mesa.desfazer(r));
+    _naMesa((mesa) => mesa.desfazer(r));
     _aviso('Desfeito');
   }
 
   // missoes e mundo
 
   Future<void> _abrirMissao(Missao m) async {
-    final r = await Navigator.of(context).push<RetornoMissao>(
+    await Navigator.of(context).push<void>(
       MaterialPageRoute(
         builder: (_) => DetalhesMissao(
           missao: m,
@@ -115,35 +114,29 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
         ),
       ),
     );
-    if (r == null || !mounted) return;
-    setState(() => _mesa.aplicarMissao(r));
   }
 
   Future<void> _novaMissao() async {
     final m = await pedirMissao(context, campanhaId: _c.id);
     if (m == null || !mounted) return;
-    setState(() => _mesa.adicionarMissao(m));
+    _naMesa((mesa) => mesa.adicionarMissao(m));
     _aviso('Missão criada', tipo: Snackbar.sucesso);
   }
 
   Future<void> _novoNpc() async {
     final npc = await pedirNpc(context, _c.id);
     if (npc == null || !mounted) return;
-    setState(() => _mesa.adicionarNpc(npc));
+    _naMesa((mesa) => mesa.adicionarNpc(npc));
   }
 
   void _revelarNpc(Npc npc, bool revelado) =>
-      setState(() => _mesa.revelarNpc(npc, revelado));
+      _naMesa((mesa) => mesa.revelarNpc(npc, revelado));
 
   void _verComoHeroi() {
     Navigator.of(context).push<void>(
       MaterialPageRoute(
-        builder: (_) => CampanhaHeroi(
-          campanha: _c,
-          heroi: _herois.firstOrNull,
-          grupo: _herois,
-          modoPrevia: true,
-        ),
+        builder: (_) =>
+            CampanhaHeroi(campanhaId: widget.campanhaId, modoPrevia: true),
       ),
     );
   }
@@ -167,12 +160,20 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
     ),
     2 => MundoTab(npcs: _c.npcs, onRevelar: _revelarNpc, onNovo: _novoNpc),
     3 => SessoesTab(sessoes: _c.sessoes),
-    _ => NotasTab(texto: _c.notasMestre, onChanged: _mesa.editarNotas),
+    _ => NotasTab(
+      texto: _c.notasMestre,
+      onChanged: (t) => _naMesa((mesa) => mesa.editarNotas(t)),
+    ),
   };
 
   @override
   Widget build(BuildContext context) {
-    return PopScope<RetornoCampanha>(
+    // reconstroi quando campanha ou herois mudam
+    final c = context.watch<CampanhasProvider>().porId(widget.campanhaId);
+    context.watch<PersonagensProvider>();
+    if (c == null) return const EstadoNaoEncontrado();
+
+    return PopScope<void>(
       canPop: false,
       onPopInvokedWithResult: (saiu, _) {
         if (!saiu) _sair();

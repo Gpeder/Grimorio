@@ -6,6 +6,7 @@ import 'package:grimorio/controller/characters/gerenciador_hp.dart';
 import 'package:grimorio/controller/characters/gerenciador_inventario.dart';
 import 'package:grimorio/controller/characters/gerenciador_magias.dart';
 import 'package:grimorio/controller/characters/gerenciador_notas.dart';
+import 'package:grimorio/controller/characters/personagens_provider.dart';
 import 'package:grimorio/model/personagem.dart';
 import 'package:grimorio/view/characters/ficha/components/combate_tab.dart';
 import 'package:grimorio/view/characters/ficha/components/diario_tab.dart';
@@ -20,6 +21,7 @@ import 'package:grimorio/view/characters/ficha/components/resumo_tab.dart';
 import 'package:grimorio/widgets/image_frame.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
 import 'package:pixelarticons/pixel.dart';
+import 'package:provider/provider.dart';
 
 class Ficha extends StatefulWidget {
   const Ficha({super.key, required this.personagem});
@@ -65,7 +67,11 @@ class _FichaState extends State<Ficha> {
     setState(() => _p = acao(_p));
   }
 
-  void _sair() => Navigator.pop(context, _p);
+  // salva no provider e volta
+  void _sair() {
+    context.read<PersonagensProvider>().atualizar(_p);
+    Navigator.pop(context);
+  }
 
   void _usarItem(String id) {
     final item = _p.inventario.where((i) => i.id == id).firstOrNull;
@@ -112,7 +118,7 @@ class _FichaState extends State<Ficha> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope<Personagem>(
+    return PopScope<void>(
       canPop: false,
       onPopInvokedWithResult: (saiu, _) {
         if (!saiu) _sair();

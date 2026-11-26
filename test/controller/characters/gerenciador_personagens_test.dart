@@ -26,4 +26,11 @@ void main() {
     expect(lista.last.nome, 'Novo');
     expect(lista, hasLength(2));
   });
+
+  test('trocarTodos mantém quem não mudou', () {
+    final lista = personagens.trocarTodos([a, b], [b.copyWith(xp: 9)]);
+    expect(lista, hasLength(2));
+    expect(lista.first.xp, a.xp);
+    expect(lista.last.xp, 9);
+  });
 }

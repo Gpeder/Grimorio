@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/model/campanha_mock.dart';
-import 'package:grimorio/model/personagem_mock.dart';
+import 'package:grimorio/controller/campaign/campanhas_provider.dart';
+import 'package:grimorio/controller/characters/personagens_provider.dart';
+import 'package:grimorio/controller/settings/usuario_provider.dart';
 import 'package:grimorio/model/usuario.dart';
-import 'package:grimorio/model/usuario_mock.dart';
 import 'package:grimorio/view/characters/ficha/components/titulo_secao.dart';
 import 'package:grimorio/view/settings/components/ajuste_tile.dart';
 import 'package:grimorio/view/settings/components/grupo_ajustes.dart';
@@ -13,6 +13,7 @@ import 'package:grimorio/view/settings/components/perfil_card.dart';
 import 'package:grimorio/view/settings/components/perfil_sheet.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
 import 'package:pixelarticons/pixel.dart';
+import 'package:provider/provider.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -22,7 +23,9 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  Usuario _u = usuarioMock;
+  Usuario get _u => context.read<UsuarioProvider>().usuario;
+
+  void _salvar(Usuario u) => context.read<UsuarioProvider>().atualizar(u);
 
   static const _versao = '0.1.0';
 
@@ -48,18 +51,18 @@ class _SettingsState extends State<Settings> {
       nota: nota,
     );
     if (escolhido == null || !mounted) return;
-    setState(() => _u = aplicar(escolhido));
+    _salvar(aplicar(escolhido));
   }
 
   Future<void> _editarPerfil() async {
     final novo = await mostrarPerfilSheet(context, _u);
     if (novo == null || !mounted) return;
-    setState(() => _u = novo);
+    _salvar(novo);
     _aviso('Perfil atualizado', tipo: Snackbar.sucesso);
   }
 
   void _atualizarCompendio() {
-    setState(() => _u = _u.copyWith(compendioAtualizadoEm: DateTime.now()));
+    _salvar(_u.copyWith(compendioAtualizadoEm: DateTime.now()));
     _aviso('Compêndio atualizado', tipo: Snackbar.sucesso);
   }
 
@@ -108,6 +111,7 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<UsuarioProvider>();
     final textTheme = Theme.of(context).textTheme;
 
     final secoes = <Widget>[
@@ -120,8 +124,8 @@ class _SettingsState extends State<Settings> {
       ),
       PerfilCard(
         usuario: _u,
-        herois: personagensMock.length,
-        campanhas: campanhasMock.length,
+        herois: context.watch<PersonagensProvider>().meus.length,
+        campanhas: context.watch<CampanhasProvider>().campanhas.length,
         onEditar: _editarPerfil,
         onEntrar: () => _aviso('Login em breve'),
       ),
@@ -181,20 +185,19 @@ class _SettingsState extends State<Settings> {
             titulo: 'Mostrar dicas de bônus',
             subtitulo: '"Ataque +5" ao lado das armas e magias',
             ligado: _u.dicasBonus,
-            onChanged: (v) => setState(() => _u = _u.copyWith(dicasBonus: v)),
+            onChanged: (v) => _salvar(_u.copyWith(dicasBonus: v)),
           ),
           AjusteTile.alternar(
             icone: Pixel.vibrate,
             titulo: 'Vibrar ao tocar',
             ligado: _u.vibrar,
-            onChanged: (v) => setState(() => _u = _u.copyWith(vibrar: v)),
+            onChanged: (v) => _salvar(_u.copyWith(vibrar: v)),
           ),
           AjusteTile.alternar(
             icone: Pixel.warningdiamond,
             titulo: 'Confirmar antes de apagar',
             ligado: _u.confirmarApagar,
-            onChanged: (v) =>
-                setState(() => _u = _u.copyWith(confirmarApagar: v)),
+            onChanged: (v) => _salvar(_u.copyWith(confirmarApagar: v)),
           ),
         ],
       ),

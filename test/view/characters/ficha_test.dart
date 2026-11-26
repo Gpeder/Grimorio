@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart' hide Characters;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:grimorio/app/theme/app_theme.dart';
 import 'package:grimorio/model/personagem_mock.dart';
 import 'package:grimorio/view/characters/characters.dart';
 import 'package:grimorio/view/characters/ficha/components/ficha_tabs.dart';
 import 'package:grimorio/view/characters/ficha/ficha.dart';
+
+import '../../helpers/app_teste.dart';
+
 import 'package:pixelarticons/pixel.dart';
 
 void main() {
@@ -14,10 +16,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      MaterialApp(
-        theme: AppTheme.dark,
-        home: const Ficha(personagem: personagemAtivoMock),
-      ),
+      telaDeTeste(const Ficha(personagem: personagemAtivoMock)),
     );
   }
 
@@ -99,9 +98,7 @@ void main() {
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
-    await tester.pumpWidget(
-      MaterialApp(theme: AppTheme.dark, home: const Characters()),
-    );
+    await tester.pumpWidget(telaDeTeste(const Characters()));
 
     Future<void> abrirMagias() async {
       await tester.tap(find.text('Elyndra'));

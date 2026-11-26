@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:grimorio/app/theme/app_theme.dart';
 import 'package:grimorio/view/campaign/campaign.dart';
 import 'package:grimorio/view/campaign/components/campanha_card.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
+
+import '../../helpers/app_teste.dart';
 
 void main() {
   Future<void> abrir(WidgetTester tester) async {
@@ -11,9 +12,7 @@ void main() {
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
 
-    await tester.pumpWidget(
-      MaterialApp(theme: AppTheme.dark, home: const Campaign()),
-    );
+    await tester.pumpWidget(telaDeTeste(const Campaign()));
     await tester.pumpAndSettle();
   }
 

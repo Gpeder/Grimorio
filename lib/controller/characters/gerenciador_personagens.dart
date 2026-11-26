@@ -21,4 +21,13 @@ class GerenciadorPersonagens {
     List<Personagem> personagens,
     Personagem atualizado,
   ) => [for (final p in personagens) p.id == atualizado.id ? atualizado : p];
+
+  // troca pelo id, quem nao mudou fica
+  List<Personagem> trocarTodos(
+    List<Personagem> personagens,
+    List<Personagem> alterados,
+  ) {
+    final porId = {for (final h in alterados) h.id: h};
+    return [for (final p in personagens) porId[p.id] ?? p];
+  }
 }
