@@ -1,9 +1,9 @@
 String _dois(int n) => n.toString().padLeft(2, '0');
 
-// "12/11"
+// dia e mes, ex 12/11
 String formatarDia(DateTime d) => '${_dois(d.day)}/${_dois(d.month)}';
 
-// 1200 → "1.200"
+// 1200 vira 1.200
 String formatarMilhar(int n) {
   final digitos = n.abs().toString();
   final saida = StringBuffer(n < 0 ? '-' : '');
@@ -14,7 +14,7 @@ String formatarMilhar(int n) {
   return saida.toString();
 }
 
-// "agora", "há 5 min", "há 2 h", "há 3 dias"
+// agora, há 5 min, há 2 h
 String tempoDesde(DateTime d, {DateTime? agora}) {
   final diff = (agora ?? DateTime.now()).difference(d);
   if (diff.inMinutes < 1) return 'agora';
@@ -24,7 +24,7 @@ String tempoDesde(DateTime d, {DateTime? agora}) {
   return dias == 1 ? 'há 1 dia' : 'há $dias dias';
 }
 
-// Ids locais até existir banco. O contador evita repetir dentro do mesmo tique.
+// id local até ter banco, contador evita repetir
 var _sequencia = 0;
 String novoId(String prefixo) =>
     '$prefixo-${DateTime.now().microsecondsSinceEpoch}-${_sequencia++}';

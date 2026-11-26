@@ -68,7 +68,7 @@ void main() {
   ) async {
     await abrir(tester);
 
-    // O ícone de 26 fica no centro do botão de 54: o topo do botão está 27 acima.
+    // icone de 26 no centro do botao de 54, topo fica 27 acima
     final icone = tester.getRect(
       find.descendant(
         of: find.byType(BottomBarCenterAction),

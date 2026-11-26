@@ -35,7 +35,7 @@ class _GrimoireState extends State<Grimoire> {
 
   static const _porGrupo = 5;
 
-  // Telas internas vão no navigator raiz, por cima da barra flutuante.
+  // por cima da barra flutuante
   void _abrir(Widget tela) => Navigator.of(
     context,
     rootNavigator: true,

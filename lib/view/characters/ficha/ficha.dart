@@ -121,6 +121,7 @@ class _FichaState extends State<Ficha> {
         body: CustomScrollView(
           controller: _rolagem,
           slivers: [
+            // barra fixa, titulo aparece ao rolar
             SliverAppBar(
               pinned: true,
               automaticallyImplyLeading: false,
@@ -150,11 +151,13 @@ class _FichaState extends State<Ficha> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // nome, nivel e xp
                     FichaHeader(
                       personagem: _p,
                       onSubirNivel: () => mostrarAviso(context, 'Em breve'),
                     ),
                     const SizedBox(height: AppSpacing.medium),
+                    // hp
                     FichaStatus(
                       personagem: _p,
                       onDano: (v) => _atualizar((p) => _hp.receberDano(p, v)),
@@ -162,6 +165,7 @@ class _FichaState extends State<Ficha> {
                       onHpTemp: (v) => _atualizar((p) => _hp.definirTemp(p, v)),
                     ),
                     const SizedBox(height: AppSpacing.medium - 4),
+                    // condições
                     FichaCondicoes(
                       condicoes: _p.condicoes,
                       onAdicionar: (c) =>
@@ -173,6 +177,7 @@ class _FichaState extends State<Ficha> {
                 ),
               ),
             ),
+            // abas
             FichaTabs(aba: _aba, onAba: (i) => setState(() => _aba = i)),
             SliverSafeArea(
               top: false,
@@ -184,6 +189,7 @@ class _FichaState extends State<Ficha> {
                   AppSpacing.large,
                 ),
                 sliver: SliverToBoxAdapter(
+                  // conteudo da aba
                   child: KeyedSubtree(key: ValueKey(_aba), child: _conteudo()),
                 ),
               ),

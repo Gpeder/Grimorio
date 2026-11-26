@@ -30,7 +30,7 @@ class PersonagemAtivoCard extends StatelessWidget {
               children: [
                 ButtonInfo(text: 'Personagem Ativo', onPressed: () {}),
                 TextButton(
-                  // A Home ainda é mock: o resultado da ficha é ignorado.
+                  // home ainda é mock, ignora a volta
                   onPressed: () => Navigator.of(context, rootNavigator: true)
                       .push<Personagem>(
                         MaterialPageRoute(
@@ -164,7 +164,7 @@ class _Atributos extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // HP
+          // hp
           Expanded(
             flex: 3,
             child: Column(
@@ -189,7 +189,7 @@ class _Atributos extends StatelessWidget {
           ),
           divisoria,
 
-          // CA
+          // ca
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -212,7 +212,7 @@ class _Atributos extends StatelessWidget {
           ),
           divisoria,
 
-          // Magia
+          // magia
           Expanded(
             flex: 2,
             child: Column(
@@ -227,7 +227,7 @@ class _Atributos extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.small),
-                // Uma gema por espaço do maior círculo: cheia = livre, vazia = usado.
+                // gema por espaço do maior círculo
                 Wrap(
                   alignment: WrapAlignment.center,
                   children: [

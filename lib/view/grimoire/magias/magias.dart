@@ -12,7 +12,7 @@ import 'package:grimorio/view/grimoire/components/tela_lista.dart';
 import 'package:grimorio/view/grimoire/magias/detalhes_magia.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
 
-// Círculo escolhido: null = todas, 4 = "4º+".
+// null é todas, 4 é 4º ou mais
 const _circulos = <int?, String>{
   null: 'Todas',
   0: 'Truques',

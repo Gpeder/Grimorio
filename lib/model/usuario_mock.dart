@@ -16,7 +16,7 @@ final usuarioMock = Usuario(
   compendioAtualizadoEm: DateTime(2026, 11, 24),
 );
 
-// Nomes dos outros usuários do mock, até existir login.
+// nomes dos outros usuarios até ter login
 const nomesUsuariosMock = {
   'u_gustavo': 'Gustavo',
   'u_bruno': 'Bruno',

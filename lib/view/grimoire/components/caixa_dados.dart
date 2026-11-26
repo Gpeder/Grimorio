@@ -12,7 +12,7 @@ class Dado {
   final String? detalhe;
 }
 
-// AppCard com os dados em grade de 2 colunas.
+// grade de 2 colunas
 class CaixaDados extends StatelessWidget {
   const CaixaDados({super.key, required this.dados});
 

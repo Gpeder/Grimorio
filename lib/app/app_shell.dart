@@ -1,4 +1,4 @@
-// `Characters` do Flutter (pacote characters) colide com a tela de personagens.
+// esconde o Characters do flutter, colide com a tela
 import 'package:flutter/material.dart' hide Characters;
 import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
 import 'package:grimorio/app/components/navegacao_bottom_bar.dart';
@@ -15,7 +15,7 @@ class AppShell extends StatefulWidget {
 
   static const abaAjustes = 4;
 
-  // Troca de aba a partir de qualquer tela dentro do shell.
+  // troca de aba de qualquer tela
   static void irPara(BuildContext context, int aba) {
     context.findAncestorStateOfType<_AppShellState>()?._irPara(aba);
   }

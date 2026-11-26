@@ -18,10 +18,10 @@ class EntradaTile extends StatelessWidget {
 
   final EntradaMissao entrada;
 
-  // É o objetivo atual da missão.
+  // objetivo atual
   final bool atual;
 
-  // Só o mestre recebe estes callbacks.
+  // so o mestre
   final VoidCallback? onAlternarRevelada;
   final ValueChanged<AcaoEntrada>? onAcao;
 

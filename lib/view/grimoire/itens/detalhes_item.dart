@@ -6,8 +6,7 @@ import 'package:grimorio/view/grimoire/components/raridade_badge.dart';
 import 'package:grimorio/widgets/image_frame.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
 
-// Bottom sheet com o item. O aviso sai pelo context de quem abriu, depois
-// de fechar o sheet, para não ficar escondido atrás dele.
+// aviso usa o context de quem abriu
 void mostrarItem(BuildContext context, ItemCompendio item) {
   showModalBottomSheet<void>(
     context: context,

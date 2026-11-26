@@ -18,7 +18,7 @@ class MissoesHeroiTab extends StatefulWidget {
     required this.onAbrir,
   });
 
-  // Já filtradas por `missoesVisiveis`.
+  // ja filtradas
   final List<Missao> missoes;
   final int sessaoAtual;
   final ValueChanged<Missao> onAbrir;

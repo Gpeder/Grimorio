@@ -8,7 +8,7 @@ import 'package:grimorio/view/grimoire/components/compendio_tile.dart';
 import 'package:grimorio/view/grimoire/components/filtros.dart';
 import 'package:grimorio/view/grimoire/components/tela_lista.dart';
 
-// Faixas de ND: rótulo → (mínimo, máximo).
+// faixas de nd: rótulo -> min e max
 const _faixas = <String, (double, double)?>{
   'Todos': null,
   'ND 0–1': (0, 1),

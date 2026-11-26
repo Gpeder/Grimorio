@@ -49,7 +49,7 @@ void main() {
   ) async {
     await abrir(tester);
 
-    // A barra de abas rola na horizontal; em 360 px "Magias" fica fora.
+    // em 360 a aba magias fica fora, precisa rolar
     await tester.drag(find.text('Resumo'), const Offset(-200, 0));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Magias'));

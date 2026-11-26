@@ -111,7 +111,7 @@ class Missao {
   final List<EntradaMissao> entradas;
   final int recompensaXp;
 
-  // Keys de `itensMock`.
+  // keys do itensMock
   final List<String> recompensaItens;
   final List<String> npcIds;
   final DateTime atualizadaEm;

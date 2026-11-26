@@ -4,7 +4,7 @@ import 'package:grimorio/controller/campaign/formatos.dart';
 import 'package:grimorio/model/campanha.dart';
 import 'package:grimorio/view/characters/ficha/components/titulo_secao.dart';
 
-// Sem `missao`, cria uma nova. Com `missao`, edita título, tipo, região e descrição.
+// sem missao cria, com missao edita
 Future<Missao?> pedirMissao(
   BuildContext context, {
   required String campanhaId,

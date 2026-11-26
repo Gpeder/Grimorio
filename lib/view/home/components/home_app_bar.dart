@@ -118,7 +118,7 @@ class _ConteudoDaBarra extends StatelessWidget {
                   ),
                 ),
               ),
-              // Logo no centro.
+              // logo
               Center(
                 child: Image.asset(
                   AppImages.logo,

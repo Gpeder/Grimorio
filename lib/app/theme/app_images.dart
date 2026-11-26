@@ -1,5 +1,5 @@
 abstract final class AppImages {
-  // Fundos
+  // fundos
   static const bg = 'images/bg/bg.webp';
   static const bg1 = 'images/bg/bg_1.webp';
   static const bg2 = 'images/bg/bg_2.webp';
@@ -11,17 +11,17 @@ abstract final class AppImages {
   static const bg8 = 'images/bg/bg_8.webp';
   static const bgCastelo = 'images/bg/castelo.webp';
 
-  // Logo
+  // logo
   static const logo = 'images/logo/logo.webp';
 
-  // Itens do menu
+  // itens do menu
   static const menuBolsa = 'images/itens_menu/mochila.webp';
   static const menuBussola = 'images/itens_menu/bussola.webp';
   static const menuMapa = 'images/itens_menu/mapa.webp';
   static const menuBestiario = 'images/itens_menu/bestiario.webp';
   static const menuGrimorio = 'images/itens_menu/livro_magia.webp';
 
-  // Itens gerais
+  // itens gerais
   static const bau = 'images/gerais/bau.webp';
   static const chave = 'images/gerais/chave.webp';
   static const comida = 'images/gerais/comida.webp';
@@ -31,18 +31,18 @@ abstract final class AppImages {
   static const pergMissao = 'images/gerais/perg_missao.webp';
   static const tocha = 'images/gerais/tocha.webp';
 
-  // Slots (gemas)
+  // slots e gemas
   static const gemaCheia = 'images/slot/gema_cheia.webp';
   static const gemaCheiag = 'images/slot/gema_cheiag.webp';
   static const gemaVazia = 'images/slot/gema_vazia.webp';
   static const gemaVaziag = 'images/slot/gema_vaziag.webp';
 
-  // Acessórios
+  // acessórios
   static const anel = 'images/acessorios/anel.webp';
   static const capa = 'images/acessorios/capa.webp';
   static const colar = 'images/acessorios/colar.webp';
 
-  // Armaduras leves
+  // armaduras leves
   static const armaduraLeve = 'images/armaduras/leve/armadura_leve.webp';
   static const armaduraLeveMago =
       'images/armaduras/leve/armadura_leve_mago.webp';
@@ -53,25 +53,25 @@ abstract final class AppImages {
   static const luvaLeve = 'images/armaduras/leve/luva_leve.webp';
   static const luvaLeveMago = 'images/armaduras/leve/luva_leve_mago.webp';
 
-  // Armaduras médias
+  // armaduras médias
   static const armaduraMedio = 'images/armaduras/medio/armadura_medio.webp';
   static const botaMedio = 'images/armaduras/medio/bota_medio.webp';
   static const elmoMedio = 'images/armaduras/medio/elmo_medio.webp';
   static const luvaMedio = 'images/armaduras/medio/luva_medio.webp';
 
-  // Armaduras pesadas
+  // armaduras pesadas
   static const armaduraPesada = 'images/armaduras/pesado/armadura_pesada.webp';
   static const botaPesada = 'images/armaduras/pesado/bota_pesada.webp';
   static const elmoPesado = 'images/armaduras/pesado/elmo_pesado.webp';
   static const luvaPesada = 'images/armaduras/pesado/luva_pesada.webp';
 
-  // Armas
+  // armas
   static const arma01 = 'images/armas/arma_01.webp';
   static const arma02 = 'images/armas/arma_02.webp';
   static const arma03 = 'images/armas/arma_03.webp';
   static const arma04 = 'images/armas/arma_04.webp';
 
-  // Poções
+  // poções
   static const pocao1 = 'images/pocoes/pocao_1.webp';
   static const pocao2 = 'images/pocoes/pocao_2.webp';
   static const pocao3 = 'images/pocoes/pocao_3.webp';
@@ -84,7 +84,7 @@ abstract final class AppImages {
   static const pocao10 = 'images/pocoes/pocao_10.webp';
   static const pocao11 = 'images/pocoes/pocao_11.webp';
 
-  // Espécies
+  // espécies
   static const especieAnaoF = 'images/species/anao_f.webp';
   static const especieAnaoM = 'images/species/anao_m.webp';
   static const especieDraconatoF = 'images/species/draconato_f.webp';
@@ -104,7 +104,7 @@ abstract final class AppImages {
   static const especieTieflingF = 'images/species/tiefling_f.webp';
   static const especieTieflingM = 'images/species/tiefling_m.webp';
 
-  // Classes
+  // classes
   static const classeArtifice = 'images/classes/artifice.webp';
   static const classeBarbaro = 'images/classes/barbaro.webp';
   static const classeBardo = 'images/classes/bardo.webp';
@@ -119,14 +119,14 @@ abstract final class AppImages {
   static const classePaladino = 'images/classes/paladino.webp';
   static const classePatrulheiro = 'images/classes/patrulheiro.webp';
 
-  // Subclasses: Artífice
+  // subclasses artífice
   static const artificeAlquimista = 'images/artifice/alquimista.webp';
   static const artificeArmeiro = 'images/artifice/armeiro.webp';
   static const artificeArtilheiro = 'images/artifice/artilheiro.webp';
   static const artificeFerreiroBatalha =
       'images/artifice/ferreiro_batalha.webp';
 
-  // Subclasses: Bárbaro
+  // subclasses bárbaro
   static const barbaroBerserker = 'images/barbaro/berserker.webp';
   static const barbaroBesta = 'images/barbaro/besta.webp';
   static const barbaroGigante = 'images/barbaro/gigante.webp';
@@ -136,7 +136,7 @@ abstract final class AppImages {
   static const barbaroTotem = 'images/barbaro/totem.webp';
   static const barbaroZelote = 'images/barbaro/zelote.webp';
 
-  // Subclasses: Bardo
+  // subclasses bardo
   static const bardoBravura = 'images/bardo/bravura.webp';
   static const bardoColegioEloquencia = 'images/bardo/colegio_eloquencia.webp';
   static const bardoColegioGlamour = 'images/bardo/colegio_glamour.webp';
@@ -148,7 +148,7 @@ abstract final class AppImages {
   static const bardoEspadas = 'images/bardo/espadas.webp';
   static const bardoSussurros = 'images/bardo/sussurros.webp';
 
-  // Subclasses: Bruxo
+  // subclasses bruxo
   static const bruxoAbissal = 'images/bruxo/abissal.webp';
   static const bruxoArquifada = 'images/bruxo/arquifada.webp';
   static const bruxoCelestial = 'images/bruxo/celestial.webp';
@@ -159,7 +159,7 @@ abstract final class AppImages {
   static const bruxoLaminaMaldita = 'images/bruxo/lamina_maldita.webp';
   static const bruxoMortoVivo = 'images/bruxo/morto_vivo.webp';
 
-  // Subclasses: Clérigo
+  // subclasses clérigo
   static const clerico01 = 'images/clerico/clerico_01.webp';
   static const clericoConhecimento = 'images/clerico/conhecimento.webp';
   static const clericoDominioLuz = 'images/clerico/dominio_luz.webp';
@@ -174,7 +174,7 @@ abstract final class AppImages {
   static const clericoSepultura = 'images/clerico/sepultura.webp';
   static const clericoTempestade = 'images/clerico/tempestade.webp';
 
-  // Subclasses: Druida
+  // subclasses druida
   static const druidaCirculoFeras = 'images/druida/circulo_feras.webp';
   static const druidaCirculoLua = 'images/druida/circulo_lua.webp';
   static const druidaCirculoSonho = 'images/druida/circulo_sonho.webp';
@@ -185,7 +185,7 @@ abstract final class AppImages {
   static const druidaMar = 'images/druida/mar.webp';
   static const druidaPastor = 'images/druida/pastor.webp';
 
-  // Subclasses: Feiticeiro
+  // subclasses feiticeiro
   static const feiticeiroAlmaMecanica = 'images/feiticeiro/alma_mecanica.webp';
   static const feiticeiroDivina = 'images/feiticeiro/divina.webp';
   static const feiticeiroDraconica = 'images/feiticeiro/draconica.webp';
@@ -196,7 +196,7 @@ abstract final class AppImages {
   static const feiticeiroSombras = 'images/feiticeiro/sombras.webp';
   static const feiticeiroTempestade = 'images/feiticeiro/tempestade.webp';
 
-  // Subclasses: Guerreiro
+  // subclasses guerreiro
   static const guerreiroCampeao = 'images/guerreiro/campeao.webp';
   static const guerreiroCavaleiro = 'images/guerreiro/cavaleiro.webp';
   static const guerreiroCavaleiroMistico =
@@ -208,7 +208,7 @@ abstract final class AppImages {
   static const guerreiroRunico = 'images/guerreiro/runico.webp';
   static const guerreiroSamurai = 'images/guerreiro/samurai.webp';
 
-  // Subclasses: Mago
+  // subclasses mago
   static const magoAbjuracao = 'images/mago/abjuracao.webp';
   static const magoAdivinhacao = 'images/mago/adivinhacao.webp';
   static const magoCantorLamina = 'images/mago/cantor_lamina.webp';
@@ -223,7 +223,7 @@ abstract final class AppImages {
   static const magoNecromancia = 'images/mago/necromancia.webp';
   static const magoTransmutacao = 'images/mago/transmutacao.webp';
 
-  // Subclasses: Monge
+  // subclasses monge
   static const mongeAlmaSolar = 'images/monge/alma_solar.webp';
   static const mongeAstral = 'images/monge/astral.webp';
   static const mongeDragaoAscendente = 'images/monge/dragao_ascendente.webp';
@@ -234,7 +234,7 @@ abstract final class AppImages {
   static const mongeQuatroElementos = 'images/monge/quatro_elementos.webp';
   static const mongeSombra = 'images/monge/sombra.webp';
 
-  // Subclasses: Paladino
+  // subclasses paladino
   static const paladinoAncioes = 'images/paladino/ancioes.webp';
   static const paladinoConquista = 'images/paladino/conquista.webp';
   static const paladinoCoroa = 'images/paladino/coroa.webp';
@@ -245,7 +245,7 @@ abstract final class AppImages {
   static const paladinoVigilantes = 'images/paladino/vigilantes.webp';
   static const paladinoVinganca = 'images/paladino/vinganca.webp';
 
-  // Subclasses: Patrulheiro
+  // subclasses patrulheiro
   static const patrulheiroAndarilhoDraconico =
       'images/patrulheiro/andarilho_draconico.webp';
   static const patrulheiroAndarilhoFeerico =
@@ -261,7 +261,7 @@ abstract final class AppImages {
   static const patrulheiroPerseguidorSombrio =
       'images/patrulheiro/perseguidor_sombrio.webp';
 
-  // Subclasses: Ladino
+  // subclasses ladino
   static const ladinoAssassino = 'images/ladino/assassino.webp';
   static const ladinoBatedor = 'images/ladino/batedor.webp';
   static const ladinoEspadachim = 'images/ladino/espadachim.webp';

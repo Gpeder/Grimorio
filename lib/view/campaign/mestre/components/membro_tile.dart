@@ -13,7 +13,7 @@ class MembroTile extends StatelessWidget {
 
   final Personagem heroi;
 
-  // Sem callbacks a linha fica só de leitura (aba Grupo do herói).
+  // sem callback fica so leitura
   final VoidCallback? onXp;
   final VoidCallback? onItem;
 

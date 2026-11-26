@@ -96,7 +96,7 @@ void main() {
       await tocar('Pacote de sacerdote');
       await avancar();
 
-      // SAB 17 → +3 → 4 preparadas.
+      // sab 17 da +3, entao 4 preparadas
       for (final m in ['Chama Sagrada', 'Luz', 'Taumaturgia']) {
         await tocar(m);
       }
@@ -128,7 +128,7 @@ void main() {
       expect(find.text('Lyra despertou!'), findsOneWidget);
       expect(find.text('ATIVA'), findsOneWidget);
 
-      // A ficha abre com o antecedente e as magias escolhidas.
+      // ficha abre com antecedente e magias
       await tester.tap(find.text('Lyra'));
       await tester.pumpAndSettle();
       expect(find.byType(Ficha), findsOneWidget);

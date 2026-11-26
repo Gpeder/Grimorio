@@ -4,7 +4,7 @@ import 'package:grimorio/model/opcoes_heroi.dart';
 import 'package:grimorio/model/opcoes_heroi_mock.dart';
 import 'package:grimorio/model/personagem.dart';
 
-// magiasMock repete magias que estão em mais de uma lista de classe.
+// sem repetir magia de mais de uma classe
 final magiasCompendio = [
   ...{for (final m in magiasMock) m.key: m}.values,
 ];
@@ -630,7 +630,7 @@ const condicoesMock = [
   ),
 ];
 
-// Papel e atributo principal, para o cabeçalho da classe.
+// papel e atributo do topo da classe
 const papelDaClasse = {
   'srd_barbarian': 'Combatente',
   'srd_bard': 'Conjurador arcano',
@@ -646,7 +646,7 @@ const papelDaClasse = {
   'srd_wizard': 'Conjurador arcano',
 };
 
-// Subclasses que existem só nos livros (têm imagem, mas não estão no mock).
+// subclasses so do livro, com imagem
 const subclassesLivro = <String, List<(String, String)>>{
   'srd_barbarian': [
     ('Berserker', AppImages.barbaroBerserker),
@@ -787,7 +787,7 @@ const subclassesLivro = <String, List<(String, String)>>{
   ],
 };
 
-// Espaços por nível (índice 0 = nível 1), do 1º ao 9º círculo.
+// espaços por nivel, indice 0 é o nivel 1
 const _conjuradorCompleto = [
   [2],
   [3],
@@ -834,7 +834,7 @@ const _meioConjurador = [
   [4, 3, 3, 3, 2],
 ];
 
-// Magia de pacto: (quantidade, círculo).
+// pacto: quantidade e círculo
 const _pacto = [
   (1, 1),
   (2, 1),

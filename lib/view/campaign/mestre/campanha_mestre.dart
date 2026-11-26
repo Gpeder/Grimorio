@@ -32,7 +32,7 @@ class CampanhaMestre extends StatefulWidget {
 
   final Campanha campanha;
 
-  // Heróis desta campanha.
+  // herois da campanha
   final List<Personagem> herois;
 
   @override
@@ -148,6 +148,7 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
     );
   }
 
+  // conteudo de cada aba
   Widget _conteudoAba() => switch (_aba) {
     0 => MesaTab(
       campanha: _c,
@@ -180,6 +181,7 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
         body: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
+              // topo
               child: CampanhaHeader(
                 campanha: _c,
                 papel: _papel,
@@ -199,6 +201,7 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
                 child: Row(
                   children: [
                     Expanded(
+                      // iniciar ou encerrar sessao
                       child: _c.emSessao
                           ? ElevatedButton.icon(
                               onPressed: _encerrarSessao,
@@ -225,6 +228,7 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
                 ),
               ),
             ),
+            // abas
             FichaTabs(
               aba: _aba,
               onAba: (i) => setState(() => _aba = i),

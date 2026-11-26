@@ -19,7 +19,7 @@ String milhar(int n) {
   return b.toString();
 }
 
-// "+4", "−1": sinal tipográfico, como num statblock.
+// sinal de statblock, +4 ou −1
 String _mod(int valor) {
   final m = modificador(valor);
   return m < 0 ? '−${-m}' : '+$m';

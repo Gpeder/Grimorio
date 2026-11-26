@@ -11,7 +11,7 @@ import 'package:pixelarticons/pixel.dart';
 
 typedef DarItem = ({ItemCompendio item, String? heroiId});
 
-// Sem heróis, só escolhe o item (recompensa de missão).
+// sem herois so escolhe o item
 Future<DarItem?> pedirItem(
   BuildContext context, {
   List<Personagem> herois = const [],

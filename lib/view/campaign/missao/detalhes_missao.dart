@@ -157,6 +157,7 @@ class _DetalhesMissaoState extends State<DetalhesMissao> {
                 ),
                 child: Row(
                   children: [
+                    // voltar
                     IconButton(
                       tooltip: 'Voltar',
                       onPressed: _sair,
@@ -174,6 +175,7 @@ class _DetalhesMissaoState extends State<DetalhesMissao> {
                       ),
                     ),
                     if (_mestre)
+                      // editar missao
                       IconButton(
                         tooltip: 'Editar missão',
                         onPressed: _editar,
@@ -191,6 +193,7 @@ class _DetalhesMissaoState extends State<DetalhesMissao> {
                     AppSpacing.large,
                   ),
                   children: [
+                    // etiquetas
                     Wrap(
                       spacing: 6,
                       runSpacing: 6,
@@ -238,6 +241,7 @@ class _DetalhesMissaoState extends State<DetalhesMissao> {
                       ),
                     ],
                     const SizedBox(height: AppSpacing.large),
+                    // registro
                     const RotuloSecao('Registro · mais recente primeiro'),
                     const SizedBox(height: AppSpacing.small),
                     if (entradas.isEmpty)
@@ -286,6 +290,7 @@ class _DetalhesMissaoState extends State<DetalhesMissao> {
                         ),
                       ),
                     const SizedBox(height: AppSpacing.large),
+                    // envolvidos
                     const RotuloSecao('Envolvidos'),
                     const SizedBox(height: AppSpacing.small),
                     if (envolvidos.isEmpty)
@@ -312,6 +317,7 @@ class _DetalhesMissaoState extends State<DetalhesMissao> {
                         ],
                       ),
                     const SizedBox(height: AppSpacing.large),
+                    // recompensa
                     const RotuloSecao('Recompensa'),
                     const SizedBox(height: AppSpacing.small),
                     RecompensaCard(
@@ -327,6 +333,7 @@ class _DetalhesMissaoState extends State<DetalhesMissao> {
             ],
           ),
         ),
+        // falhou e concluir
         bottomNavigationBar: rodape
             ? SafeArea(
                 child: Padding(
@@ -368,7 +375,7 @@ class _DetalhesMissaoState extends State<DetalhesMissao> {
   }
 }
 
-// Devolve, para cada item, o id do herói que recebe.
+// item -> heroi que recebe
 class _ConcluirDialog extends StatefulWidget {
   const _ConcluirDialog({
     required this.xp,

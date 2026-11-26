@@ -19,10 +19,10 @@ class CampanhaHeader extends StatelessWidget {
   final PapelCampanha papel;
   final Widget? trailing;
 
-  // true quando algo fixo já ocupa a barra de status (faixa de prévia).
+  // faixa de prévia já ocupa o topo
   final bool semTopo;
 
-  // Altura mínima: cresce se o nome quebrar em duas linhas.
+  // cresce se o nome quebrar
   static const _altura = 190.0;
 
   @override

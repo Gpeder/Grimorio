@@ -13,7 +13,7 @@ class MeuHeroiCard extends StatelessWidget {
 
   final Personagem heroi;
 
-  // Nulo na prévia do Mestre (só leitura).
+  // null na prévia do mestre
   final VoidCallback? onAbrirFicha;
 
   @override
@@ -79,7 +79,7 @@ class MeuHeroiCard extends StatelessWidget {
   }
 }
 
-// Espaços de magia só para olhar: cheia = livre, vazada = gasto.
+// gemas de magia, cheia é livre
 class _Gemas extends StatelessWidget {
   const _Gemas({required this.espacos});
 

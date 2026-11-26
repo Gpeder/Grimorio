@@ -156,8 +156,7 @@ class _HpButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Quadrado de 28 px: o IconButton do tema força 48 px e não cabe ao
-    // lado da barra de HP em telas de 360.
+    // quadrado de 28, o IconButton do tema não cabe em 360
     final raio = BorderRadius.circular(AppSpacing.radiusSmall);
     return Tooltip(
       message: dica,

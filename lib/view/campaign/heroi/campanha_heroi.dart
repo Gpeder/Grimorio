@@ -29,13 +29,13 @@ class CampanhaHeroi extends StatefulWidget {
 
   final Campanha campanha;
 
-  // O herói do usuário nesta campanha.
+  // heroi do usuario
   final Personagem? heroi;
 
-  // Todos os heróis da campanha (a aba Grupo mostra os outros).
+  // todos da campanha
   final List<Personagem> grupo;
 
-  // Aberta pelo Mestre em "Ver como herói": só leitura.
+  // ver como herói do mestre, so leitura
   final bool modoPrevia;
 
   @override
@@ -76,6 +76,7 @@ class _CampanhaHeroiState extends State<CampanhaHeroi> {
     );
   }
 
+  // conteudo de cada aba
   Widget _conteudoAba() => switch (_aba) {
     0 => MissoesHeroiTab(
       missoes: const GerenciadorVisibilidade().missoes(_c, _papel),
@@ -102,6 +103,7 @@ class _CampanhaHeroiState extends State<CampanhaHeroi> {
     final rolagem = CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
+          // topo
           child: CampanhaHeader(campanha: _c, papel: _papel, semTopo: previa),
         ),
         SliverPadding(
@@ -115,6 +117,7 @@ class _CampanhaHeroiState extends State<CampanhaHeroi> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // sessao rolando
                 if (_c.emSessao) ...[
                   AvisoSessao(
                     sessao: _c.sessaoAtual,
@@ -131,6 +134,7 @@ class _CampanhaHeroiState extends State<CampanhaHeroi> {
             ),
           ),
         ),
+        // abas
         FichaTabs(
           aba: _aba,
           onAba: (i) => setState(() => _aba = i),

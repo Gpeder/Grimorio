@@ -13,7 +13,7 @@ enum Atributo {
   final String sigla;
 }
 
-// Tabela de XP mínimonível
+// xp minimo de cada nivel
 const xpPorNivel = [
   0,
   300,
@@ -102,7 +102,6 @@ class Atributos {
   );
 }
 
-// Classe e nivel
 class ClassePersonagem {
   const ClassePersonagem({
     required this.apiKey,

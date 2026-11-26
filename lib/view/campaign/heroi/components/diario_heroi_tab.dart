@@ -13,7 +13,7 @@ class DiarioHeroiTab extends StatelessWidget {
 
   final List<Sessao> sessoes;
 
-  // Já filtrados por `npcsVisiveis`.
+  // ja filtrados
   final List<Npc> npcs;
 
   @override

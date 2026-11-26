@@ -5,7 +5,7 @@ import 'package:grimorio/model/personagem.dart';
 import 'package:grimorio/view/campaign/mestre/components/membro_tile.dart';
 import 'package:grimorio/widgets/appcard.dart';
 
-// Só leitura: nome, classe/nível e HP dos outros heróis.
+// outros herois, so leitura
 class GrupoTab extends StatelessWidget {
   const GrupoTab({super.key, required this.outros});
 

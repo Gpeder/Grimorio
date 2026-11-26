@@ -33,7 +33,7 @@ class Campanha {
   final String nome;
   final String capitulo;
 
-  // 0..1
+  // de 0 a 1
   final double progresso;
   final String? capa;
   final String mestreId;
@@ -44,7 +44,7 @@ class Campanha {
   final List<Npc> npcs;
   final List<Sessao> sessoes;
 
-  // Mais novo primeiro.
+  // mais novo primeiro
   final List<RegistroMesa> registros;
   final String notasMestre;
 
@@ -130,7 +130,7 @@ class Campanha {
   );
 }
 
-// O que as telas de campanha devolvem no pop.
+// volta das telas de campanha
 typedef RetornoCampanha = ({Campanha campanha, List<Personagem> herois});
 
 typedef RetornoMissao = ({

@@ -220,10 +220,10 @@ const kaelMock = Personagem(
   donoId: 'u_lia',
 );
 
-// Só os heróis do usuário (donoId 'u_gustavo'): é o que a aba Heróis mostra.
+// so os herois do usuario, aba heróis
 const personagensMock = [personagemAtivoMock];
 
-// Todos os heróis das campanhas, inclusive os de outros jogadores.
+// todos os herois das campanhas
 const todosPersonagensMock = [
   personagemAtivoMock,
   thorgarMock,

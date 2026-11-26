@@ -9,7 +9,7 @@ class Filtro {
   final VoidCallback onTap;
 }
 
-// Fileira rolável de Etiquetas selecionáveis.
+// fileira de etiquetas
 class Filtros extends StatelessWidget {
   const Filtros({super.key, required this.itens});
 

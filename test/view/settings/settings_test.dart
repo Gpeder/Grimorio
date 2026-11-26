@@ -27,7 +27,7 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  // A lista é preguiçosa: rola até a linha existir antes de procurar nela.
+  // lista preguiçosa, rola até a linha existir
   Future<Finder> rolarAte(WidgetTester tester, String titulo) async {
     final alvo = find.widgetWithText(AjusteTile, titulo);
     await tester.scrollUntilVisible(

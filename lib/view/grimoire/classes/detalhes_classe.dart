@@ -220,7 +220,7 @@ class _Progressao extends StatelessWidget {
 class _GradeSubclasses extends StatelessWidget {
   const _GradeSubclasses({required this.subclasses});
 
-  // (nome, imagem, só no livro)
+  // nome, imagem e se é so do livro
   final List<(String, String, bool)> subclasses;
 
   static const _colunas = 4;

@@ -164,7 +164,7 @@ class DetalhesMagia extends StatelessWidget {
 
   static String _ou(String v) => v.isEmpty ? '—' : v;
 
-  // "V, S, M (um símbolo sagrado)" → valor "V, S, M" e o material embaixo.
+  // material vai embaixo dos componentes
   static List<Dado> _componentes(String texto) {
     final i = texto.indexOf(' (');
     if (i < 0) return [Dado('Componentes', _ou(texto))];

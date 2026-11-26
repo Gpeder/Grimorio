@@ -4,7 +4,7 @@ import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/view/grimoire/components/busca_compendio.dart';
 import 'package:pixelarticons/pixel.dart';
 
-// Base das listas: voltar, título, contagem, busca, filtros e conteúdo.
+// base das listas do grimorio
 class TelaLista extends StatelessWidget {
   const TelaLista({
     super.key,
@@ -90,7 +90,7 @@ class TelaLista extends StatelessWidget {
   }
 }
 
-// Linha do topo das telas internas: voltar, título e algo à direita.
+// topo das telas internas
 class VoltarHeader extends StatelessWidget {
   const VoltarHeader({super.key, this.titulo, this.direita});
 
@@ -143,7 +143,7 @@ class VoltarHeader extends StatelessWidget {
   }
 }
 
-// Botão fixo no rodapé das telas de detalhe.
+// botao fixo no rodapé
 class RodapeButton extends StatelessWidget {
   const RodapeButton({super.key, required this.texto, required this.onPressed});
 

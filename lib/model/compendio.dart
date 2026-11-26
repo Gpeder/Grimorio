@@ -34,10 +34,10 @@ class AcaoMonstro {
   final String nome;
   final String descricao;
 
-  // "+4 para acertar" ou "Salv. CON CD 14".
+  // ex +4 para acertar ou Salv CON CD 14
   final String? ataque;
 
-  // "1d6 + 2 cortante".
+  // ex 1d6 + 2 cortante
   final String? dano;
 
   factory AcaoMonstro.fromJson(Map<String, dynamic> json) => AcaoMonstro(
@@ -96,7 +96,7 @@ class Monstro {
   final String tamanho;
   final String alinhamento;
 
-  // "1/4", "2"…
+  // ex 1/4 ou 2
   final String nd;
   final int xp;
   final int ca;
@@ -235,7 +235,7 @@ class ItemCompendio {
   final String key;
   final String nome;
 
-  // "Poção", "Anel", "Arma", "Armadura"…
+  // poção, anel, arma, armadura
   final String categoria;
   final Raridade raridade;
   final bool sintonia;
@@ -296,7 +296,7 @@ class CondicaoInfo {
   final String nome;
   final String descricao;
 
-  // Só para Exausto.
+  // so no exausto
   final List<String> niveis;
 
   factory CondicaoInfo.fromJson(Map<String, dynamic> json) => CondicaoInfo(
