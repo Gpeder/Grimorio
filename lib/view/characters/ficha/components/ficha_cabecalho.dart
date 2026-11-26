@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
+import 'package:grimorio/controller/characters/gerenciador_exp.dart';
 import 'package:grimorio/model/character.dart';
 import 'package:grimorio/widgets/appcard.dart';
 import 'package:grimorio/widgets/button_info.dart';
@@ -33,7 +34,7 @@ class FichaCabecalho extends StatelessWidget {
     final p = personagem;
     final classe = p.classes.isEmpty ? null : p.classes.first;
     final subclasse = classe?.subclasse;
-    final faltam = p.xpProximoNivel - p.xp;
+    final faltam = const GerenciadorExp().faltaParaProximo(p);
     final suave = AppColors.onSurface.withValues(alpha: 0.7);
 
     return Column(

@@ -1,5 +1,4 @@
 import 'package:grimorio/model/character.dart';
-import 'package:grimorio/model/grimoire.dart';
 import 'package:grimorio/model/missao.dart';
 
 export 'package:grimorio/model/missao.dart';
@@ -82,64 +81,13 @@ class Campaign {
     registros: registros ?? this.registros,
     notasMestre: notasMestre ?? this.notasMestre,
   );
-
-  Campaign trocarMissao(Missao missao) => copyWith(
-    missoes: [for (final m in missoes) m.id == missao.id ? missao : m],
-  );
-
-  Campaign registrar(List<RegistroMesa> novos) =>
-      copyWith(registros: [...novos.reversed, ...registros]);
 }
 
 // O que as telas de campanha devolvem no pop.
 typedef RetornoCampanha = ({Campaign campanha, List<Character> herois});
 
-// Regras de "quem vê o quê". Ficam puras para virar RLS no Supabase.
-
-bool _mestre(PapelCampanha p) => p == PapelCampanha.mestre;
-
-List<Missao> missoesVisiveis(Campaign c, PapelCampanha p) => [
-  for (final m in c.missoes)
-    if (_mestre(p) || m.revelada) m,
-];
-
-List<EntradaMissao> entradasVisiveis(Missao m, PapelCampanha p) => [
-  for (final e in m.entradas)
-    if (_mestre(p) || e.revelada) e,
-]..sort((a, b) => b.criadaEm.compareTo(a.criadaEm));
-
-EntradaMissao? objetivoAtual(Missao m, PapelCampanha p) =>
-    entradasVisiveis(m, p).where((e) => e.objetivo && !e.concluida).firstOrNull;
-
-bool recompensaVisivel(Missao m, PapelCampanha p) =>
-    _mestre(p) || m.estado == EstadoMissao.concluida;
-
-List<Npc> npcsVisiveis(Campaign c, PapelCampanha p) => [
-  for (final n in c.npcs)
-    if (_mestre(p) || n.revelado) n,
-];
-
-bool podeEditarCampanha(PapelCampanha p) => _mestre(p);
-
-// Converte um item do compêndio para o inventário do herói.
-InventoryItem itemDoCompendio(ItemCompendio i) => InventoryItem(
-  id: i.key,
-  nome: i.nome,
-  imagem: i.imagem,
-  consumivel: i.categoria == 'Poção',
-  descricao: i.descricao,
-);
-
-// "ABCD-12": 4 letras do nome + 2 dígitos do relógio.
-String gerarCodigoConvite(String nome, DateTime agora) {
-  final letras = nome
-      .toUpperCase()
-      .replaceAll(RegExp(r'[^A-Z]'), '')
-      .padRight(4, 'X')
-      .substring(0, 4);
-  final digitos = (agora.millisecondsSinceEpoch % 100).toString().padLeft(
-    2,
-    '0',
-  );
-  return '$letras-$digitos';
-}
+typedef RetornoMissao = ({
+  Missao missao,
+  List<Character> herois,
+  List<RegistroMesa> registros,
+});

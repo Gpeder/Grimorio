@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/view/campaign/components/caixa_tracejada.dart';
-import 'package:grimorio/view/campaign/components/formatos.dart';
+import 'package:grimorio/controller/campaign/formatos.dart';
+import 'package:grimorio/controller/campaign/gerenciador_missoes.dart';
+import 'package:grimorio/controller/campaign/gerenciador_visibilidade.dart';
 import 'package:grimorio/view/campaign/components/sheet_missao.dart';
 import 'package:grimorio/view/campaign/mestre/components/sheet_dar_item.dart';
 import 'package:grimorio/view/campaign/missao/components/card_recompensa.dart';
@@ -13,15 +15,8 @@ import 'package:grimorio/widgets/etiqueta.dart';
 import 'package:grimorio/model/campaign.dart' as dados;
 import 'package:grimorio/model/character.dart';
 import 'package:grimorio/model/grimoire.dart';
-import 'package:grimorio/model/grimoire_mock.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
 import 'package:pixelarticons/pixel.dart';
-
-typedef RetornoMissao = ({
-  dados.Missao missao,
-  List<Character> herois,
-  List<dados.RegistroMesa> registros,
-});
 
 class MissaoDetalhe extends StatefulWidget {
   const MissaoDetalhe({
@@ -44,48 +39,23 @@ class MissaoDetalhe extends StatefulWidget {
 }
 
 class _MissaoDetalheState extends State<MissaoDetalhe> {
-  late dados.Missao _m = widget.missao;
-  late List<Character> _herois = [...widget.herois];
-  final _registros = <dados.RegistroMesa>[];
+  late final _missoes = GerenciadorMissoes(
+    missao: widget.missao,
+    herois: widget.herois,
+  );
+
+  static const _visibilidade = GerenciadorVisibilidade();
+
+  dados.Missao get _m => _missoes.missao;
 
   bool get _mestre => widget.papel == dados.PapelCampanha.mestre;
 
-  void _sair() => Navigator.pop<RetornoMissao>(context, (
-    missao: _m,
-    herois: _herois,
-    registros: _registros,
-  ));
-
-  void _mudar(dados.Missao Function(dados.Missao m) f) =>
-      setState(() => _m = f(_m).copyWith(atualizadaEm: DateTime.now()));
-
-  dados.RegistroMesa _registro(
-    dados.TipoRegistro tipo,
-    String texto, {
-    String? personagemId,
-    int? valor,
-    String? itemKey,
-  }) => dados.RegistroMesa(
-    id: novoId('registro'),
-    campanhaId: _m.campanhaId,
-    tipo: tipo,
-    texto: texto,
-    personagemId: personagemId,
-    valor: valor,
-    itemKey: itemKey,
-    criadoEm: DateTime.now(),
-  );
-
-  void _trocarEntrada(dados.EntradaMissao nova) => _mudar(
-    (m) => m.copyWith(
-      entradas: [for (final e in m.entradas) e.id == nova.id ? nova : e],
-    ),
-  );
+  void _sair() => Navigator.pop<dados.RetornoMissao>(context, _missoes.retorno);
 
   Future<void> _acaoEntrada(dados.EntradaMissao e, AcaoEntrada acao) async {
     switch (acao) {
       case AcaoEntrada.concluir:
-        _trocarEntrada(e.copyWith(concluida: true));
+        setState(() => _missoes.concluirEntrada(e));
       case AcaoEntrada.apagar:
         final ok = await confirmar(
           context,
@@ -94,24 +64,14 @@ class _MissaoDetalheState extends State<MissaoDetalhe> {
           sim: 'Apagar',
         );
         if (!ok || !mounted) return;
-        _mudar(
-          (m) => m.copyWith(
-            entradas: [
-              for (final x in m.entradas)
-                if (x.id != e.id) x,
-            ],
-          ),
-        );
+        setState(() => _missoes.apagarEntrada(e));
     }
   }
 
   Future<void> _novaEntrada() async {
     final e = await pedirEntrada(context, sessao: widget.sessaoAtual);
     if (e == null || !mounted) return;
-    _mudar((m) => m.copyWith(entradas: [...m.entradas, e]));
-    _registros.add(
-      _registro(dados.TipoRegistro.entrada, 'Nova entrada em ${_m.titulo}'),
-    );
+    setState(() => _missoes.adicionarEntrada(e));
   }
 
   Future<void> _editar() async {
@@ -121,17 +81,10 @@ class _MissaoDetalheState extends State<MissaoDetalhe> {
       missao: _m,
     );
     if (editada == null || !mounted) return;
-    setState(() => _m = editada);
+    setState(() => _missoes.editar(editada));
   }
 
-  void _alternarRevelada() {
-    _mudar((m) => m.copyWith(revelada: !m.revelada));
-    if (_m.revelada) {
-      _registros.add(
-        _registro(dados.TipoRegistro.missao, 'Missão revelada: ${_m.titulo}'),
-      );
-    }
-  }
+  void _alternarRevelada() => setState(_missoes.alternarRevelada);
 
   Future<void> _editarXp() async {
     final xp = await pedirNumero(
@@ -140,25 +93,16 @@ class _MissaoDetalheState extends State<MissaoDetalhe> {
       inicial: _m.recompensaXp,
     );
     if (xp == null || !mounted) return;
-    _mudar((m) => m.copyWith(recompensaXp: xp));
+    setState(() => _missoes.definirXp(xp));
   }
 
   Future<void> _adicionarItem() async {
     final escolha = await pedirItem(context);
     if (escolha == null || !mounted) return;
-    final key = escolha.item.key;
-    if (_m.recompensaItens.contains(key)) return;
-    _mudar((m) => m.copyWith(recompensaItens: [...m.recompensaItens, key]));
+    setState(() => _missoes.adicionarItem(escolha.item.key));
   }
 
-  void _removerItem(String key) => _mudar(
-    (m) => m.copyWith(
-      recompensaItens: [
-        for (final k in m.recompensaItens)
-          if (k != key) k,
-      ],
-    ),
-  );
+  void _removerItem(String key) => setState(() => _missoes.removerItem(key));
 
   Future<void> _falhou() async {
     final ok = await confirmar(
@@ -168,63 +112,20 @@ class _MissaoDetalheState extends State<MissaoDetalhe> {
       sim: 'Falhou',
     );
     if (!ok || !mounted) return;
-    _mudar((m) => m.copyWith(estado: dados.EstadoMissao.falhou));
-    _registros.add(
-      _registro(dados.TipoRegistro.missao, 'Missão falhou: ${_m.titulo}'),
-    );
+    setState(_missoes.falhar);
   }
 
   Future<void> _concluir() async {
-    final itens = [
-      for (final key in _m.recompensaItens)
-        ?itensMock.where((i) => i.key == key).firstOrNull,
-    ];
     final destinos = await showDialog<Map<String, String>>(
       context: context,
-      builder: (_) =>
-          _DialogoConcluir(xp: _m.recompensaXp, itens: itens, herois: _herois),
+      builder: (_) => _DialogoConcluir(
+        xp: _m.recompensaXp,
+        itens: _missoes.itensRecompensa,
+        herois: _missoes.herois,
+      ),
     );
     if (destinos == null || !mounted) return;
-
-    final xp = _m.recompensaXp;
-    final novos = <dados.RegistroMesa>[];
-    var herois = [for (final h in _herois) xp > 0 ? h.ganharXp(xp) : h];
-    if (xp > 0) {
-      for (final h in herois) {
-        novos.add(
-          _registro(
-            dados.TipoRegistro.xp,
-            '+${formatarMilhar(xp)} XP para ${h.nome}',
-            personagemId: h.id,
-            valor: xp,
-          ),
-        );
-      }
-    }
-    for (final item in itens) {
-      final destino = destinos[item.key];
-      final heroi = herois.where((h) => h.id == destino).firstOrNull;
-      if (heroi == null) continue;
-      herois = [
-        for (final h in herois)
-          h.id == heroi.id ? h.receberItem(dados.itemDoCompendio(item)) : h,
-      ];
-      novos.add(
-        _registro(
-          dados.TipoRegistro.item,
-          '${item.nome} para ${heroi.nome}',
-          personagemId: heroi.id,
-          itemKey: item.key,
-        ),
-      );
-    }
-    novos.add(
-      _registro(dados.TipoRegistro.missao, 'Missão concluída: ${_m.titulo}'),
-    );
-
-    setState(() => _herois = herois);
-    _mudar((m) => m.copyWith(estado: dados.EstadoMissao.concluida));
-    _registros.addAll(novos);
+    setState(() => _missoes.concluir(destinos));
     mostrarAviso(context, 'Missão concluída!', tipo: Snackbar.sucesso);
   }
 
@@ -232,15 +133,12 @@ class _MissaoDetalheState extends State<MissaoDetalhe> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final papel = widget.papel;
-    final entradas = dados.entradasVisiveis(_m, papel);
-    final atual = dados.objetivoAtual(_m, papel);
-    final envolvidos = [
-      for (final n in widget.npcs)
-        if (_m.npcIds.contains(n.id) && (_mestre || n.revelado)) n,
-    ];
+    final entradas = _visibilidade.entradas(_m, papel);
+    final atual = _visibilidade.objetivoAtual(_m, papel);
+    final envolvidos = _visibilidade.envolvidos(_m, widget.npcs, papel);
     final rodape = _mestre && _m.ativa;
 
-    return PopScope<RetornoMissao>(
+    return PopScope<dados.RetornoMissao>(
       canPop: false,
       onPopInvokedWithResult: (saiu, _) {
         if (!saiu) _sair();
@@ -359,8 +257,8 @@ class _MissaoDetalheState extends State<MissaoDetalhe> {
                         entrada: e,
                         atual: e.id == atual?.id && _m.ativa,
                         onAlternarRevelada: _mestre
-                            ? () => _trocarEntrada(
-                                e.copyWith(revelada: !e.revelada),
+                            ? () => setState(
+                                () => _missoes.alternarEntradaRevelada(e),
                               )
                             : null,
                         onAcao: _mestre ? (a) => _acaoEntrada(e, a) : null,

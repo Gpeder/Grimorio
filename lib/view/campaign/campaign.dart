@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/view/campaign/components/card_campanha.dart';
-import 'package:grimorio/view/campaign/components/dialogo_codigo.dart';
-import 'package:grimorio/view/campaign/components/sheet_nova_campanha.dart';
-import 'package:grimorio/view/campaign/heroi/campanha_heroi.dart';
-import 'package:grimorio/view/campaign/mestre/campanha_mestre.dart';
+import 'package:grimorio/controller/campaign/gerenciador_campanhas.dart';
 import 'package:grimorio/model/campaign.dart' as dados;
 import 'package:grimorio/model/campaign_mock.dart';
 import 'package:grimorio/model/character.dart';
 import 'package:grimorio/model/character_mock.dart';
 import 'package:grimorio/model/usuario_mock.dart';
+import 'package:grimorio/view/campaign/components/card_campanha.dart';
+import 'package:grimorio/view/campaign/components/dialogo_codigo.dart';
+import 'package:grimorio/view/campaign/components/sheet_nova_campanha.dart';
+import 'package:grimorio/view/campaign/heroi/campanha_heroi.dart';
+import 'package:grimorio/view/campaign/mestre/campanha_mestre.dart';
 import 'package:grimorio/widgets/image_frame.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
 import 'package:pixelarticons/pixel.dart';
@@ -28,22 +29,18 @@ class _CampaignState extends State<Campaign> {
   late List<Character> _personagens = [...todosPersonagensMock];
 
   static const _acimaDaBarra = 110.0;
+  static const _gerenciador = GerenciadorCampanhas();
 
   void _aviso(String texto, {Snackbar tipo = Snackbar.info}) =>
       mostrarAviso(context, texto, tipo: tipo, acimaDaBarra: true);
 
-  List<Character> _heroisDe(dados.Campaign c) => [
-    for (final p in _personagens)
-      if (p.campanhaId == c.id) p,
-  ];
+  List<Character> _heroisDe(dados.Campaign c) =>
+      _gerenciador.heroisDe(c, _personagens);
 
   Future<void> _entrarComCodigo() async {
     final codigo = await pedirCodigo(context);
     if (codigo == null || !mounted) return;
-    final alvo = codigo.trim().toUpperCase();
-    final campanha = _campanhas
-        .where((c) => c.codigoConvite.toUpperCase() == alvo)
-        .firstOrNull;
+    final campanha = _gerenciador.buscarPorCodigo(_campanhas, codigo);
     if (campanha == null) {
       _aviso('Código não encontrado', tipo: Snackbar.erro);
     } else {
@@ -54,13 +51,11 @@ class _CampaignState extends State<Campaign> {
   Future<void> _novaCampanha() async {
     final nova = await pedirNovaCampanha(context);
     if (nova == null || !mounted) return;
-    final agora = DateTime.now();
-    final campanha = dados.Campaign(
-      id: 'campanha-${agora.microsecondsSinceEpoch}',
+    final campanha = _gerenciador.criar(
       nome: nova.nome,
       capitulo: nova.capitulo,
       mestreId: usuarioMock.id,
-      codigoConvite: dados.gerarCodigoConvite(nova.nome, agora),
+      agora: DateTime.now(),
     );
     setState(() => _campanhas = [..._campanhas, campanha]);
     _aviso('${campanha.nome} criada', tipo: Snackbar.sucesso);
@@ -72,7 +67,7 @@ class _CampaignState extends State<Campaign> {
         ? CampanhaMestre(campanha: c, herois: herois)
         : CampanhaHeroi(
             campanha: c,
-            heroi: herois.where((h) => h.donoId == usuarioMock.id).firstOrNull,
+            heroi: _gerenciador.heroiDoUsuario(herois, usuarioMock.id),
             grupo: herois,
           );
 
@@ -82,12 +77,9 @@ class _CampaignState extends State<Campaign> {
     ).push<dados.RetornoCampanha>(MaterialPageRoute(builder: (_) => tela));
     if (r == null || !mounted) return;
 
-    final alterados = {for (final h in r.herois) h.id: h};
     setState(() {
-      _campanhas = [
-        for (final x in _campanhas) x.id == r.campanha.id ? r.campanha : x,
-      ];
-      _personagens = [for (final p in _personagens) alterados[p.id] ?? p];
+      _campanhas = _gerenciador.trocar(_campanhas, r.campanha);
+      _personagens = _gerenciador.trocarHerois(_personagens, r.herois);
     });
   }
 

@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:grimorio/view/grimoire/components/busca_compendio.dart';
+import 'package:grimorio/controller/grimoire/gerenciador_compendio.dart';
+import 'package:grimorio/model/grimoire.dart';
+import 'package:grimorio/model/grimoire_mock.dart';
 import 'package:grimorio/view/grimoire/components/filtros.dart';
 import 'package:grimorio/view/grimoire/components/linha_compendio.dart';
 import 'package:grimorio/view/grimoire/components/selo_raridade.dart';
 import 'package:grimorio/view/grimoire/components/tela_lista.dart';
 import 'package:grimorio/view/grimoire/itens/item_detalhe.dart';
-import 'package:grimorio/model/grimoire.dart';
-import 'package:grimorio/model/grimoire_mock.dart';
-
-enum _Tipo { magicos, equipamento, armas, armaduras }
 
 const _rotulos = {
-  _Tipo.magicos: 'Mágicos',
-  _Tipo.equipamento: 'Equipamento',
-  _Tipo.armas: 'Armas',
-  _Tipo.armaduras: 'Armaduras',
+  FiltroItem.magicos: 'Mágicos',
+  FiltroItem.equipamento: 'Equipamento',
+  FiltroItem.armas: 'Armas',
+  FiltroItem.armaduras: 'Armaduras',
 };
 
 class Itens extends StatefulWidget {
@@ -26,23 +24,19 @@ class Itens extends StatefulWidget {
 
 class _ItensState extends State<Itens> {
   String _busca = '';
-  _Tipo? _tipo;
+  FiltroItem? _tipo;
   Raridade? _raridade;
 
-  bool _passa(ItemCompendio i) =>
-      contem(i.nome, _busca) &&
-      switch (_tipo) {
-        null => true,
-        _Tipo.magicos => i.magico,
-        _Tipo.equipamento => !i.magico,
-        _Tipo.armas => i.categoria == 'Arma',
-        _Tipo.armaduras => i.categoria == 'Armadura' || i.categoria == 'Escudo',
-      } &&
-      (_raridade == null || i.raridade == _raridade);
+  static const _compendio = GerenciadorCompendio();
 
   @override
   Widget build(BuildContext context) {
-    final filtrados = itensMock.where(_passa).toList();
+    final filtrados = _compendio.filtrarItens(
+      itensMock,
+      busca: _busca,
+      tipo: _tipo,
+      raridade: _raridade,
+    );
 
     return TelaLista(
       titulo: 'Itens',
@@ -52,7 +46,7 @@ class _ItensState extends State<Itens> {
       filtros: [
         Filtros(
           itens: [
-            for (final t in _Tipo.values)
+            for (final t in FiltroItem.values)
               Filtro(
                 _rotulos[t]!,
                 selecionado: _tipo == t,

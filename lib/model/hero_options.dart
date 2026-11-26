@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:grimorio/model/character.dart';
 
 const nomeAtributo = {
@@ -266,67 +264,6 @@ class SkillOption {
 
 String sinal(int v) => v >= 0 ? '+$v' : '$v';
 
-int bonusDeEspecie(
-  Ability a, {
-  SpeciesOption? especie,
-  SubspeciesOption? subespecie,
-  Set<Ability> livres = const {},
-}) =>
-    (especie?.bonus[a] ?? 0) +
-    (subespecie?.bonus[a] ?? 0) +
-    (livres.contains(a) ? 1 : 0);
-
 const custoCompra = {8: 0, 9: 1, 10: 2, 11: 3, 12: 4, 13: 5, 14: 7, 15: 9};
 const limiteCompra = 27;
 const arrayPadrao = [15, 14, 13, 12, 10, 8];
-
-int? pontosGastos(Iterable<int?> valores) {
-  var total = 0;
-  for (final v in valores) {
-    final custo = custoCompra[v];
-    if (custo == null) return null;
-    total += custo;
-  }
-  return total;
-}
-
-bool compraValida(Iterable<int?> valores) {
-  final gastos = pontosGastos(valores);
-  return gastos != null && gastos <= limiteCompra;
-}
-
-int hpNivel1({
-  required int dadoDeVida,
-  required int constituicao,
-  int extraPorNivel = 0,
-}) => math.max(1, dadoDeVida + modificador(constituicao) + extraPorNivel);
-
-int calcularCA({
-  required int destreza,
-  required int constituicao,
-  required int sabedoria,
-  TipoArmadura? armadura,
-  bool escudo = false,
-  String? classeKey,
-}) {
-  final des = modificador(destreza);
-  final int base = switch (armadura) {
-    TipoArmadura.couro => 11 + des,
-    TipoArmadura.escamas => 14 + math.min(des, 2),
-    TipoArmadura.malha => 16,
-    _ => switch (classeKey) {
-      'srd_barbarian' => 10 + des + modificador(constituicao),
-      'srd_monk' when !escudo => 10 + des + modificador(sabedoria),
-      _ => 10 + des,
-    },
-  };
-  return base + (escudo ? 2 : 0);
-}
-
-int limiteDeMagias(ClassOption classe, {required int valorAtributo}) {
-  if (classe.atributoPreparo == null) return classe.magias;
-  return math.max(1, modificador(valorAtributo) + 1);
-}
-
-int bonusPericia({required int valorAtributo, required bool proficiente}) =>
-    modificador(valorAtributo) + (proficiente ? proficienciaNivel1 : 0);

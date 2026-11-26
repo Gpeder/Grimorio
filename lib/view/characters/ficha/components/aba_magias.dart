@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
+import 'package:grimorio/controller/characters/gerenciador_magias.dart';
 import 'package:grimorio/view/characters/ficha/components/gemas_magia.dart';
 import 'package:grimorio/view/characters/ficha/components/titulo_secao.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
 import 'package:grimorio/model/character.dart';
 import 'package:grimorio/model/hero_options.dart';
-import 'package:grimorio/model/hero_options_mock.dart';
 import 'package:grimorio/widgets/appcard.dart';
 import 'package:grimorio/widgets/image_frame.dart';
 
@@ -58,14 +58,7 @@ class _AbaMagiasState extends State<AbaMagias> {
 
   Character get _p => widget.personagem;
 
-  bool _preparada(SpellOption m) =>
-      m.circulo == 0 || _p.magiasPreparadas.contains(m.key);
-
-  bool _passa(SpellOption m) => switch (_filtro) {
-    _Filtro.preparadas => _preparada(m),
-    _Filtro.todas => true,
-    _ => m.circulo == _filtro.circulo,
-  };
+  static const _magias = GerenciadorMagias();
 
   void _detalhes(SpellOption m) {
     showModalBottomSheet<void>(
@@ -86,7 +79,7 @@ class _AbaMagiasState extends State<AbaMagias> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final p = _p;
-    final conhecidas = [for (final k in p.magias) ?magiaPorKey(k)];
+    final conhecidas = _magias.conhecidas(p);
 
     if (p.espacosDeMagia.isEmpty && conhecidas.isEmpty) {
       return Padding(
@@ -114,13 +107,13 @@ class _AbaMagiasState extends State<AbaMagias> {
 
     final total = p.espacosDeMagia.fold(0, (s, e) => s + e.total);
     final naoTruques = conhecidas.where((m) => m.circulo > 0);
-    final preparadas = naoTruques.where(_preparada).length;
+    final preparadas = naoTruques.where((m) => _magias.preparada(p, m)).length;
 
-    final filtradas = conhecidas.where(_passa).toList()
-      ..sort((a, b) {
-        final c = a.circulo.compareTo(b.circulo);
-        return c != 0 ? c : a.nome.compareTo(b.nome);
-      });
+    final filtradas = _magias.filtrar(
+      p,
+      soPreparadas: _filtro == _Filtro.preparadas,
+      circulo: _filtro.circulo,
+    );
     final circulos = {for (final m in filtradas) m.circulo};
 
     return Column(
@@ -218,7 +211,7 @@ class _AbaMagiasState extends State<AbaMagias> {
             if (m.circulo == c)
               _LinhaMagia(
                 magia: m,
-                apagada: !_preparada(m),
+                apagada: !_magias.preparada(p, m),
                 onTap: () => _detalhes(m),
               ),
           const SizedBox(height: AppSpacing.medium),

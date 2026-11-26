@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/view/campaign/components/caixa_tracejada.dart';
-import 'package:grimorio/view/campaign/components/formatos.dart';
+import 'package:grimorio/controller/campaign/formatos.dart';
+import 'package:grimorio/controller/campaign/gerenciador_visibilidade.dart';
 import 'package:grimorio/model/campaign.dart' as dados;
 import 'package:grimorio/model/grimoire_mock.dart';
+import 'package:grimorio/view/campaign/components/caixa_tracejada.dart';
 import 'package:grimorio/widgets/appcard.dart';
 import 'package:grimorio/widgets/image_frame.dart';
 import 'package:pixelarticons/pixel.dart';
@@ -31,7 +32,7 @@ class CardRecompensa extends StatelessWidget {
     final mestre = papel == dados.PapelCampanha.mestre;
     final apagado = AppColors.onSurface.withValues(alpha: 0.6);
 
-    if (!dados.recompensaVisivel(missao, papel)) {
+    if (!const GerenciadorVisibilidade().recompensaVisivel(missao, papel)) {
       return CaixaTracejada(
         child: Row(
           children: [

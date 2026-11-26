@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
+import 'package:grimorio/controller/grimoire/gerenciador_compendio.dart';
+import 'package:grimorio/model/grimoire.dart';
+import 'package:grimorio/model/grimoire_mock.dart';
 import 'package:grimorio/view/grimoire/bestiario/monstro_detalhe.dart';
-import 'package:grimorio/view/grimoire/components/busca_compendio.dart';
 import 'package:grimorio/view/grimoire/components/filtros.dart';
 import 'package:grimorio/view/grimoire/components/linha_compendio.dart';
 import 'package:grimorio/view/grimoire/components/tela_lista.dart';
-import 'package:grimorio/model/grimoire.dart';
-import 'package:grimorio/model/grimoire_mock.dart';
 
 // Faixas de ND: rótulo → (mínimo, máximo).
 const _faixas = <String, (double, double)?>{
@@ -31,12 +31,7 @@ class _BestiarioState extends State<Bestiario> {
   String _faixa = 'Todos';
   String? _tipo;
 
-  bool _passa(Monstro m) {
-    final faixa = _faixas[_faixa];
-    return contem(m.nome, _busca) &&
-        (faixa == null || (m.ndValor >= faixa.$1 && m.ndValor <= faixa.$2)) &&
-        (_tipo == null || m.tipo == _tipo);
-  }
+  static const _compendio = GerenciadorCompendio();
 
   void _abrir(Monstro m) => Navigator.of(
     context,
@@ -45,8 +40,12 @@ class _BestiarioState extends State<Bestiario> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final filtrados = monstrosMock.where(_passa).toList()
-      ..sort((a, b) => a.ndValor.compareTo(b.ndValor));
+    final filtrados = _compendio.filtrarMonstros(
+      monstrosMock,
+      busca: _busca,
+      faixa: _faixas[_faixa],
+      tipo: _tipo,
+    );
 
     return TelaLista(
       titulo: 'Bestiário',

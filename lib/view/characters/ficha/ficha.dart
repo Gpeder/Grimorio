@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
+import 'package:grimorio/controller/characters/gerenciador_condicoes.dart';
+import 'package:grimorio/controller/characters/gerenciador_hp.dart';
+import 'package:grimorio/controller/characters/gerenciador_inventario.dart';
+import 'package:grimorio/controller/characters/gerenciador_magias.dart';
+import 'package:grimorio/controller/characters/gerenciador_notas.dart';
 import 'package:grimorio/view/characters/ficha/components/aba_combate.dart';
 import 'package:grimorio/view/characters/ficha/components/aba_diario.dart';
 import 'package:grimorio/view/characters/ficha/components/aba_inventario.dart';
@@ -34,6 +39,12 @@ class _FichaState extends State<Ficha> {
 
   static const _limiteCompacto = 190.0;
 
+  static const _hp = GerenciadorHp();
+  static const _magias = GerenciadorMagias();
+  static const _inventario = GerenciadorInventario();
+  static const _condicoes = GerenciadorCondicoes();
+  static const _notas = GerenciadorNotas();
+
   @override
   void initState() {
     super.initState();
@@ -58,7 +69,7 @@ class _FichaState extends State<Ficha> {
 
   void _usarItem(String id) {
     final item = _p.inventario.where((i) => i.id == id).firstOrNull;
-    _atualizar((p) => p.usarItem(id));
+    _atualizar((p) => _inventario.usar(p, id));
     if (item != null) {
       mostrarAviso(context, '${item.nome} usado', tipo: Snackbar.sucesso);
     }
@@ -67,9 +78,9 @@ class _FichaState extends State<Ficha> {
   Widget _conteudo() => switch (_aba) {
     0 => AbaResumo(
       personagem: _p,
-      onInspiracao: () => _atualizar((p) => p.alternarInspiracao()),
-      onCurar: (v) => _atualizar((p) => p.curar(v)),
-      onDescansoLongo: () => _atualizar((p) => p.descansoLongo()),
+      onInspiracao: () => _atualizar((p) => _condicoes.alternarInspiracao(p)),
+      onCurar: (v) => _atualizar((p) => _hp.curar(p, v)),
+      onDescansoLongo: () => _atualizar((p) => _hp.descansoLongo(p)),
       onVerPericias: () => setState(() => _aba = 1),
     ),
     1 => AbaPericias(personagem: _p),
@@ -79,22 +90,23 @@ class _FichaState extends State<Ficha> {
     ),
     3 => AbaMagias(
       personagem: _p,
-      onGastar: (c) => _atualizar((p) => p.gastarEspaco(c)),
-      onRecuperar: (c) => _atualizar((p) => p.recuperarEspaco(c)),
-      onAlternarPreparada: (k) => _atualizar((p) => p.alternarPreparada(k)),
+      onGastar: (c) => _atualizar((p) => _magias.gastarEspaco(p, c)),
+      onRecuperar: (c) => _atualizar((p) => _magias.recuperarEspaco(p, c)),
+      onAlternarPreparada: (k) =>
+          _atualizar((p) => _magias.alternarPreparada(p, k)),
     ),
     4 => AbaInventario(
       personagem: _p,
-      onEquipar: (id) => _atualizar((p) => p.equipar(id)),
-      onDesequipar: (id) => _atualizar((p) => p.desequipar(id)),
+      onEquipar: (id) => _atualizar((p) => _inventario.equipar(p, id)),
+      onDesequipar: (id) => _atualizar((p) => _inventario.desequipar(p, id)),
       onUsar: _usarItem,
-      onRemover: (id) => _atualizar((p) => p.removerItem(id)),
-      onMoedas: (m) => _atualizar((p) => p.definirMoedas(m)),
+      onRemover: (id) => _atualizar((p) => _inventario.remover(p, id)),
+      onMoedas: (m) => _atualizar((p) => _inventario.definirMoedas(p, m)),
     ),
     _ => AbaDiario(
       notas: _p.notas,
-      onAdicionar: (n) => _atualizar((p) => p.adicionarNota(n)),
-      onRemover: (id) => _atualizar((p) => p.removerNota(id)),
+      onAdicionar: (n) => _atualizar((p) => _notas.adicionar(p, n)),
+      onRemover: (id) => _atualizar((p) => _notas.remover(p, id)),
     ),
   };
 
@@ -145,16 +157,17 @@ class _FichaState extends State<Ficha> {
                     const SizedBox(height: AppSpacing.medium),
                     FichaStatus(
                       personagem: _p,
-                      onDano: (v) => _atualizar((p) => p.receberDano(v)),
-                      onCura: (v) => _atualizar((p) => p.curar(v)),
-                      onHpTemp: (v) => _atualizar((p) => p.definirHpTemp(v)),
+                      onDano: (v) => _atualizar((p) => _hp.receberDano(p, v)),
+                      onCura: (v) => _atualizar((p) => _hp.curar(p, v)),
+                      onHpTemp: (v) => _atualizar((p) => _hp.definirTemp(p, v)),
                     ),
                     const SizedBox(height: AppSpacing.medium - 4),
                     FichaCondicoes(
                       condicoes: _p.condicoes,
                       onAdicionar: (c) =>
-                          _atualizar((p) => p.adicionarCondicao(c)),
-                      onRemover: (n) => _atualizar((p) => p.removerCondicao(n)),
+                          _atualizar((p) => _condicoes.adicionar(p, c)),
+                      onRemover: (n) =>
+                          _atualizar((p) => _condicoes.remover(p, n)),
                     ),
                   ],
                 ),

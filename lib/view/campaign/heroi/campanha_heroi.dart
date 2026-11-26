@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
+import 'package:grimorio/controller/campaign/gerenciador_visibilidade.dart';
+import 'package:grimorio/model/campaign.dart' as dados;
+import 'package:grimorio/model/character.dart';
+import 'package:grimorio/model/usuario_mock.dart';
 import 'package:grimorio/view/campaign/components/cabecalho_campanha.dart';
 import 'package:grimorio/view/campaign/heroi/components/aba_diario_heroi.dart';
 import 'package:grimorio/view/campaign/heroi/components/aba_grupo.dart';
@@ -10,9 +14,6 @@ import 'package:grimorio/view/campaign/heroi/components/card_meu_heroi.dart';
 import 'package:grimorio/view/campaign/missao/missao_detalhe.dart';
 import 'package:grimorio/view/characters/ficha/components/ficha_abas.dart';
 import 'package:grimorio/view/characters/ficha/ficha.dart';
-import 'package:grimorio/model/campaign.dart' as dados;
-import 'package:grimorio/model/character.dart';
-import 'package:grimorio/model/usuario_mock.dart';
 import 'package:pixelarticons/pixel.dart';
 
 const _abas = ['Missões', 'Grupo', 'Diário'];
@@ -63,7 +64,7 @@ class _CampanhaHeroiState extends State<CampanhaHeroi> {
   }
 
   void _abrirMissao(dados.Missao m) {
-    Navigator.of(context).push<RetornoMissao>(
+    Navigator.of(context).push<dados.RetornoMissao>(
       MaterialPageRoute(
         builder: (_) => MissaoDetalhe(
           missao: m,
@@ -77,7 +78,7 @@ class _CampanhaHeroiState extends State<CampanhaHeroi> {
 
   Widget _conteudoAba() => switch (_aba) {
     0 => AbaMissoesHeroi(
-      missoes: dados.missoesVisiveis(_c, _papel),
+      missoes: const GerenciadorVisibilidade().missoes(_c, _papel),
       sessaoAtual: _c.sessaoAtual,
       onAbrir: _abrirMissao,
     ),
@@ -89,7 +90,7 @@ class _CampanhaHeroiState extends State<CampanhaHeroi> {
     ),
     _ => AbaDiarioHeroi(
       sessoes: _c.sessoes,
-      npcs: dados.npcsVisiveis(_c, _papel),
+      npcs: const GerenciadorVisibilidade().npcs(_c, _papel),
     ),
   };
 

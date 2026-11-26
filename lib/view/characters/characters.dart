@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Characters;
 import 'package:grimorio/app/theme/app_spacing.dart';
+import 'package:grimorio/controller/characters/gerenciador_personagens.dart';
 import 'package:grimorio/view/characters/components/botao_novo_heroi.dart';
 import 'package:grimorio/view/characters/components/characters_header.dart';
 import 'package:grimorio/view/characters/components/lista_personagens.dart';
@@ -32,6 +33,7 @@ class _CharactersState extends State<Characters> {
   late List<Character> _personagens = [...widget.personagens];
 
   static const _espacoEntreSecoes = AppSpacing.medium;
+  static const _gerenciador = GerenciadorPersonagens();
 
   Future<void> _abrirNovoHeroi() async {
     final novo = await Navigator.of(
@@ -41,10 +43,7 @@ class _CharactersState extends State<Characters> {
     if (novo == null || !mounted) return;
 
     setState(() {
-      _personagens = [
-        for (final p in _personagens) p.copyWith(ativo: false),
-        novo,
-      ];
+      _personagens = _gerenciador.adicionarNovo(_personagens, novo);
     });
     mostrarAviso(
       context,
@@ -62,23 +61,16 @@ class _CharactersState extends State<Characters> {
     if (atualizado == null || !mounted) return;
 
     setState(() {
-      _personagens = [
-        for (final c in _personagens) c.id == atualizado.id ? atualizado : c,
-      ];
+      _personagens = _gerenciador.trocar(_personagens, atualizado);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final busca = _busca.trim().toLowerCase();
-
     final secoes = <Widget>[
       CharactersHeader(onBusca: (v) => setState(() => _busca = v)),
       ListaPersonagens(
-        personagens: [
-          for (final p in _personagens)
-            if (p.nome.toLowerCase().contains(busca)) p,
-        ],
+        personagens: _gerenciador.filtrar(_personagens, _busca),
         campanhas: widget.campanhas ?? campanhasMock,
         onAbrir: _abrirFicha,
       ),

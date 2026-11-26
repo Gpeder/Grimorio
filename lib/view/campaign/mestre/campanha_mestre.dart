@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/view/campaign/components/cabecalho_campanha.dart';
-import 'package:grimorio/view/campaign/components/formatos.dart';
+import 'package:grimorio/controller/campaign/formatos.dart';
+import 'package:grimorio/controller/campaign/gerenciador_mesa.dart';
 import 'package:grimorio/view/campaign/components/sheet_missao.dart';
 import 'package:grimorio/view/campaign/heroi/campanha_heroi.dart';
 import 'package:grimorio/view/campaign/mestre/components/aba_mesa.dart';
@@ -41,9 +42,14 @@ class CampanhaMestre extends StatefulWidget {
 class _CampanhaMestreState extends State<CampanhaMestre> {
   static const _papel = dados.PapelCampanha.mestre;
 
-  late dados.Campaign _c = widget.campanha;
-  late List<Character> _herois = [...widget.herois];
+  late final _mesa = GerenciadorMesa(
+    campanha: widget.campanha,
+    herois: widget.herois,
+  );
   int _aba = 0;
+
+  dados.Campaign get _c => _mesa.campanha;
+  List<Character> get _herois => _mesa.herois;
 
   void _sair() => Navigator.pop<dados.RetornoCampanha>(context, (
     campanha: _c,
@@ -53,47 +59,12 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
   void _aviso(String texto, {Snackbar tipo = Snackbar.info}) =>
       mostrarAviso(context, texto, tipo: tipo);
 
-  dados.RegistroMesa _registro(
-    dados.TipoRegistro tipo,
-    String texto, {
-    String? personagemId,
-    int? valor,
-    String? itemKey,
-  }) => dados.RegistroMesa(
-    id: novoId('registro'),
-    campanhaId: _c.id,
-    tipo: tipo,
-    texto: texto,
-    personagemId: personagemId,
-    valor: valor,
-    itemKey: itemKey,
-    criadoEm: DateTime.now(),
-  );
-
-  void _trocarHeroi(String id, Character Function(Character h) f) {
-    _herois = [for (final h in _herois) h.id == id ? f(h) : h];
-  }
-
-  // Sessão
+  // sessao
 
   void _iniciarSessao() {
-    final numero = _c.sessaoAtual + 1;
-    setState(() {
-      _c = _c.copyWith(emSessao: true, sessaoAtual: numero).registrar([
-        _registro(dados.TipoRegistro.sessao, 'Sessão $numero iniciada'),
-      ]);
-    });
+    var numero = 0;
+    setState(() => numero = _mesa.iniciarSessao());
     _aviso('Sessão $numero iniciada', tipo: Snackbar.sucesso);
-  }
-
-  // XP dado desde o último registro de sessão (o "iniciada").
-  int get _xpDaSessao {
-    var total = 0;
-    for (final r in _c.registros) {
-      if (r.tipo == dados.TipoRegistro.sessao) break;
-      if (r.tipo == dados.TipoRegistro.xp) total += r.valor ?? 0;
-    }
-    return total;
   }
 
   Future<void> _encerrarSessao() async {
@@ -105,45 +76,16 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
       builder: (_) => _SheetEncerrar(numero: numero),
     );
     if (resumo == null || !mounted) return;
-    final sessao = dados.Sessao(
-      id: novoId('sessao'),
-      campanhaId: _c.id,
-      numero: numero,
-      data: DateTime.now(),
-      resumo: resumo,
-      xpTotal: _xpDaSessao,
-    );
-    setState(() {
-      _c = _c
-          .copyWith(emSessao: false, sessoes: [..._c.sessoes, sessao])
-          .registrar([
-            _registro(dados.TipoRegistro.sessao, 'Sessão $numero encerrada'),
-          ]);
-    });
+    setState(() => _mesa.encerrarSessao(resumo));
     _aviso('Sessão $numero encerrada', tipo: Snackbar.sucesso);
   }
 
-  // XP e itens
+  // xp e itens
 
   Future<void> _darXp(Set<String> marcados) async {
     final r = await pedirXp(context, herois: _herois, marcados: marcados);
     if (r == null || !mounted) return;
-    final novos = <dados.RegistroMesa>[];
-    setState(() {
-      for (final id in r.heroiIds) {
-        _trocarHeroi(id, (h) => h.ganharXp(r.valor));
-        final nome = _herois.firstWhere((h) => h.id == id).nome;
-        novos.add(
-          _registro(
-            dados.TipoRegistro.xp,
-            '+${formatarMilhar(r.valor)} XP para $nome',
-            personagemId: id,
-            valor: r.valor,
-          ),
-        );
-      }
-      _c = _c.registrar(novos);
-    });
+    setState(() => _mesa.darXp(r.valor, r.heroiIds));
     _aviso('+${formatarMilhar(r.valor)} XP entregue', tipo: Snackbar.sucesso);
   }
 
@@ -151,50 +93,20 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
     final r = await pedirItem(context, herois: _herois, heroiId: heroi.id);
     final destino = r?.heroiId;
     if (r == null || destino == null || !mounted) return;
-    setState(() {
-      _trocarHeroi(
-        destino,
-        (h) => h.receberItem(dados.itemDoCompendio(r.item)),
-      );
-      final nome = _herois.firstWhere((h) => h.id == destino).nome;
-      _c = _c.registrar([
-        _registro(
-          dados.TipoRegistro.item,
-          '${r.item.nome} para $nome',
-          personagemId: destino,
-          itemKey: r.item.key,
-        ),
-      ]);
-    });
+    setState(() => _mesa.darItem(r.item, destino));
     _aviso('${r.item.nome} entregue', tipo: Snackbar.sucesso);
   }
 
   void _desfazer(dados.RegistroMesa r) {
-    final id = r.personagemId;
-    if (id == null) return;
-    setState(() {
-      switch (r.tipo) {
-        case dados.TipoRegistro.xp:
-          _trocarHeroi(id, (h) => h.ganharXp(-(r.valor ?? 0)));
-        case dados.TipoRegistro.item:
-          _trocarHeroi(id, (h) => h.removerUmaUnidade(r.itemKey ?? ''));
-        default:
-          return;
-      }
-      _c = _c.copyWith(
-        registros: [
-          for (final x in _c.registros)
-            if (x.id != r.id) x,
-        ],
-      );
-    });
+    if (r.personagemId == null) return;
+    setState(() => _mesa.desfazer(r));
     _aviso('Desfeito');
   }
 
-  // Missões e mundo
+  // missoes e mundo
 
   Future<void> _abrirMissao(dados.Missao m) async {
-    final r = await Navigator.of(context).push<RetornoMissao>(
+    final r = await Navigator.of(context).push<dados.RetornoMissao>(
       MaterialPageRoute(
         builder: (_) => MissaoDetalhe(
           missao: m,
@@ -206,35 +118,24 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
       ),
     );
     if (r == null || !mounted) return;
-    setState(() {
-      _c = _c.trocarMissao(r.missao).registrar(r.registros);
-      _herois = r.herois;
-    });
+    setState(() => _mesa.aplicarMissao(r));
   }
 
   Future<void> _novaMissao() async {
     final m = await pedirMissao(context, campanhaId: _c.id);
     if (m == null || !mounted) return;
-    setState(() {
-      _c = _c.copyWith(missoes: [..._c.missoes, m]);
-    });
+    setState(() => _mesa.adicionarMissao(m));
     _aviso('Missão criada', tipo: Snackbar.sucesso);
   }
 
   Future<void> _novoNpc() async {
     final npc = await pedirNpc(context, _c.id);
     if (npc == null || !mounted) return;
-    setState(() => _c = _c.copyWith(npcs: [..._c.npcs, npc]));
+    setState(() => _mesa.adicionarNpc(npc));
   }
 
-  void _revelarNpc(dados.Npc npc, bool revelado) => setState(() {
-    _c = _c.copyWith(
-      npcs: [
-        for (final n in _c.npcs)
-          n.id == npc.id ? n.copyWith(revelado: revelado) : n,
-      ],
-    );
-  });
+  void _revelarNpc(dados.Npc npc, bool revelado) =>
+      setState(() => _mesa.revelarNpc(npc, revelado));
 
   void _verComoHeroi() {
     Navigator.of(context).push<void>(
@@ -267,10 +168,7 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
     ),
     2 => AbaMundo(npcs: _c.npcs, onRevelar: _revelarNpc, onNovo: _novoNpc),
     3 => AbaSessoes(sessoes: _c.sessoes),
-    _ => AbaNotas(
-      texto: _c.notasMestre,
-      onChanged: (t) => _c = _c.copyWith(notasMestre: t),
-    ),
+    _ => AbaNotas(texto: _c.notasMestre, onChanged: _mesa.editarNotas),
   };
 
   @override

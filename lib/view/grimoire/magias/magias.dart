@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
+import 'package:grimorio/controller/grimoire/gerenciador_compendio.dart';
+import 'package:grimorio/model/grimoire_mock.dart';
+import 'package:grimorio/model/hero_options.dart';
+import 'package:grimorio/model/hero_options_mock.dart';
 import 'package:grimorio/view/characters/ficha/components/titulo_secao.dart';
-import 'package:grimorio/widgets/etiqueta.dart';
-import 'package:grimorio/view/grimoire/components/busca_compendio.dart';
 import 'package:grimorio/view/grimoire/components/filtros.dart';
 import 'package:grimorio/view/grimoire/components/linha_compendio.dart';
 import 'package:grimorio/view/grimoire/components/tela_lista.dart';
 import 'package:grimorio/view/grimoire/magias/magia_detalhe.dart';
-import 'package:grimorio/model/grimoire_mock.dart';
-import 'package:grimorio/model/hero_options.dart';
-import 'package:grimorio/model/hero_options_mock.dart';
+import 'package:grimorio/widgets/etiqueta.dart';
 
 // Círculo escolhido: null = todas, 4 = "4º+".
 const _circulos = <int?, String>{
@@ -36,16 +36,7 @@ class _MagiasState extends State<Magias> {
   bool _concentracao = false;
   bool _ritual = false;
 
-  bool _passa(SpellOption m) =>
-      contem(m.nome, _busca) &&
-      switch (_circulo) {
-        null => true,
-        4 => m.circulo >= 4,
-        final c => m.circulo == c,
-      } &&
-      (_classe == null || m.classes.contains(_classe)) &&
-      (!_concentracao || m.concentracao) &&
-      (!_ritual || m.ritual);
+  static const _compendio = GerenciadorCompendio();
 
   Future<void> _escolherClasse() async {
     final escolha = await showModalBottomSheet<String>(
@@ -90,11 +81,14 @@ class _MagiasState extends State<Magias> {
 
   @override
   Widget build(BuildContext context) {
-    final filtradas = magiasCompendio.where(_passa).toList()
-      ..sort((a, b) {
-        final c = a.circulo.compareTo(b.circulo);
-        return c != 0 ? c : normalizar(a.nome).compareTo(normalizar(b.nome));
-      });
+    final filtradas = _compendio.filtrarMagias(
+      magiasCompendio,
+      busca: _busca,
+      circulo: _circulo,
+      classe: _classe,
+      concentracao: _concentracao,
+      ritual: _ritual,
+    );
     final circulos = {for (final m in filtradas) m.circulo};
 
     return TelaLista(

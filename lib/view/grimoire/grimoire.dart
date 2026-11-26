@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
+import 'package:grimorio/controller/grimoire/gerenciador_compendio.dart';
+import 'package:grimorio/model/grimoire_mock.dart';
+import 'package:grimorio/model/hero_options_mock.dart';
 import 'package:grimorio/view/characters/ficha/components/titulo_secao.dart';
 import 'package:grimorio/view/grimoire/bestiario/bestiario.dart';
 import 'package:grimorio/view/grimoire/bestiario/monstro_detalhe.dart';
@@ -17,8 +20,6 @@ import 'package:grimorio/view/grimoire/itens/item_detalhe.dart';
 import 'package:grimorio/view/grimoire/itens/itens.dart';
 import 'package:grimorio/view/grimoire/magias/magia_detalhe.dart';
 import 'package:grimorio/view/grimoire/magias/magias.dart';
-import 'package:grimorio/model/grimoire_mock.dart';
-import 'package:grimorio/model/hero_options_mock.dart';
 
 class Grimoire extends StatefulWidget {
   const Grimoire({super.key});
@@ -28,6 +29,8 @@ class Grimoire extends StatefulWidget {
 }
 
 class _GrimoireState extends State<Grimoire> {
+  static const _compendio = GerenciadorCompendio();
+
   String _busca = '';
 
   static const _porGrupo = 5;
@@ -102,7 +105,9 @@ class _GrimoireState extends State<Grimoire> {
       (
         'Magias',
         [
-          for (final m in magiasCompendio.where((m) => contem(m.nome, b)))
+          for (final m in magiasCompendio.where(
+            (m) => _compendio.contem(m.nome, b),
+          ))
             LinhaCompendio(
               imagem: imagemDaEscola(m.escola),
               titulo: m.nome,
@@ -115,7 +120,9 @@ class _GrimoireState extends State<Grimoire> {
       (
         'Criaturas',
         [
-          for (final m in monstrosMock.where((m) => contem(m.nome, b)))
+          for (final m in monstrosMock.where(
+            (m) => _compendio.contem(m.nome, b),
+          ))
             LinhaCompendio(
               imagem: m.imagem,
               titulo: m.nome,
@@ -127,7 +134,7 @@ class _GrimoireState extends State<Grimoire> {
       (
         'Itens',
         [
-          for (final i in itensMock.where((i) => contem(i.nome, b)))
+          for (final i in itensMock.where((i) => _compendio.contem(i.nome, b)))
             LinhaCompendio(
               imagem: i.imagem,
               titulo: i.nome,
@@ -141,7 +148,9 @@ class _GrimoireState extends State<Grimoire> {
       (
         'Classes',
         [
-          for (final c in classesMock.where((c) => contem(c.nome, b)))
+          for (final c in classesMock.where(
+            (c) => _compendio.contem(c.nome, b),
+          ))
             LinhaCompendio(
               imagem: c.imagem,
               titulo: c.nome,
@@ -181,7 +190,7 @@ class _GrimoireState extends State<Grimoire> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final buscando = normalizar(_busca).length >= 2;
+    final buscando = _compendio.normalizar(_busca).length >= 2;
 
     return Scaffold(
       body: SafeArea(

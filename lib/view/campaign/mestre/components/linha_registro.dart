@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/view/campaign/components/formatos.dart';
+import 'package:grimorio/controller/campaign/formatos.dart';
 import 'package:grimorio/model/campaign.dart' as dados;
 import 'package:pixelarticons/pixel.dart';
 

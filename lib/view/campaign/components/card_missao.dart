@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/widgets/etiqueta.dart';
+import 'package:grimorio/controller/campaign/gerenciador_visibilidade.dart';
 import 'package:grimorio/model/campaign.dart' as dados;
+import 'package:grimorio/widgets/etiqueta.dart';
 import 'package:pixelarticons/pixel.dart';
 
 class CardMissao extends StatelessWidget {
@@ -25,8 +26,8 @@ class CardMissao extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final m = missao;
-    final entradas = dados.entradasVisiveis(m, papel);
-    final objetivo = dados.objetivoAtual(m, papel);
+    final entradas = const GerenciadorVisibilidade().entradas(m, papel);
+    final objetivo = const GerenciadorVisibilidade().objetivoAtual(m, papel);
     final novaEntrada =
         m.ativa && entradas.isNotEmpty && entradas.first.sessao == sessaoAtual;
     final mestre = papel == dados.PapelCampanha.mestre;

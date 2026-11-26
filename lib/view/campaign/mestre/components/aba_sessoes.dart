@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/view/campaign/components/formatos.dart';
+import 'package:grimorio/controller/campaign/formatos.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
 import 'package:grimorio/model/campaign.dart' as dados;
 
