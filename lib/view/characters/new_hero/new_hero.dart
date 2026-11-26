@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:grimorio/controller/characters/gerenciador_criacao.dart';
 import 'package:grimorio/model/opcoes_heroi.dart';
 import 'package:grimorio/model/opcoes_heroi_mock.dart';
@@ -62,7 +63,7 @@ class _NewHeroState extends State<NewHero> {
   void _sair([Personagem? personagem]) {
     setState(() => _saindo = true);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) Navigator.of(context).pop(personagem);
+      if (mounted) context.pop(personagem);
     });
   }
 

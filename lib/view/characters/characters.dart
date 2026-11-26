@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart' hide Characters;
+import 'package:go_router/go_router.dart';
+import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/controller/campaign/campanhas_provider.dart';
 import 'package:grimorio/controller/characters/gerenciador_personagens.dart';
@@ -7,8 +9,6 @@ import 'package:grimorio/model/personagem.dart';
 import 'package:grimorio/view/characters/components/lista_personagens.dart';
 import 'package:grimorio/view/characters/components/novo_heroi_button.dart';
 import 'package:grimorio/view/characters/components/personagens_header.dart';
-import 'package:grimorio/view/characters/ficha/ficha.dart';
-import 'package:grimorio/view/characters/new_hero/new_hero.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -26,10 +26,7 @@ class _CharactersState extends State<Characters> {
   static const _gerenciador = GerenciadorPersonagens();
 
   Future<void> _abrirNovoHeroi() async {
-    final novo = await Navigator.of(
-      context,
-      rootNavigator: true,
-    ).push<Personagem>(MaterialPageRoute(builder: (_) => const NewHero()));
+    final novo = await context.pushNamed<Personagem>(Rotas.nomeNovoHeroi);
     if (novo == null || !mounted) return;
 
     context.read<PersonagensProvider>().adicionar(novo);
@@ -41,12 +38,8 @@ class _CharactersState extends State<Characters> {
     );
   }
 
-  void _abrirFicha(Personagem p) {
-    Navigator.of(
-      context,
-      rootNavigator: true,
-    ).push<void>(MaterialPageRoute(builder: (_) => Ficha(personagem: p)));
-  }
+  void _abrirFicha(Personagem p) =>
+      context.pushNamed(Rotas.nomeFicha, pathParameters: {Rotas.heroiId: p.id});
 
   @override
   Widget build(BuildContext context) {

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/controller/grimoire/gerenciador_compendio.dart';
 import 'package:grimorio/model/compendio.dart';
@@ -33,9 +35,10 @@ class _BestiarioState extends State<Bestiario> {
 
   static const _compendio = GerenciadorCompendio();
 
-  void _abrir(Monstro m) => Navigator.of(
-    context,
-  ).push(MaterialPageRoute<void>(builder: (_) => DetalhesMonstro(monstro: m)));
+  void _abrir(Monstro m) => context.pushNamed(
+    Rotas.nomeDetalheCompendio,
+    pathParameters: {Rotas.tipo: TipoCompendio.bestiario, Rotas.key: m.key},
+  );
 
   @override
   Widget build(BuildContext context) {

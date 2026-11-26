@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/model/opcoes_heroi_mock.dart';
 import 'package:grimorio/view/characters/new_hero/components/grade_imagens.dart';
-import 'package:grimorio/view/grimoire/classes/detalhes_classe.dart';
 import 'package:grimorio/view/grimoire/components/tela_lista.dart';
 
 class Classes extends StatelessWidget {
@@ -19,10 +20,12 @@ class Classes extends StatelessWidget {
               ItemImagem(
                 imagem: c.imagem,
                 rotulo: c.nome,
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => DetalhesClasse(classe: c),
-                  ),
+                onTap: () => context.pushNamed(
+                  Rotas.nomeDetalheCompendio,
+                  pathParameters: {
+                    Rotas.tipo: TipoCompendio.classes,
+                    Rotas.key: c.key,
+                  },
                 ),
               ),
           ],

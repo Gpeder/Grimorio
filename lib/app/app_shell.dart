@@ -1,46 +1,23 @@
-// esconde o Characters do flutter, colide com a tela
-import 'package:flutter/material.dart' hide Characters;
+import 'package:flutter/material.dart';
 import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
+import 'package:go_router/go_router.dart';
 import 'package:grimorio/app/components/navegacao_bottom_bar.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/view/campaign/campaign.dart';
-import 'package:grimorio/view/characters/characters.dart';
-import 'package:grimorio/view/grimoire/grimoire.dart';
-import 'package:grimorio/view/home/home.dart';
-import 'package:grimorio/view/settings/settings.dart';
 
-class AppShell extends StatefulWidget {
-  const AppShell({super.key});
+// shell das 5 abas, cada uma guarda o proprio estado
+class AppShell extends StatelessWidget {
+  const AppShell({super.key, required this.navigationShell});
 
-  static const abaAjustes = 4;
-
-  // troca de aba de qualquer tela
-  static void irPara(BuildContext context, int aba) {
-    context.findAncestorStateOfType<_AppShellState>()?._irPara(aba);
-  }
-
-  @override
-  State<AppShell> createState() => _AppShellState();
-}
-
-class _AppShellState extends State<AppShell> {
-  int _index = 0;
-
-  static const _pages = <Widget>[
-    Home(),
-    Characters(),
-    Campaign(),
-    Grimoire(),
-    Settings(),
-  ];
+  final StatefulNavigationShell navigationShell;
 
   static const _radius = BorderRadius.all(Radius.circular(AppSpacing.radius));
 
-  void _irPara(int aba) {
-    if (aba == _index) return;
-    setState(() => _index = aba);
-  }
+  // tocar na aba ativa volta para a raiz dela
+  void _irPara(int aba) => navigationShell.goBranch(
+    aba,
+    initialLocation: aba == navigationShell.currentIndex,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -66,10 +43,13 @@ class _AppShellState extends State<AppShell> {
             centerAction: NavegacaoBottomBar.temaBotaoCentral,
           ),
         ),
-        body: IndexedStack(index: _index, children: _pages),
+        body: navigationShell,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-          child: NavegacaoBottomBar(selectedIndex: _index, onSelected: _irPara),
+          child: NavegacaoBottomBar(
+            selectedIndex: navigationShell.currentIndex,
+            onSelected: _irPara,
+          ),
         ),
       ),
     );

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart' hide Characters;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:grimorio/view/characters/characters.dart';
+import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/view/characters/ficha/ficha.dart';
 import 'package:grimorio/view/characters/new_hero/new_hero.dart';
 
@@ -43,7 +43,7 @@ void main() {
     testWidgets('cria um Clérigo Elfo e ele aparece como ativo', (
       tester,
     ) async {
-      await tester.pumpWidget(telaDeTeste(const Characters()));
+      await tester.pumpWidget(appDeTeste(Rotas.herois));
 
       Future<void> tocar(String texto) async {
         final alvo = find.text(texto).first;

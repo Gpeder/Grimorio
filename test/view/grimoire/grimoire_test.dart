@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:grimorio/app/theme/app_theme.dart';
+import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/model/compendio_mock.dart';
 import 'package:grimorio/model/opcoes_heroi_mock.dart';
-import 'package:grimorio/view/grimoire/grimoire.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
+
+import '../../helpers/app_teste.dart';
 
 void main() {
   Future<void> abrir(WidgetTester tester) async {
@@ -12,9 +13,7 @@ void main() {
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
 
-    await tester.pumpWidget(
-      MaterialApp(theme: AppTheme.dark, home: const Grimoire()),
-    );
+    await tester.pumpWidget(appDeTeste(Rotas.grimorio));
   }
 
   Future<void> tocar(WidgetTester tester, Finder alvo) async {

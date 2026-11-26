@@ -1,7 +1,8 @@
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
-import 'package:grimorio/app/app_shell.dart';
+import 'package:go_router/go_router.dart';
+import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/widgets/avatar_circle.dart';
@@ -133,8 +134,7 @@ class _ConteudoDaBarra extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 16),
                   child: IconButton(
                     tooltip: 'Ajustes',
-                    onPressed: () =>
-                        AppShell.irPara(context, AppShell.abaAjustes),
+                    onPressed: () => context.go(Rotas.ajustes),
                     icon: const Icon(
                       Pixel.settingscog,
                       color: AppColors.secondary,

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
@@ -6,18 +8,11 @@ import 'package:grimorio/controller/grimoire/gerenciador_compendio.dart';
 import 'package:grimorio/model/compendio_mock.dart';
 import 'package:grimorio/model/opcoes_heroi_mock.dart';
 import 'package:grimorio/view/characters/ficha/components/titulo_secao.dart';
-import 'package:grimorio/view/grimoire/bestiario/bestiario.dart';
-import 'package:grimorio/view/grimoire/bestiario/detalhes_monstro.dart';
-import 'package:grimorio/view/grimoire/classes/classes.dart';
-import 'package:grimorio/view/grimoire/classes/detalhes_classe.dart';
 import 'package:grimorio/view/grimoire/components/busca_compendio.dart';
 import 'package:grimorio/view/grimoire/components/categoria_card.dart';
 import 'package:grimorio/view/grimoire/components/compendio_tile.dart';
 import 'package:grimorio/view/grimoire/components/raridade_badge.dart';
-import 'package:grimorio/view/grimoire/condicoes/condicoes.dart';
-import 'package:grimorio/view/grimoire/especies/especies.dart';
 import 'package:grimorio/view/grimoire/itens/detalhes_item.dart';
-import 'package:grimorio/view/grimoire/itens/itens.dart';
 import 'package:grimorio/view/grimoire/magias/detalhes_magia.dart';
 import 'package:grimorio/view/grimoire/magias/magias.dart';
 
@@ -35,49 +30,61 @@ class _GrimoireState extends State<Grimoire> {
 
   static const _porGrupo = 5;
 
-  // por cima da barra flutuante
-  void _abrir(Widget tela) => Navigator.of(
-    context,
-    rootNavigator: true,
-  ).push(MaterialPageRoute<void>(builder: (_) => tela));
-
   List<Widget> _categorias() {
     final cards = [
       CategoriaCard(
         nome: 'Classes',
         contagem: '${classesMock.length} classes',
         imagem: AppImages.menuGrimorio,
-        onTap: () => _abrir(const Classes()),
+        onTap: () => context.pushNamed(
+          Rotas.nomeListaCompendio,
+          pathParameters: {Rotas.tipo: TipoCompendio.classes},
+        ),
       ),
       CategoriaCard(
         nome: 'Espécies',
         contagem: '${especiesMock.length} espécies',
         imagem: AppImages.especieElfoF,
-        onTap: () => _abrir(const Especies()),
+        onTap: () => context.pushNamed(
+          Rotas.nomeListaCompendio,
+          pathParameters: {Rotas.tipo: TipoCompendio.especies},
+        ),
       ),
       CategoriaCard(
         nome: 'Magias',
         contagem: '${magiasCompendio.length} magias',
         imagem: AppImages.pergMagia,
-        onTap: () => _abrir(const Magias()),
+        onTap: () => context.pushNamed(
+          Rotas.nomeListaCompendio,
+          pathParameters: {Rotas.tipo: TipoCompendio.magias},
+        ),
       ),
       CategoriaCard(
         nome: 'Bestiário',
         contagem: '${monstrosMock.length} criaturas',
         imagem: AppImages.menuBestiario,
-        onTap: () => _abrir(const Bestiario()),
+        onTap: () => context.pushNamed(
+          Rotas.nomeListaCompendio,
+          pathParameters: {Rotas.tipo: TipoCompendio.bestiario},
+        ),
       ),
       CategoriaCard(
         nome: 'Itens',
         contagem: '${itensMock.length} itens',
         imagem: AppImages.bau,
-        onTap: () => _abrir(const Itens()),
+        onTap: () => context.pushNamed(
+          Rotas.nomeListaCompendio,
+          pathParameters: {Rotas.tipo: TipoCompendio.itens},
+        ),
       ),
       CategoriaCard(
         nome: 'Condições',
         contagem: '${condicoesMock.length} condições',
         imagem: AppImages.pocao7,
-        onTap: () => _abrir(const Condicoes()),
+        onTap: () => context.pushNamed(
+          Rotas.nomeListaCompendio,
+          pathParameters: {Rotas.tipo: TipoCompendio.condicoes},
+        ),
       ),
     ];
 
@@ -113,7 +120,13 @@ class _GrimoireState extends State<Grimoire> {
               titulo: m.nome,
               subtitulo: '${nomeDoCirculo(m.circulo)} · ${m.escola}',
               tags: TagsMagia(magia: m),
-              onTap: () => _abrir(DetalhesMagia(magia: m)),
+              onTap: () => context.pushNamed(
+                Rotas.nomeDetalheCompendio,
+                pathParameters: {
+                  Rotas.tipo: TipoCompendio.magias,
+                  Rotas.key: m.key,
+                },
+              ),
             ),
         ],
       ),
@@ -127,7 +140,13 @@ class _GrimoireState extends State<Grimoire> {
               imagem: m.imagem,
               titulo: m.nome,
               subtitulo: '${m.tipo} ${m.tamanho} · ND ${m.nd}',
-              onTap: () => _abrir(DetalhesMonstro(monstro: m)),
+              onTap: () => context.pushNamed(
+                Rotas.nomeDetalheCompendio,
+                pathParameters: {
+                  Rotas.tipo: TipoCompendio.bestiario,
+                  Rotas.key: m.key,
+                },
+              ),
             ),
         ],
       ),
@@ -155,7 +174,13 @@ class _GrimoireState extends State<Grimoire> {
               imagem: c.imagem,
               titulo: c.nome,
               subtitulo: papelDaClasse[c.key] ?? '',
-              onTap: () => _abrir(DetalhesClasse(classe: c)),
+              onTap: () => context.pushNamed(
+                Rotas.nomeDetalheCompendio,
+                pathParameters: {
+                  Rotas.tipo: TipoCompendio.classes,
+                  Rotas.key: c.key,
+                },
+              ),
             ),
         ],
       ),

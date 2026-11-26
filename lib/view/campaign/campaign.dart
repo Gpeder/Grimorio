@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
@@ -10,8 +12,6 @@ import 'package:grimorio/model/personagem.dart';
 import 'package:grimorio/view/campaign/components/campanha_card.dart';
 import 'package:grimorio/view/campaign/components/codigo_dialog.dart';
 import 'package:grimorio/view/campaign/components/nova_campanha_sheet.dart';
-import 'package:grimorio/view/campaign/heroi/campanha_heroi.dart';
-import 'package:grimorio/view/campaign/mestre/campanha_mestre.dart';
 import 'package:grimorio/widgets/image_frame.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
 import 'package:pixelarticons/pixel.dart';
@@ -57,15 +57,10 @@ class _CampanhaState extends State<Campaign> {
     _aviso('${campanha.nome} criada', tipo: Snackbar.sucesso);
   }
 
-  void _abrir(Campanha c) {
-    final tela = c.papelDe(_usuarioId) == PapelCampanha.mestre
-        ? CampanhaMestre(campanhaId: c.id)
-        : CampanhaHeroi(campanhaId: c.id);
-    Navigator.of(
-      context,
-      rootNavigator: true,
-    ).push<void>(MaterialPageRoute(builder: (_) => tela));
-  }
+  void _abrir(Campanha c) => context.pushNamed(
+    Rotas.nomeCampanha,
+    pathParameters: {Rotas.campanhaId: c.id},
+  );
 
   @override
   Widget build(BuildContext context) {

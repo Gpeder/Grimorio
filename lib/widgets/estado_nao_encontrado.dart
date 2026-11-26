@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
@@ -8,8 +10,11 @@ import 'package:grimorio/widgets/image_frame.dart';
 class EstadoNaoEncontrado extends StatelessWidget {
   const EstadoNaoEncontrado({super.key, this.onVoltar});
 
-  // sem callback volta uma tela
+  // sem callback volta uma tela ou vai pro inicio
   final VoidCallback? onVoltar;
+
+  void _voltar(BuildContext context) =>
+      context.canPop() ? context.pop() : context.go(Rotas.inicio);
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +51,7 @@ class EstadoNaoEncontrado extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.large),
                 OutlinedButton(
-                  onPressed: onVoltar ?? () => Navigator.of(context).maybePop(),
+                  onPressed: onVoltar ?? () => _voltar(context),
                   child: const Text('Voltar'),
                 ),
               ],

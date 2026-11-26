@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/controller/campaign/campanhas_provider.dart';
@@ -15,9 +17,7 @@ import 'package:grimorio/view/campaign/heroi/components/diario_heroi_tab.dart';
 import 'package:grimorio/view/campaign/heroi/components/grupo_tab.dart';
 import 'package:grimorio/view/campaign/heroi/components/meu_heroi_card.dart';
 import 'package:grimorio/view/campaign/heroi/components/missoes_heroi_tab.dart';
-import 'package:grimorio/view/campaign/missao/detalhes_missao.dart';
 import 'package:grimorio/view/characters/ficha/components/ficha_tabs.dart';
-import 'package:grimorio/view/characters/ficha/ficha.dart';
 import 'package:grimorio/widgets/estado_nao_encontrado.dart';
 import 'package:pixelarticons/pixel.dart';
 import 'package:provider/provider.dart';
@@ -62,26 +62,18 @@ class _CampanhaHeroiState extends State<CampanhaHeroi> {
           context.read<UsuarioProvider>().usuario.id,
         );
 
-  void _sair() => Navigator.pop(context);
+  void _sair() => context.pop();
 
-  void _abrirFicha(Personagem heroi) {
-    Navigator.of(
-      context,
-    ).push<void>(MaterialPageRoute(builder: (_) => Ficha(personagem: heroi)));
-  }
+  void _abrirFicha(Personagem heroi) => context.pushNamed(
+    Rotas.nomeFicha,
+    pathParameters: {Rotas.heroiId: heroi.id},
+  );
 
-  void _abrirMissao(Missao m) {
-    Navigator.of(context).push<void>(
-      MaterialPageRoute(
-        builder: (_) => DetalhesMissao(
-          missao: m,
-          papel: _papel,
-          npcs: _c.npcs,
-          sessaoAtual: _c.sessaoAtual,
-        ),
-      ),
-    );
-  }
+  // na previa a missao abre como heroi
+  void _abrirMissao(Missao m) => context.pushNamed(
+    widget.modoPrevia ? Rotas.nomeMissaoPrevia : Rotas.nomeMissao,
+    pathParameters: {Rotas.campanhaId: widget.campanhaId, Rotas.missaoId: m.id},
+  );
 
   // conteudo de cada aba
   Widget _conteudoAba() => switch (_aba) {
@@ -215,7 +207,7 @@ class _FaixaPrevia extends StatelessWidget {
                 ),
               ),
               TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => context.pop(),
                 child: const Text('Sair'),
               ),
             ],

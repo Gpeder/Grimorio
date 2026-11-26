@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/model/campanha_mock.dart';
 import 'package:grimorio/model/personagem_mock.dart';
 import 'package:grimorio/model/usuario.dart';
 import 'package:grimorio/model/usuario_mock.dart';
 import 'package:grimorio/view/settings/components/ajuste_tile.dart';
 import 'package:grimorio/view/settings/components/perfil_card.dart';
-import 'package:grimorio/view/settings/settings.dart';
 
 import '../../helpers/app_teste.dart';
 
@@ -16,7 +16,7 @@ void main() {
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
 
-    await tester.pumpWidget(telaDeTeste(const Settings()));
+    await tester.pumpWidget(appDeTeste(Rotas.ajustes));
   }
 
   Future<void> tocar(WidgetTester tester, Finder alvo) async {

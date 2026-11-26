@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/model/personagem.dart';
-import 'package:grimorio/view/characters/ficha/ficha.dart';
 import 'package:grimorio/widgets/appcard.dart';
 import 'package:grimorio/widgets/button_info.dart';
 import 'package:grimorio/widgets/image_frame.dart';
@@ -30,13 +31,10 @@ class PersonagemAtivoCard extends StatelessWidget {
               children: [
                 ButtonInfo(text: 'Personagem Ativo', onPressed: () {}),
                 TextButton(
-                  // home ainda é mock, ignora a volta
-                  onPressed: () => Navigator.of(context, rootNavigator: true)
-                      .push<Personagem>(
-                        MaterialPageRoute(
-                          builder: (_) => Ficha(personagem: personagem),
-                        ),
-                      ),
+                  onPressed: () => context.pushNamed(
+                    Rotas.nomeFicha,
+                    pathParameters: {Rotas.heroiId: personagem.id},
+                  ),
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

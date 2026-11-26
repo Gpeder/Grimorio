@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart' hide Characters;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:grimorio/view/characters/characters.dart';
+import 'package:grimorio/app/router/rotas.dart';
 
 import '../../helpers/app_teste.dart';
 
 void main() {
   Future<void> abrir(WidgetTester tester) async {
-    await tester.pumpWidget(telaDeTeste(const Characters()));
+    await tester.pumpWidget(appDeTeste(Rotas.herois));
   }
 
   testWidgets('mostra o personagem ativo com a campanha', (tester) async {

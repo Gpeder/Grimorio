@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:grimorio/view/campaign/campaign.dart';
+import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/view/campaign/components/campanha_card.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
 
@@ -12,7 +12,7 @@ void main() {
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
 
-    await tester.pumpWidget(telaDeTeste(const Campaign()));
+    await tester.pumpWidget(appDeTeste(Rotas.campanhas));
     await tester.pumpAndSettle();
   }
 

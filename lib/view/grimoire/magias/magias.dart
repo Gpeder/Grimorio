@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/controller/grimoire/gerenciador_compendio.dart';
@@ -76,8 +78,10 @@ class _MagiasState extends State<Magias> {
     setState(() => _classe = escolha.isEmpty ? null : escolha);
   }
 
-  void _abrir(OpcaoMagia m) => Navigator.of(context)
-      .push(MaterialPageRoute<void>(builder: (_) => DetalhesMagia(magia: m)));
+  void _abrir(OpcaoMagia m) => context.pushNamed(
+    Rotas.nomeDetalheCompendio,
+    pathParameters: {Rotas.tipo: TipoCompendio.magias, Rotas.key: m.key},
+  );
 
   @override
   Widget build(BuildContext context) {

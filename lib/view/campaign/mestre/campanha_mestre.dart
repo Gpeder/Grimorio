@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/controller/campaign/campanhas_provider.dart';
 import 'package:grimorio/controller/campaign/formatos.dart';
@@ -8,7 +10,6 @@ import 'package:grimorio/model/campanha.dart';
 import 'package:grimorio/model/personagem.dart';
 import 'package:grimorio/view/campaign/components/campanha_header.dart';
 import 'package:grimorio/view/campaign/components/missao_sheet.dart';
-import 'package:grimorio/view/campaign/heroi/campanha_heroi.dart';
 import 'package:grimorio/view/campaign/mestre/components/codigo_convite.dart';
 import 'package:grimorio/view/campaign/mestre/components/dar_item_sheet.dart';
 import 'package:grimorio/view/campaign/mestre/components/dar_xp_sheet.dart';
@@ -17,7 +18,6 @@ import 'package:grimorio/view/campaign/mestre/components/missoes_mestre_tab.dart
 import 'package:grimorio/view/campaign/mestre/components/mundo_tab.dart';
 import 'package:grimorio/view/campaign/mestre/components/notas_tab.dart';
 import 'package:grimorio/view/campaign/mestre/components/sessoes_tab.dart';
-import 'package:grimorio/view/campaign/missao/detalhes_missao.dart';
 import 'package:grimorio/view/characters/ficha/components/ficha_tabs.dart';
 import 'package:grimorio/view/characters/ficha/components/titulo_secao.dart';
 import 'package:grimorio/widgets/estado_nao_encontrado.dart';
@@ -51,7 +51,7 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
       .read<CampanhasProvider>()
       .naMesa(widget.campanhaId, context.read<PersonagensProvider>(), acao);
 
-  void _sair() => Navigator.pop(context);
+  void _sair() => context.pop();
 
   void _aviso(String texto, {Snackbar tipo = Snackbar.info}) =>
       mostrarAviso(context, texto, tipo: tipo);
@@ -102,19 +102,10 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
 
   // missoes e mundo
 
-  Future<void> _abrirMissao(Missao m) async {
-    await Navigator.of(context).push<void>(
-      MaterialPageRoute(
-        builder: (_) => DetalhesMissao(
-          missao: m,
-          papel: _papel,
-          npcs: _c.npcs,
-          herois: _herois,
-          sessaoAtual: _c.sessaoAtual,
-        ),
-      ),
-    );
-  }
+  void _abrirMissao(Missao m) => context.pushNamed(
+    Rotas.nomeMissao,
+    pathParameters: {Rotas.campanhaId: widget.campanhaId, Rotas.missaoId: m.id},
+  );
 
   Future<void> _novaMissao() async {
     final m = await pedirMissao(context, campanhaId: _c.id);
@@ -132,14 +123,10 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
   void _revelarNpc(Npc npc, bool revelado) =>
       _naMesa((mesa) => mesa.revelarNpc(npc, revelado));
 
-  void _verComoHeroi() {
-    Navigator.of(context).push<void>(
-      MaterialPageRoute(
-        builder: (_) =>
-            CampanhaHeroi(campanhaId: widget.campanhaId, modoPrevia: true),
-      ),
-    );
-  }
+  void _verComoHeroi() => context.pushNamed(
+    Rotas.nomePrevia,
+    pathParameters: {Rotas.campanhaId: widget.campanhaId},
+  );
 
   // conteudo de cada aba
   Widget _conteudoAba() => switch (_aba) {

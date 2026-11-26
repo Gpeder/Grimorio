@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/controller/campaign/campanhas_provider.dart';
@@ -62,7 +63,7 @@ class _DetalhesMissaoState extends State<DetalhesMissao> {
         (mesa) => mesa.aplicarMissao(_missoes.retorno),
       );
     }
-    Navigator.pop(context);
+    context.pop();
   }
 
   Future<void> _acaoEntrada(EntradaMissao e, AcaoEntrada acao) async {

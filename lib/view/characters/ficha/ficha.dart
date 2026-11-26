@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/controller/characters/gerenciador_condicoes.dart';
@@ -70,7 +71,7 @@ class _FichaState extends State<Ficha> {
   // salva no provider e volta
   void _sair() {
     context.read<PersonagensProvider>().atualizar(_p);
-    Navigator.pop(context);
+    context.pop();
   }
 
   void _usarItem(String id) {
