@@ -19,15 +19,36 @@ App Flutter de apoio a campanhas de D&D 5e na mesa. Dados da API Open5e v2 (SRD 
 - Estilo de botão, divisor, card e campo fica em `app_theme.dart`. Widget não passa `style:` próprio.
 - Telas dentro do `AppShell` terminam com padding inferior de 96 (barra flutuante).
 - Sem gradiente roxo, neon, glassmorphism ou emoji.
-- Imports sempre de pacote (`package:grimorio/...`), nunca `../`.
+- Imports sempre de pacote (`package:grimorio/...`), nunca `../`. Exceção: helpers de `test/helpers/` nos testes.
 
 ### Estrutura
 
-- `lib/app/` (tema, shell, barra) e `lib/widgets/` (AppCard, ImageFrame, Etiqueta, mostrarAviso…) ficam fixos.
+- `lib/app/` (tema, shell, barra, `router/`, `providers/`, `log/`) e `lib/widgets/` (AppCard, ImageFrame, Etiqueta, mostrarAviso…) ficam fixos.
 - `lib/view/<feature>/`: telas, com `components/` e subtelas na mesma ideia (`characters/ficha/`, `characters/new_hero/`). Features: `home`, `characters`, `campaign`, `grimoire`, `settings`.
-- `lib/controller/<feature>/`: espelha o `view/`. Classe Dart pura, um arquivo por responsabilidade (`GerenciadorExp`, `GerenciadorHp`, `GerenciadorMesa`…). Sem `material.dart`, sem `BuildContext`, sem aviso. A view continua `StatefulWidget` e chama o controller dentro do `setState`. Nada de provider, riverpod, bloc ou `ChangeNotifier`.
+- `lib/controller/<feature>/`: espelha o `view/`. Classe Dart pura, um arquivo por responsabilidade (`GerenciadorExp`, `GerenciadorHp`, `GerenciadorMesa`…). Sem `material.dart`, sem `BuildContext`, sem aviso. Gerenciadores são puros; os providers (`*_provider.dart`, `ChangeNotifier`) ficam na mesma pasta e usam os gerenciadores, sem copiar a lógica. Nada de riverpod ou bloc.
 - `lib/model/`: dados + getters calculados. Cada model tem `fromJson`, `toJson` e `copyWith` escritos à mão, chaves em `snake_case`, enum salvo como `name` e lido com `lerEnum` (`model/json.dart`). Mock do lado: `x.dart` + `x_mock.dart`.
 - Lógica visual (abrir sheet, trocar aba, animação) fica na view.
+- `lib/service/`: `api/` (`ApiClient`, `ApiErro`, `ApiRotas`, `Paginado`) e `open5e/` (um service por recurso). Models da API em `lib/model/srd/`.
+
+### Rotas
+
+- Path e nome só pelas constantes de `Rotas` (`app/router/rotas.dart`). Nada de string de rota solta.
+- Navegar com `context.pushNamed(Rotas.nomeX, pathParameters: {...})`, `context.go(Rotas.x)` e `context.pop()`. Nunca `Navigator.push`/`MaterialPageRoute`. Dialog e bottom sheet continuam com `showDialog`/`showModalBottomSheet`.
+- Parâmetro vai no path (`heroiId`, `campanhaId`); a rota busca o objeto no provider ou no mock. Nada de `extra`. Id que não existe mostra `EstadoNaoEncontrado`.
+- Subrota nova entra em `app_router.dart` com `parentNavigatorKey` da raiz (abre por cima da barra).
+
+### Estado
+
+- Provider só para dado que mais de uma tela usa (`UsuarioProvider`, `PersonagensProvider`, `CampanhasProvider`, `CompendioProvider`), registrado em `AppProviders`.
+- A tela lê com `context.watch<X>()` e age com `context.read<X>()`. Componente de `components/` nunca lê provider: recebe por parâmetro.
+- Estado local (aba interna, campo, sheet aberto) continua com `setState`. Nada de `notifyListeners()` dentro de `build`.
+
+### API e erros
+
+- HTTP só por service → `ApiClient`. Endpoint e filtro só em `ApiRotas`. Todo erro sai do client como `ApiErro` (nenhum `DioException` vaza).
+- Open5e: documento com `document__key__in=srd-2014` (o `document__key` é ignorado em itens, itens mágicos e armas), condições no documento `core`, busca com `name__icontains`. O helper `consultaSrd` já monta isso.
+- Log só pelo `AppLog` com as tags de `TagLog` (`API`, `ROTA`, `PROVIDER`, `UI`, `FLUTTER`, `APP`). Nada de `print`/`debugPrint`. Todo `catch` loga com a stack.
+- O usuário só vê mensagem amigável: `mensagemDeErro(e)` (loga o original), `mostrarErro` para ação que falhou, `EstadoCarregando`, `EstadoErro`, `EstadoVazio` e `ListaPaginada` para listas. Nunca `e.toString()` na tela.
 - `test/` espelha o `lib/`: `test/view/`, `test/controller/`, `test/model/`.
 
 ### Nomes
@@ -46,6 +67,8 @@ App Flutter de apoio a campanhas de D&D 5e na mesa. Dados da API Open5e v2 (SRD 
 
 - Tema: `lib/app/theme/`
 - Shell e barra: `lib/app/app_shell.dart`
+- Rotas: `lib/app/router/` · providers: `lib/app/providers/app_providers.dart` · log: `lib/app/log/`
+- API: `lib/service/`
 - Models: `lib/model/` (valores calculados ficam como getters no model)
 - Regras e alterações: `lib/controller/`
 - Assets: `images/` — **não abrir**, os nomes estão todos em `app_images.dart`
