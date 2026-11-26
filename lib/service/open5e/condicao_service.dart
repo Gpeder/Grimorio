@@ -17,6 +17,7 @@ class CondicaoService {
         pagina: pagina,
         busca: busca,
         documento: ApiRotas.documentoCondicoes,
+        ordem: ApiRotas.ordemNome,
       );
 
   // uma condicao pela key

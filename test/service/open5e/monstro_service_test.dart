@@ -38,23 +38,37 @@ void main() {
     expect(dio.ultimo.queryParameters['document__key__in'], 'core');
   });
 
-  test('itens cobrem as quatro rotas', () async {
+  test('armas e armaduras saem de /items/ pela categoria', () async {
     final dio = DioFalso({
-      ApiRotas.itens: RespostaFalsa(json: fixture('itens.json')),
       ApiRotas.itensMagicos: RespostaFalsa(json: fixture('itens_magicos.json')),
-      ApiRotas.armas: RespostaFalsa(json: fixture('armas.json')),
-      ApiRotas.armaduras: RespostaFalsa(json: fixture('armaduras.json')),
     });
     final s = ItemService(clienteFalso(dio));
+
+    dio.respostas[ApiRotas.itens] = RespostaFalsa(json: fixture('itens.json'));
     expect((await s.listarItens()).itens.single.nome, 'Abacus');
+    final equipamento = dio.ultimo.queryParameters[ApiRotas.filtroCategoria];
+
     expect((await s.listarMagicos()).itens.single.raridade, 'Uncommon');
+
+    dio.respostas[ApiRotas.itens] = RespostaFalsa(json: fixture('armas.json'));
     expect((await s.listarArmas()).itens.single.dano, '1d8');
-    expect((await s.listarArmaduras()).itens.single.caBase, 14);
+    expect(dio.ultimo.queryParameters[ApiRotas.filtroCategoria], 'weapon');
+
+    dio.respostas[ApiRotas.itens] = RespostaFalsa(
+      json: fixture('armaduras.json'),
+    );
+    expect((await s.listarArmaduras()).itens.single.caBase, 16);
+    expect(
+      dio.ultimo.queryParameters[ApiRotas.filtroCategoria],
+      'armor,shield',
+    );
+
+    expect(equipamento, isNot(contains('weapon')));
     expect(dio.pedidos.map((p) => p.path), [
       ApiRotas.itens,
       ApiRotas.itensMagicos,
-      ApiRotas.armas,
-      ApiRotas.armaduras,
+      ApiRotas.itens,
+      ApiRotas.itens,
     ]);
   });
 }

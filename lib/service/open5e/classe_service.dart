@@ -9,14 +9,23 @@ class ClasseService {
 
   final ApiClient _api;
 
-  // lista paginada
-  Future<Paginado<ClasseSrd>> listar({int pagina = 1, String? busca}) =>
-      _api.listarSrd(
-        ApiRotas.classes,
-        ClasseSrd.fromJson,
-        pagina: pagina,
-        busca: busca,
-      );
+  // lista paginada; subclasse false traz so as classes base
+  Future<Paginado<ClasseSrd>> listar({
+    int pagina = 1,
+    String? busca,
+    bool? subclasse,
+    String? subclasseDe,
+  }) => _api.listarSrd(
+    ApiRotas.classes,
+    ClasseSrd.fromJson,
+    pagina: pagina,
+    busca: busca,
+    ordem: ApiRotas.ordemNome,
+    filtros: {
+      ApiRotas.filtroEhSubclasse: subclasse,
+      ApiRotas.filtroSubclasseDe: subclasseDe,
+    },
+  );
 
   // uma classe pela key
   Future<ClasseSrd> buscar(String key) =>

@@ -49,7 +49,10 @@ void main() {
       final arma = ItemSrd.fromJson(primeiro('armas.json'));
       expect(arma.tipoDano, 'Slashing');
       final armadura = ItemSrd.fromJson(primeiro('armaduras.json'));
-      expect(armadura.caTexto, '14 + Dex modifier (max 2)');
+      expect(armadura.caTexto, '16');
+      expect(armadura.categoriaArmadura, 'heavy');
+      expect(armadura.forcaMinima, 13);
+      expect(arma.propriedades.single.nome, 'Versatile');
       for (final i in [comum, magico, arma, armadura]) {
         expect(ItemSrd.fromJson(i.toJson()).toJson(), i.toJson());
       }

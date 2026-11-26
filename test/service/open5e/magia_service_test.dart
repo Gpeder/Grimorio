@@ -11,7 +11,10 @@ void main() {
     });
     final r = await MagiaService(clienteFalso(dio)).listar();
 
-    expect(dio.ultimo.queryParameters, {'document__key__in': 'srd-2014'});
+    expect(dio.ultimo.queryParameters, {
+      'document__key__in': 'srd-2014',
+      'ordering': 'level,name',
+    });
     expect(r.total, 319);
     expect(r.temMais, isTrue);
     expect(r.itens.single.nome, 'Acid Arrow');
@@ -27,6 +30,7 @@ void main() {
       'document__key__in': 'srd-2014',
       'page': 3,
       'name__icontains': 'fogo',
+      'ordering': 'level,name',
     });
   });
 

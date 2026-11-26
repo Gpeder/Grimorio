@@ -3,6 +3,7 @@ import 'package:grimorio/app/log/app_log.dart';
 import 'package:grimorio/app/log/mensagem_erro.dart';
 import 'package:grimorio/controller/grimoire/estado_detalhe.dart';
 import 'package:grimorio/controller/grimoire/estado_lista.dart';
+import 'package:grimorio/controller/grimoire/filtros_srd.dart';
 import 'package:grimorio/model/srd/classe_srd.dart';
 import 'package:grimorio/model/srd/condicao_srd.dart';
 import 'package:grimorio/model/srd/especie.dart';
@@ -18,18 +19,20 @@ import 'package:grimorio/service/open5e/item_service.dart';
 import 'package:grimorio/service/open5e/magia_service.dart';
 import 'package:grimorio/service/open5e/monstro_service.dart';
 
-typedef BuscaPagina<T> = Future<Paginado<T>> Function(
+typedef BuscaPagina<T, F> = Future<Paginado<T>> Function(
   int pagina,
   String? busca,
+  F filtro,
 );
 
-// uma lista do srd com o jeito de buscar
-class _Lista<T> {
-  _Lista(this.nome, this.keyDe, this.buscar);
+// uma lista do srd com o jeito de buscar e o filtro atual
+class _Lista<T, F> {
+  _Lista(this.nome, this.keyDe, this.filtro, this.buscar);
 
   final String nome;
   final String Function(T item) keyDe;
-  final BuscaPagina<T> buscar;
+  final BuscaPagina<T, F> buscar;
+  F filtro;
   EstadoLista<T> estado = EstadoLista<T>();
 
   // muda a cada busca nova, resposta velha e ignorada
@@ -61,47 +64,71 @@ class CompendioProvider extends ChangeNotifier {
        _magias = _Lista(
          'Magias',
          (m) => m.key,
-         (p, b) => magias.listar(pagina: p, busca: b),
+         const FiltroMagia(),
+         (p, b, f) => magias.listar(
+           pagina: p,
+           busca: b,
+           nivel: f.nivel,
+           nivelMinimo: f.nivelMinimo,
+           concentracao: f.concentracao ? true : null,
+           classeKey: f.classeKey,
+           escolaKey: f.escolaKey,
+         ),
        ),
        _monstros = _Lista(
          'Monstros',
          (m) => m.key,
-         (p, b) => monstros.listar(pagina: p, busca: b),
+         const FiltroMonstro(),
+         (p, b, f) => monstros.listar(
+           pagina: p,
+           busca: b,
+           tipo: f.tipo,
+           ndMinimo: f.ndMinimo,
+           ndMaximo: f.ndMaximo,
+         ),
        ),
        _itens = _Lista(
          'Itens',
          (i) => i.key,
-         (p, b) => itens.listarItens(pagina: p, busca: b),
+         null,
+         (p, b, _) => itens.listarItens(pagina: p, busca: b),
        ),
        _itensMagicos = _Lista(
          'ItensMagicos',
          (i) => i.key,
-         (p, b) => itens.listarMagicos(pagina: p, busca: b),
+         const FiltroItemMagico(),
+         (p, b, f) =>
+             itens.listarMagicos(pagina: p, busca: b, raridade: f.raridade),
        ),
        _armas = _Lista(
          'Armas',
          (i) => i.key,
-         (p, b) => itens.listarArmas(pagina: p, busca: b),
+         null,
+         (p, b, _) => itens.listarArmas(pagina: p, busca: b),
        ),
        _armaduras = _Lista(
          'Armaduras',
          (i) => i.key,
-         (p, b) => itens.listarArmaduras(pagina: p, busca: b),
+         null,
+         (p, b, _) => itens.listarArmaduras(pagina: p, busca: b),
        ),
        _classes = _Lista(
          'Classes',
          (c) => c.key,
-         (p, b) => classes.listar(pagina: p, busca: b),
+         null,
+         (p, b, _) => classes.listar(pagina: p, busca: b, subclasse: false),
        ),
        _especies = _Lista(
          'Especies',
          (e) => e.key,
-         (p, b) => especies.listar(pagina: p, busca: b),
+         null,
+         (p, b, _) => especies.listar(pagina: p, busca: b, subespecie: false),
        ),
        _condicoes = _Lista(
          'Condicoes',
          (c) => c.key,
-         (p, b) => condicoes.listar(pagina: p, busca: b),
+         null,
+         (p, b, _) => condicoes.listar(pagina: p, busca: b),
        );
 
   final MagiaService _magiaService;
@@ -111,15 +138,15 @@ class CompendioProvider extends ChangeNotifier {
   final EspecieService _especieService;
   final CondicaoService _condicaoService;
 
-  final _Lista<Magia> _magias;
-  final _Lista<MonstroSrd> _monstros;
-  final _Lista<ItemSrd> _itens;
-  final _Lista<ItemSrd> _itensMagicos;
-  final _Lista<ItemSrd> _armas;
-  final _Lista<ItemSrd> _armaduras;
-  final _Lista<ClasseSrd> _classes;
-  final _Lista<Especie> _especies;
-  final _Lista<CondicaoSrd> _condicoes;
+  final _Lista<Magia, FiltroMagia> _magias;
+  final _Lista<MonstroSrd, FiltroMonstro> _monstros;
+  final _Lista<ItemSrd, Object?> _itens;
+  final _Lista<ItemSrd, FiltroItemMagico> _itensMagicos;
+  final _Lista<ItemSrd, Object?> _armas;
+  final _Lista<ItemSrd, Object?> _armaduras;
+  final _Lista<ClasseSrd, Object?> _classes;
+  final _Lista<Especie, Object?> _especies;
+  final _Lista<CondicaoSrd, Object?> _condicoes;
 
   // tipo + key
   final _detalhes = <String, EstadoDetalhe<Object>>{};
@@ -138,26 +165,47 @@ class CompendioProvider extends ChangeNotifier {
   EstadoLista<Especie> get especies => _especies.estado;
   EstadoLista<CondicaoSrd> get condicoes => _condicoes.estado;
 
-  // primeira pagina; mesma busca ja carregada nao chama a api
+  // filtros atuais, a tela comeca deles ao voltar
 
-  Future<void> carregarMagias({String? busca, bool forcar = false}) =>
-      _carregar(_magias, busca, forcar: forcar);
-  Future<void> carregarMonstros({String? busca, bool forcar = false}) =>
-      _carregar(_monstros, busca, forcar: forcar);
+  FiltroMagia get filtroMagias => _magias.filtro;
+  FiltroMonstro get filtroMonstros => _monstros.filtro;
+  FiltroItemMagico get filtroItensMagicos => _itensMagicos.filtro;
+
+  // primeira pagina; mesma busca e filtro ja carregados nao chamam a api
+  // filtro omitido mantem o atual
+
+  Future<void> carregarMagias({
+    String? busca,
+    FiltroMagia? filtro,
+    bool forcar = false,
+  }) => _carregar(_magias, busca, filtro ?? _magias.filtro, forcar: forcar);
+  Future<void> carregarMonstros({
+    String? busca,
+    FiltroMonstro? filtro,
+    bool forcar = false,
+  }) => _carregar(_monstros, busca, filtro ?? _monstros.filtro, forcar: forcar);
   Future<void> carregarItens({String? busca, bool forcar = false}) =>
-      _carregar(_itens, busca, forcar: forcar);
-  Future<void> carregarItensMagicos({String? busca, bool forcar = false}) =>
-      _carregar(_itensMagicos, busca, forcar: forcar);
+      _carregar(_itens, busca, null, forcar: forcar);
+  Future<void> carregarItensMagicos({
+    String? busca,
+    FiltroItemMagico? filtro,
+    bool forcar = false,
+  }) => _carregar(
+    _itensMagicos,
+    busca,
+    filtro ?? _itensMagicos.filtro,
+    forcar: forcar,
+  );
   Future<void> carregarArmas({String? busca, bool forcar = false}) =>
-      _carregar(_armas, busca, forcar: forcar);
+      _carregar(_armas, busca, null, forcar: forcar);
   Future<void> carregarArmaduras({String? busca, bool forcar = false}) =>
-      _carregar(_armaduras, busca, forcar: forcar);
+      _carregar(_armaduras, busca, null, forcar: forcar);
   Future<void> carregarClasses({String? busca, bool forcar = false}) =>
-      _carregar(_classes, busca, forcar: forcar);
+      _carregar(_classes, busca, null, forcar: forcar);
   Future<void> carregarEspecies({String? busca, bool forcar = false}) =>
-      _carregar(_especies, busca, forcar: forcar);
+      _carregar(_especies, busca, null, forcar: forcar);
   Future<void> carregarCondicoes({String? busca, bool forcar = false}) =>
-      _carregar(_condicoes, busca, forcar: forcar);
+      _carregar(_condicoes, busca, null, forcar: forcar);
 
   // proxima pagina
 
@@ -257,19 +305,21 @@ class CompendioProvider extends ChangeNotifier {
 
   // listas
 
-  Future<void> _carregarMais<T>(_Lista<T> lista) {
+  Future<void> _carregarMais<T, F>(_Lista<T, F> lista) {
     final e = lista.estado;
     if (!e.temMais) return Future.value();
     return _buscarPagina(lista, e.pagina + 1, e.busca);
   }
 
-  Future<void> _carregar<T>(
-    _Lista<T> lista,
-    String? busca, {
+  Future<void> _carregar<T, F>(
+    _Lista<T, F> lista,
+    String? busca,
+    F filtro, {
     required bool forcar,
   }) {
     final e = lista.estado;
-    final mesma = e.busca == busca;
+    final mesma = e.busca == busca && lista.filtro == filtro;
+    lista.filtro = filtro;
     final ativa =
         e.carregamento == Carregamento.pronto ||
         e.carregamento == Carregamento.carregando;
@@ -278,8 +328,8 @@ class CompendioProvider extends ChangeNotifier {
   }
 
   // todo carregamento termina em pronto ou erro
-  Future<void> _buscarPagina<T>(
-    _Lista<T> lista,
+  Future<void> _buscarPagina<T, F>(
+    _Lista<T, F> lista,
     int pagina,
     String? busca,
   ) async {
@@ -294,7 +344,7 @@ class CompendioProvider extends ChangeNotifier {
     _avisar();
 
     try {
-      final r = await lista.buscar(pagina, busca);
+      final r = await lista.buscar(pagina, busca, lista.filtro);
       if (versao != lista.versao) return;
       final base = lista.estado;
       lista.estado = base.copyWith(

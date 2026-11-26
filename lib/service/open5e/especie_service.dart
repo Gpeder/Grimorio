@@ -9,14 +9,22 @@ class EspecieService {
 
   final ApiClient _api;
 
-  // lista paginada
-  Future<Paginado<Especie>> listar({int pagina = 1, String? busca}) =>
-      _api.listarSrd(
-        ApiRotas.especies,
-        Especie.fromJson,
-        pagina: pagina,
-        busca: busca,
-      );
+  // lista paginada; subespecie false traz so as especies base
+  // subspecies_of=key e ignorado pela api, so o isnull funciona
+  Future<Paginado<Especie>> listar({
+    int pagina = 1,
+    String? busca,
+    bool? subespecie,
+  }) => _api.listarSrd(
+    ApiRotas.especies,
+    Especie.fromJson,
+    pagina: pagina,
+    busca: busca,
+    ordem: ApiRotas.ordemNome,
+    filtros: {
+      ApiRotas.filtroSemEspecieMae: subespecie == null ? null : !subespecie,
+    },
+  );
 
   // uma especie pela key
   Future<Especie> buscar(String key) =>

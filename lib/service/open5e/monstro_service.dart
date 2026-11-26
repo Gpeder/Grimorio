@@ -9,14 +9,25 @@ class MonstroService {
 
   final ApiClient _api;
 
-  // lista paginada
-  Future<Paginado<MonstroSrd>> listar({int pagina = 1, String? busca}) =>
-      _api.listarSrd(
-        ApiRotas.monstros,
-        MonstroSrd.fromJson,
-        pagina: pagina,
-        busca: busca,
-      );
+  // lista paginada por nd e nome
+  Future<Paginado<MonstroSrd>> listar({
+    int pagina = 1,
+    String? busca,
+    String? tipo,
+    double? ndMinimo,
+    double? ndMaximo,
+  }) => _api.listarSrd(
+    ApiRotas.monstros,
+    MonstroSrd.fromJson,
+    pagina: pagina,
+    busca: busca,
+    ordem: ApiRotas.ordemNd,
+    filtros: {
+      ApiRotas.filtroTipo: tipo,
+      ApiRotas.filtroNdMinimo: numeroDaQuery(ndMinimo),
+      ApiRotas.filtroNdMaximo: numeroDaQuery(ndMaximo),
+    },
+  );
 
   // uma criatura pela key
   Future<MonstroSrd> buscar(String key) =>
