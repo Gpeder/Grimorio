@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/controller/characters/gerenciador_criacao.dart';
-import 'package:grimorio/model/character.dart';
-import 'package:grimorio/model/hero_options.dart';
-import 'package:grimorio/model/hero_options_mock.dart';
+import 'package:grimorio/model/opcoes_heroi.dart';
+import 'package:grimorio/model/opcoes_heroi_mock.dart';
+import 'package:grimorio/model/personagem.dart';
 
-SpeciesOption _especie(String key) =>
+OpcaoEspecie _especie(String key) =>
     especiesMock.firstWhere((e) => e.key == key);
 
 void main() {
@@ -13,28 +13,28 @@ void main() {
       final elfo = _especie('srd_elf');
       final alto = elfo.subespecies.single;
 
-      int bonus(Ability a) =>
+      int bonus(Atributo a) =>
           GerenciadorCriacao.bonusDeEspecie(a, especie: elfo, subespecie: alto);
 
-      expect(bonus(Ability.destreza), 2);
-      expect(bonus(Ability.inteligencia), 1);
-      expect(bonus(Ability.forca), 0);
+      expect(bonus(Atributo.destreza), 2);
+      expect(bonus(Atributo.inteligencia), 1);
+      expect(bonus(Atributo.forca), 0);
     });
 
     test('Meio-Elfo dá CAR +2 e +1 nos 2 atributos escolhidos', () {
       final meioElfo = _especie('srd_half-elf');
-      const livres = {Ability.destreza, Ability.sabedoria};
+      const livres = {Atributo.destreza, Atributo.sabedoria};
 
-      int bonus(Ability a) => GerenciadorCriacao.bonusDeEspecie(
+      int bonus(Atributo a) => GerenciadorCriacao.bonusDeEspecie(
         a,
         especie: meioElfo,
         livres: livres,
       );
 
-      expect(bonus(Ability.carisma), 2);
-      expect(bonus(Ability.destreza), 1);
-      expect(bonus(Ability.sabedoria), 1);
-      expect(bonus(Ability.forca), 0);
+      expect(bonus(Atributo.carisma), 2);
+      expect(bonus(Atributo.destreza), 1);
+      expect(bonus(Atributo.sabedoria), 1);
+      expect(bonus(Atributo.forca), 0);
     });
   });
 
@@ -129,11 +129,11 @@ void main() {
 
     test('compra acima de 27 pontos é recusada', () {
       final c = GerenciadorCriacao()..mudarModo(ModoAtributos.compra);
-      expect(c.mudarValor(Ability.forca, 15), isTrue);
-      expect(c.mudarValor(Ability.destreza, 15), isTrue);
-      expect(c.mudarValor(Ability.constituicao, 15), isTrue);
-      expect(c.mudarValor(Ability.inteligencia, 9), isFalse);
-      expect(c.base[Ability.inteligencia], 8);
+      expect(c.mudarValor(Atributo.forca, 15), isTrue);
+      expect(c.mudarValor(Atributo.destreza, 15), isTrue);
+      expect(c.mudarValor(Atributo.constituicao, 15), isTrue);
+      expect(c.mudarValor(Atributo.inteligencia, 9), isFalse);
+      expect(c.base[Atributo.inteligencia], 8);
     });
   });
 }

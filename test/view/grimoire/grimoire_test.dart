@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/app/theme/app_theme.dart';
-import 'package:grimorio/widgets/etiqueta.dart';
+import 'package:grimorio/model/compendio_mock.dart';
+import 'package:grimorio/model/opcoes_heroi_mock.dart';
 import 'package:grimorio/view/grimoire/grimoire.dart';
-import 'package:grimorio/model/grimoire_mock.dart';
-import 'package:grimorio/model/hero_options_mock.dart';
+import 'package:grimorio/widgets/etiqueta.dart';
 
 void main() {
   Future<void> abrir(WidgetTester tester) async {

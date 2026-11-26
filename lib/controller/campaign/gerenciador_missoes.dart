@@ -2,18 +2,18 @@ import 'package:grimorio/controller/campaign/formatos.dart';
 import 'package:grimorio/controller/campaign/gerenciador_mesa.dart';
 import 'package:grimorio/controller/characters/gerenciador_exp.dart';
 import 'package:grimorio/controller/characters/gerenciador_inventario.dart';
-import 'package:grimorio/model/campaign.dart';
-import 'package:grimorio/model/character.dart';
-import 'package:grimorio/model/grimoire.dart';
-import 'package:grimorio/model/grimoire_mock.dart';
+import 'package:grimorio/model/campanha.dart';
+import 'package:grimorio/model/compendio.dart';
+import 'package:grimorio/model/compendio_mock.dart';
+import 'package:grimorio/model/personagem.dart';
 
 // estado do diario de uma missao
 class GerenciadorMissoes {
-  GerenciadorMissoes({required this.missao, List<Character> herois = const []})
+  GerenciadorMissoes({required this.missao, List<Personagem> herois = const []})
     : herois = [...herois];
 
   Missao missao;
-  List<Character> herois;
+  List<Personagem> herois;
 
   // vai para a mesa quando sai da tela
   final registros = <RegistroMesa>[];

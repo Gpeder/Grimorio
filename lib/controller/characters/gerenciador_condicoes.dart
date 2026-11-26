@@ -1,18 +1,18 @@
-import 'package:grimorio/model/character.dart';
+import 'package:grimorio/model/personagem.dart';
 
 class GerenciadorCondicoes {
   const GerenciadorCondicoes();
 
-  Character adicionar(Character p, Condition condicao) =>
+  Personagem adicionar(Personagem p, Condicao condicao) =>
       p.copyWith(condicoes: [...p.condicoes, condicao]);
 
-  Character remover(Character p, String nome) => p.copyWith(
+  Personagem remover(Personagem p, String nome) => p.copyWith(
     condicoes: [
       for (final c in p.condicoes)
         if (c.nome != nome) c,
     ],
   );
 
-  Character alternarInspiracao(Character p) =>
+  Personagem alternarInspiracao(Personagem p) =>
       p.copyWith(inspiracao: !p.inspiracao);
 }

@@ -1,9 +1,9 @@
-import 'package:grimorio/model/character.dart';
+import 'package:grimorio/model/personagem.dart';
 
 class GerenciadorPersonagens {
   const GerenciadorPersonagens();
 
-  List<Character> filtrar(List<Character> personagens, String busca) {
+  List<Personagem> filtrar(List<Personagem> personagens, String busca) {
     final b = busca.trim().toLowerCase();
     return [
       for (final p in personagens)
@@ -12,10 +12,13 @@ class GerenciadorPersonagens {
   }
 
   // o novo vira o ativo
-  List<Character> adicionarNovo(List<Character> personagens, Character novo) =>
-      [for (final p in personagens) p.copyWith(ativo: false), novo];
+  List<Personagem> adicionarNovo(
+    List<Personagem> personagens,
+    Personagem novo,
+  ) => [for (final p in personagens) p.copyWith(ativo: false), novo];
 
-  List<Character> trocar(List<Character> personagens, Character atualizado) => [
-    for (final p in personagens) p.id == atualizado.id ? atualizado : p,
-  ];
+  List<Personagem> trocar(
+    List<Personagem> personagens,
+    Personagem atualizado,
+  ) => [for (final p in personagens) p.id == atualizado.id ? atualizado : p];
 }

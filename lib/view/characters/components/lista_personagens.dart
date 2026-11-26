@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/view/characters/components/card_personagem.dart';
-import 'package:grimorio/model/campaign.dart';
-import 'package:grimorio/model/character.dart';
+import 'package:grimorio/model/campanha.dart';
+import 'package:grimorio/model/personagem.dart';
+import 'package:grimorio/view/characters/components/personagem_card.dart';
 
 class ListaPersonagens extends StatelessWidget {
   const ListaPersonagens({
@@ -13,9 +13,9 @@ class ListaPersonagens extends StatelessWidget {
     this.onAbrir,
   });
 
-  final List<Character> personagens;
-  final List<Campaign> campanhas;
-  final ValueChanged<Character>? onAbrir;
+  final List<Personagem> personagens;
+  final List<Campanha> campanhas;
+  final ValueChanged<Personagem>? onAbrir;
 
   static const _larguraDoCard = 170.0;
 
@@ -59,7 +59,7 @@ class ListaPersonagens extends StatelessWidget {
               for (var col = 0; col < colunas; col++)
                 Expanded(
                   child: switch (linha * colunas + col) {
-                    final i when i < personagens.length => CardPersonagem(
+                    final i when i < personagens.length => PersonagemCard(
                       personagem: personagens[i],
                       nomeCampanha: _nomeCampanha(personagens[i].campanhaId),
                       onTap: onAbrir == null

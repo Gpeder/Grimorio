@@ -3,14 +3,14 @@ import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/controller/campaign/gerenciador_campanhas.dart';
-import 'package:grimorio/model/campaign.dart' as dados;
-import 'package:grimorio/model/campaign_mock.dart';
-import 'package:grimorio/model/character.dart';
-import 'package:grimorio/model/character_mock.dart';
+import 'package:grimorio/model/campanha.dart';
+import 'package:grimorio/model/campanha_mock.dart';
+import 'package:grimorio/model/personagem.dart';
+import 'package:grimorio/model/personagem_mock.dart';
 import 'package:grimorio/model/usuario_mock.dart';
-import 'package:grimorio/view/campaign/components/card_campanha.dart';
-import 'package:grimorio/view/campaign/components/dialogo_codigo.dart';
-import 'package:grimorio/view/campaign/components/sheet_nova_campanha.dart';
+import 'package:grimorio/view/campaign/components/campanha_card.dart';
+import 'package:grimorio/view/campaign/components/codigo_dialog.dart';
+import 'package:grimorio/view/campaign/components/nova_campanha_sheet.dart';
 import 'package:grimorio/view/campaign/heroi/campanha_heroi.dart';
 import 'package:grimorio/view/campaign/mestre/campanha_mestre.dart';
 import 'package:grimorio/widgets/image_frame.dart';
@@ -21,12 +21,12 @@ class Campaign extends StatefulWidget {
   const Campaign({super.key});
 
   @override
-  State<Campaign> createState() => _CampaignState();
+  State<Campaign> createState() => _CampanhaState();
 }
 
-class _CampaignState extends State<Campaign> {
-  late List<dados.Campaign> _campanhas = [...campanhasMock];
-  late List<Character> _personagens = [...todosPersonagensMock];
+class _CampanhaState extends State<Campaign> {
+  late List<Campanha> _campanhas = [...campanhasMock];
+  late List<Personagem> _personagens = [...todosPersonagensMock];
 
   static const _acimaDaBarra = 110.0;
   static const _gerenciador = GerenciadorCampanhas();
@@ -34,7 +34,7 @@ class _CampaignState extends State<Campaign> {
   void _aviso(String texto, {Snackbar tipo = Snackbar.info}) =>
       mostrarAviso(context, texto, tipo: tipo, acimaDaBarra: true);
 
-  List<Character> _heroisDe(dados.Campaign c) =>
+  List<Personagem> _heroisDe(Campanha c) =>
       _gerenciador.heroisDe(c, _personagens);
 
   Future<void> _entrarComCodigo() async {
@@ -61,9 +61,9 @@ class _CampaignState extends State<Campaign> {
     _aviso('${campanha.nome} criada', tipo: Snackbar.sucesso);
   }
 
-  Future<void> _abrir(dados.Campaign c) async {
+  Future<void> _abrir(Campanha c) async {
     final herois = _heroisDe(c);
-    final tela = c.papelDe(usuarioMock.id) == dados.PapelCampanha.mestre
+    final tela = c.papelDe(usuarioMock.id) == PapelCampanha.mestre
         ? CampanhaMestre(campanha: c, herois: herois)
         : CampanhaHeroi(
             campanha: c,
@@ -74,7 +74,7 @@ class _CampaignState extends State<Campaign> {
     final r = await Navigator.of(
       context,
       rootNavigator: true,
-    ).push<dados.RetornoCampanha>(MaterialPageRoute(builder: (_) => tela));
+    ).push<RetornoCampanha>(MaterialPageRoute(builder: (_) => tela));
     if (r == null || !mounted) return;
 
     setState(() {
@@ -124,7 +124,7 @@ class _CampaignState extends State<Campaign> {
               const _Vazio()
             else
               for (final c in _campanhas) ...[
-                CardCampanha(
+                CampanhaCard(
                   campanha: c,
                   papel: c.papelDe(usuarioMock.id),
                   herois: _heroisDe(c),

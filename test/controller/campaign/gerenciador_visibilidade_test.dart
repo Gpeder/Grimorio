@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/controller/campaign/gerenciador_visibilidade.dart';
-import 'package:grimorio/model/campaign.dart';
-import 'package:grimorio/model/campaign_mock.dart';
+import 'package:grimorio/model/campanha.dart';
+import 'package:grimorio/model/campanha_mock.dart';
 
 void main() {
   final valfenda = campanhasMock.firstWhere(

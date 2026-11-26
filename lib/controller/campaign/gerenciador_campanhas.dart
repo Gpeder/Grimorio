@@ -1,31 +1,31 @@
-import 'package:grimorio/model/campaign.dart';
-import 'package:grimorio/model/character.dart';
+import 'package:grimorio/model/campanha.dart';
+import 'package:grimorio/model/personagem.dart';
 
 class GerenciadorCampanhas {
   const GerenciadorCampanhas();
 
-  List<Character> heroisDe(Campaign c, List<Character> personagens) => [
+  List<Personagem> heroisDe(Campanha c, List<Personagem> personagens) => [
     for (final p in personagens)
       if (p.campanhaId == c.id) p,
   ];
 
-  Character? heroiDoUsuario(List<Character> herois, String usuarioId) =>
+  Personagem? heroiDoUsuario(List<Personagem> herois, String usuarioId) =>
       herois.where((h) => h.donoId == usuarioId).firstOrNull;
 
   // ignora maiuscula e espaco
-  Campaign? buscarPorCodigo(List<Campaign> campanhas, String codigo) {
+  Campanha? buscarPorCodigo(List<Campanha> campanhas, String codigo) {
     final alvo = codigo.trim().toUpperCase();
     return campanhas
         .where((c) => c.codigoConvite.toUpperCase() == alvo)
         .firstOrNull;
   }
 
-  Campaign criar({
+  Campanha criar({
     required String nome,
     required String capitulo,
     required String mestreId,
     required DateTime agora,
-  }) => Campaign(
+  }) => Campanha(
     id: 'campanha-${agora.microsecondsSinceEpoch}',
     nome: nome,
     capitulo: capitulo,
@@ -47,13 +47,13 @@ class GerenciadorCampanhas {
     return '$letras-$digitos';
   }
 
-  List<Campaign> trocar(List<Campaign> campanhas, Campaign nova) => [
+  List<Campanha> trocar(List<Campanha> campanhas, Campanha nova) => [
     for (final c in campanhas) c.id == nova.id ? nova : c,
   ];
 
-  List<Character> trocarHerois(
-    List<Character> personagens,
-    List<Character> alterados,
+  List<Personagem> trocarHerois(
+    List<Personagem> personagens,
+    List<Personagem> alterados,
   ) {
     final porId = {for (final h in alterados) h.id: h};
     return [for (final p in personagens) porId[p.id] ?? p];

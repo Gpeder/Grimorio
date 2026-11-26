@@ -1,17 +1,17 @@
-import 'package:grimorio/model/character.dart';
-import 'package:grimorio/model/grimoire.dart';
+import 'package:grimorio/model/compendio.dart';
+import 'package:grimorio/model/personagem.dart';
 
 class GerenciadorInventario {
   const GerenciadorInventario();
 
-  Character equipar(Character p, String itemId) {
+  Personagem equipar(Personagem p, String itemId) {
     final item = p.inventario.where((i) => i.id == itemId).firstOrNull;
     final slot = item?.slotEquipavel;
     if (item == null || slot == null || item.equipado) return p;
 
     // anel tem 2 vagas, o resto 1
     final ocupantes = p.itensEm(slot);
-    final limite = slot == EquipSlot.anel ? 2 : 1;
+    final limite = slot == SlotEquipamento.anel ? 2 : 1;
     final sai = ocupantes.length >= limite ? ocupantes.first : null;
 
     return p.copyWith(
@@ -28,7 +28,7 @@ class GerenciadorInventario {
     );
   }
 
-  Character desequipar(Character p, String itemId) {
+  Personagem desequipar(Personagem p, String itemId) {
     final item = p.inventario.where((i) => i.id == itemId).firstOrNull;
     if (item == null || !item.equipado) return p;
     return p.copyWith(
@@ -41,7 +41,7 @@ class GerenciadorInventario {
   }
 
   // so gasta consumivel
-  Character usar(Character p, String itemId) => p.copyWith(
+  Personagem usar(Personagem p, String itemId) => p.copyWith(
     inventario: [
       for (final i in p.inventario)
         if (i.id != itemId || !i.consumivel)
@@ -51,7 +51,7 @@ class GerenciadorInventario {
     ],
   );
 
-  Character remover(Character p, String itemId) {
+  Personagem remover(Personagem p, String itemId) {
     final item = p.inventario.where((i) => i.id == itemId).firstOrNull;
     if (item == null) return p;
     return p.copyWith(
@@ -64,7 +64,7 @@ class GerenciadorInventario {
   }
 
   // repetido soma na quantidade
-  Character receber(Character p, InventoryItem item) {
+  Personagem receber(Personagem p, ItemInventario item) {
     final existe = p.inventario.any((i) => i.id == item.id);
     if (!existe) return p.copyWith(inventario: [...p.inventario, item]);
     return p.copyWith(
@@ -77,7 +77,7 @@ class GerenciadorInventario {
     );
   }
 
-  Character removerUmaUnidade(Character p, String itemId) {
+  Personagem removerUmaUnidade(Personagem p, String itemId) {
     final item = p.inventario.where((i) => i.id == itemId).firstOrNull;
     if (item == null) return p;
     if (item.quantidade <= 1) return remover(p, itemId);
@@ -89,11 +89,11 @@ class GerenciadorInventario {
     );
   }
 
-  Character definirMoedas(Character p, Moedas valor) =>
+  Personagem definirMoedas(Personagem p, Moedas valor) =>
       p.copyWith(moedas: valor);
 
   // item do compendio vira item da mochila
-  InventoryItem doCompendio(ItemCompendio i) => InventoryItem(
+  ItemInventario doCompendio(ItemCompendio i) => ItemInventario(
     id: i.key,
     nome: i.nome,
     imagem: i.imagem,

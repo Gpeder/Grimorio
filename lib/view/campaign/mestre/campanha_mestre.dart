@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/view/campaign/components/cabecalho_campanha.dart';
 import 'package:grimorio/controller/campaign/formatos.dart';
 import 'package:grimorio/controller/campaign/gerenciador_mesa.dart';
-import 'package:grimorio/view/campaign/components/sheet_missao.dart';
+import 'package:grimorio/model/campanha.dart';
+import 'package:grimorio/model/personagem.dart';
+import 'package:grimorio/view/campaign/components/campanha_header.dart';
+import 'package:grimorio/view/campaign/components/missao_sheet.dart';
 import 'package:grimorio/view/campaign/heroi/campanha_heroi.dart';
-import 'package:grimorio/view/campaign/mestre/components/aba_mesa.dart';
-import 'package:grimorio/view/campaign/mestre/components/aba_missoes_mestre.dart';
-import 'package:grimorio/view/campaign/mestre/components/aba_mundo.dart';
-import 'package:grimorio/view/campaign/mestre/components/aba_notas.dart';
-import 'package:grimorio/view/campaign/mestre/components/aba_sessoes.dart';
 import 'package:grimorio/view/campaign/mestre/components/codigo_convite.dart';
-import 'package:grimorio/view/campaign/mestre/components/sheet_dar_item.dart';
-import 'package:grimorio/view/campaign/mestre/components/sheet_dar_xp.dart';
-import 'package:grimorio/view/campaign/missao/missao_detalhe.dart';
-import 'package:grimorio/view/characters/ficha/components/ficha_abas.dart';
+import 'package:grimorio/view/campaign/mestre/components/dar_item_sheet.dart';
+import 'package:grimorio/view/campaign/mestre/components/dar_xp_sheet.dart';
+import 'package:grimorio/view/campaign/mestre/components/mesa_tab.dart';
+import 'package:grimorio/view/campaign/mestre/components/missoes_mestre_tab.dart';
+import 'package:grimorio/view/campaign/mestre/components/mundo_tab.dart';
+import 'package:grimorio/view/campaign/mestre/components/notas_tab.dart';
+import 'package:grimorio/view/campaign/mestre/components/sessoes_tab.dart';
+import 'package:grimorio/view/campaign/missao/detalhes_missao.dart';
+import 'package:grimorio/view/characters/ficha/components/ficha_tabs.dart';
 import 'package:grimorio/view/characters/ficha/components/titulo_secao.dart';
-import 'package:grimorio/model/campaign.dart' as dados;
-import 'package:grimorio/model/character.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
 import 'package:pixelarticons/pixel.dart';
 
@@ -30,17 +30,17 @@ class CampanhaMestre extends StatefulWidget {
     this.herois = const [],
   });
 
-  final dados.Campaign campanha;
+  final Campanha campanha;
 
   // Heróis desta campanha.
-  final List<Character> herois;
+  final List<Personagem> herois;
 
   @override
   State<CampanhaMestre> createState() => _CampanhaMestreState();
 }
 
 class _CampanhaMestreState extends State<CampanhaMestre> {
-  static const _papel = dados.PapelCampanha.mestre;
+  static const _papel = PapelCampanha.mestre;
 
   late final _mesa = GerenciadorMesa(
     campanha: widget.campanha,
@@ -48,13 +48,11 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
   );
   int _aba = 0;
 
-  dados.Campaign get _c => _mesa.campanha;
-  List<Character> get _herois => _mesa.herois;
+  Campanha get _c => _mesa.campanha;
+  List<Personagem> get _herois => _mesa.herois;
 
-  void _sair() => Navigator.pop<dados.RetornoCampanha>(context, (
-    campanha: _c,
-    herois: _herois,
-  ));
+  void _sair() =>
+      Navigator.pop<RetornoCampanha>(context, (campanha: _c, herois: _herois));
 
   void _aviso(String texto, {Snackbar tipo = Snackbar.info}) =>
       mostrarAviso(context, texto, tipo: tipo);
@@ -73,7 +71,7 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
       context: context,
       useRootNavigator: true,
       isScrollControlled: true,
-      builder: (_) => _SheetEncerrar(numero: numero),
+      builder: (_) => _EncerrarSheet(numero: numero),
     );
     if (resumo == null || !mounted) return;
     setState(() => _mesa.encerrarSessao(resumo));
@@ -89,7 +87,7 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
     _aviso('+${formatarMilhar(r.valor)} XP entregue', tipo: Snackbar.sucesso);
   }
 
-  Future<void> _darItem(Character heroi) async {
+  Future<void> _darItem(Personagem heroi) async {
     final r = await pedirItem(context, herois: _herois, heroiId: heroi.id);
     final destino = r?.heroiId;
     if (r == null || destino == null || !mounted) return;
@@ -97,7 +95,7 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
     _aviso('${r.item.nome} entregue', tipo: Snackbar.sucesso);
   }
 
-  void _desfazer(dados.RegistroMesa r) {
+  void _desfazer(RegistroMesa r) {
     if (r.personagemId == null) return;
     setState(() => _mesa.desfazer(r));
     _aviso('Desfeito');
@@ -105,10 +103,10 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
 
   // missoes e mundo
 
-  Future<void> _abrirMissao(dados.Missao m) async {
-    final r = await Navigator.of(context).push<dados.RetornoMissao>(
+  Future<void> _abrirMissao(Missao m) async {
+    final r = await Navigator.of(context).push<RetornoMissao>(
       MaterialPageRoute(
-        builder: (_) => MissaoDetalhe(
+        builder: (_) => DetalhesMissao(
           missao: m,
           papel: _papel,
           npcs: _c.npcs,
@@ -134,7 +132,7 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
     setState(() => _mesa.adicionarNpc(npc));
   }
 
-  void _revelarNpc(dados.Npc npc, bool revelado) =>
+  void _revelarNpc(Npc npc, bool revelado) =>
       setState(() => _mesa.revelarNpc(npc, revelado));
 
   void _verComoHeroi() {
@@ -151,7 +149,7 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
   }
 
   Widget _conteudoAba() => switch (_aba) {
-    0 => AbaMesa(
+    0 => MesaTab(
       campanha: _c,
       herois: _herois,
       onXp: (h) => _darXp({h.id}),
@@ -160,20 +158,20 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
       onAbrirMissao: _abrirMissao,
       onDesfazer: _desfazer,
     ),
-    1 => AbaMissoesMestre(
+    1 => MissoesMestreTab(
       missoes: _c.missoes,
       sessaoAtual: _c.sessaoAtual,
       onAbrir: _abrirMissao,
       onNova: _novaMissao,
     ),
-    2 => AbaMundo(npcs: _c.npcs, onRevelar: _revelarNpc, onNovo: _novoNpc),
-    3 => AbaSessoes(sessoes: _c.sessoes),
-    _ => AbaNotas(texto: _c.notasMestre, onChanged: _mesa.editarNotas),
+    2 => MundoTab(npcs: _c.npcs, onRevelar: _revelarNpc, onNovo: _novoNpc),
+    3 => SessoesTab(sessoes: _c.sessoes),
+    _ => NotasTab(texto: _c.notasMestre, onChanged: _mesa.editarNotas),
   };
 
   @override
   Widget build(BuildContext context) {
-    return PopScope<dados.RetornoCampanha>(
+    return PopScope<RetornoCampanha>(
       canPop: false,
       onPopInvokedWithResult: (saiu, _) {
         if (!saiu) _sair();
@@ -182,7 +180,7 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
         body: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
-              child: CabecalhoCampanha(
+              child: CampanhaHeader(
                 campanha: _c,
                 papel: _papel,
                 trailing: _c.codigoConvite.isEmpty
@@ -227,7 +225,7 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
                 ),
               ),
             ),
-            FichaAbas(
+            FichaTabs(
               aba: _aba,
               onAba: (i) => setState(() => _aba = i),
               abas: _abas,
@@ -248,16 +246,16 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
   }
 }
 
-class _SheetEncerrar extends StatefulWidget {
-  const _SheetEncerrar({required this.numero});
+class _EncerrarSheet extends StatefulWidget {
+  const _EncerrarSheet({required this.numero});
 
   final int numero;
 
   @override
-  State<_SheetEncerrar> createState() => _SheetEncerrarState();
+  State<_EncerrarSheet> createState() => _EncerrarSheetState();
 }
 
-class _SheetEncerrarState extends State<_SheetEncerrar> {
+class _EncerrarSheetState extends State<_EncerrarSheet> {
   final _resumo = TextEditingController();
 
   @override

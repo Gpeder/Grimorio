@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/controller/characters/gerenciador_criacao.dart';
-import 'package:grimorio/model/character.dart';
-import 'package:grimorio/model/hero_options.dart';
+import 'package:grimorio/model/opcoes_heroi.dart';
+import 'package:grimorio/model/personagem.dart';
 import 'package:grimorio/view/characters/new_hero/components/alternador.dart';
 import 'package:grimorio/view/characters/new_hero/components/caixa_opcao.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
@@ -27,19 +27,19 @@ class PassoAtributos extends StatelessWidget {
   });
 
   final ModoAtributos modo;
-  final Map<Ability, int?> base;
+  final Map<Atributo, int?> base;
 
-  final int? Function(Ability) total;
+  final int? Function(Atributo) total;
 
-  final String? Function(Ability) rotuloBonus;
-  final Ability? principal;
+  final String? Function(Atributo) rotuloBonus;
+  final Atributo? principal;
   final String? dica;
 
   final int bonusLivres;
-  final Set<Ability> escolhidosLivres;
+  final Set<Atributo> escolhidosLivres;
   final ValueChanged<ModoAtributos> onModo;
-  final void Function(Ability, int?) onValor;
-  final ValueChanged<Ability> onBonusLivre;
+  final void Function(Atributo, int?) onValor;
+  final ValueChanged<Atributo> onBonusLivre;
 
   static const _larguraSigla = 48.0;
   static const _larguraTotal = 40.0;
@@ -153,7 +153,7 @@ class PassoAtributos extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          for (final a in Ability.values) ...[
+          for (final a in Atributo.values) ...[
             _Linha(
               atributo: a,
               modo: modo,
@@ -177,8 +177,8 @@ class PassoAtributos extends StatelessWidget {
               spacing: 6,
               runSpacing: 6,
               children: [
-                for (final a in Ability.values)
-                  if (a != Ability.carisma)
+                for (final a in Atributo.values)
+                  if (a != Atributo.carisma)
                     Etiqueta(
                       a.sigla,
                       selecionado: escolhidosLivres.contains(a),
@@ -217,10 +217,10 @@ class _Linha extends StatelessWidget {
     required this.onValor,
   });
 
-  final Ability atributo;
+  final Atributo atributo;
   final ModoAtributos modo;
   final int? valor;
-  final Map<Ability, int?> base;
+  final Map<Atributo, int?> base;
   final int? total;
   final String? rotuloBonus;
   final bool principal;
@@ -320,7 +320,7 @@ class _CampoRolagem extends StatelessWidget {
     required this.onValor,
   });
 
-  final Ability atributo;
+  final Atributo atributo;
   final int? valor;
   final ValueChanged<int?> onValor;
 
@@ -391,9 +391,9 @@ class _CampoArray extends StatelessWidget {
     required this.onValor,
   });
 
-  final Ability atributo;
+  final Atributo atributo;
   final int? valor;
-  final Map<Ability, int?> base;
+  final Map<Atributo, int?> base;
   final ValueChanged<int?> onValor;
 
   @override

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/controller/grimoire/gerenciador_compendio.dart';
-import 'package:grimorio/model/grimoire.dart';
-import 'package:grimorio/model/grimoire_mock.dart';
+import 'package:grimorio/model/compendio.dart';
+import 'package:grimorio/model/compendio_mock.dart';
+import 'package:grimorio/view/grimoire/components/compendio_tile.dart';
 import 'package:grimorio/view/grimoire/components/filtros.dart';
-import 'package:grimorio/view/grimoire/components/linha_compendio.dart';
-import 'package:grimorio/view/grimoire/components/selo_raridade.dart';
+import 'package:grimorio/view/grimoire/components/raridade_badge.dart';
 import 'package:grimorio/view/grimoire/components/tela_lista.dart';
-import 'package:grimorio/view/grimoire/itens/item_detalhe.dart';
+import 'package:grimorio/view/grimoire/itens/detalhes_item.dart';
 
 const _rotulos = {
   FiltroItem.magicos: 'Mágicos',
@@ -68,13 +68,13 @@ class _ItensState extends State<Itens> {
       ],
       itens: [
         for (final i in filtrados)
-          LinhaCompendio(
+          CompendioTile(
             imagem: i.imagem,
             titulo: i.nome,
             subtitulo: [i.categoria, if (i.sintonia) 'sintonia'].join(' · '),
             corBorda: i.raridade.cor,
             lado: 44,
-            trailing: SeloRaridade(i.raridade),
+            trailing: RaridadeBadge(i.raridade),
             onTap: () => mostrarItem(context, i),
           ),
       ],

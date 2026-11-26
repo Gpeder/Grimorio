@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/model/character.dart';
-import 'package:grimorio/model/hero_options.dart';
+import 'package:grimorio/model/opcoes_heroi.dart';
+import 'package:grimorio/model/personagem.dart';
 
 class MedalhaoAtributo extends StatelessWidget {
   const MedalhaoAtributo({
@@ -12,7 +12,7 @@ class MedalhaoAtributo extends StatelessWidget {
     this.destaque = false,
   });
 
-  final Ability atributo;
+  final Atributo atributo;
   final int valor;
 
   final bool destaque;

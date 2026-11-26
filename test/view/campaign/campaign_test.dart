@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/app/theme/app_theme.dart';
 import 'package:grimorio/view/campaign/campaign.dart';
-import 'package:grimorio/view/campaign/components/card_campanha.dart';
+import 'package:grimorio/view/campaign/components/campanha_card.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
 
 void main() {
@@ -24,7 +24,7 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  Finder card(String nome) => find.widgetWithText(CardCampanha, nome);
+  Finder card(String nome) => find.widgetWithText(CampanhaCard, nome);
 
   Future<void> rolarAte(WidgetTester tester, Finder alvo) async {
     await tester.scrollUntilVisible(

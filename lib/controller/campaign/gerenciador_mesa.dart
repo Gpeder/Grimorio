@@ -1,17 +1,17 @@
 import 'package:grimorio/controller/campaign/formatos.dart';
 import 'package:grimorio/controller/characters/gerenciador_exp.dart';
 import 'package:grimorio/controller/characters/gerenciador_inventario.dart';
-import 'package:grimorio/model/campaign.dart';
-import 'package:grimorio/model/character.dart';
-import 'package:grimorio/model/grimoire.dart';
+import 'package:grimorio/model/campanha.dart';
+import 'package:grimorio/model/compendio.dart';
+import 'package:grimorio/model/personagem.dart';
 
 // estado da mesa do mestre
 class GerenciadorMesa {
-  GerenciadorMesa({required this.campanha, List<Character> herois = const []})
+  GerenciadorMesa({required this.campanha, List<Personagem> herois = const []})
     : herois = [...herois];
 
-  Campaign campanha;
-  List<Character> herois;
+  Campanha campanha;
+  List<Personagem> herois;
 
   static const _exp = GerenciadorExp();
   static const _inventario = GerenciadorInventario();
@@ -54,7 +54,7 @@ class GerenciadorMesa {
     registros: [...novos.reversed, ...campanha.registros],
   );
 
-  void _trocarHeroi(String id, Character Function(Character h) f) {
+  void _trocarHeroi(String id, Personagem Function(Personagem h) f) {
     herois = [for (final h in herois) h.id == id ? f(h) : h];
   }
 

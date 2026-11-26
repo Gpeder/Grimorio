@@ -1,4 +1,4 @@
-import 'package:grimorio/model/character.dart';
+import 'package:grimorio/model/personagem.dart';
 
 class GerenciadorExp {
   const GerenciadorExp();
@@ -6,7 +6,7 @@ class GerenciadorExp {
   static const nivelMaximo = 20;
 
   // valor negativo desfaz
-  Character adicionar(Character p, int valor) => p.copyWith(xp: p.xp + valor);
+  Personagem adicionar(Personagem p, int valor) => p.copyWith(xp: p.xp + valor);
 
   // nivel pela tabela de xp
   int nivelPorXp(int xp) {
@@ -17,5 +17,5 @@ class GerenciadorExp {
     return nivel;
   }
 
-  int faltaParaProximo(Character p) => p.xpProximoNivel - p.xp;
+  int faltaParaProximo(Personagem p) => p.xpProximoNivel - p.xp;
 }

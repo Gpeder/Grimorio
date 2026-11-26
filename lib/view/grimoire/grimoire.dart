@@ -3,22 +3,22 @@ import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/controller/grimoire/gerenciador_compendio.dart';
-import 'package:grimorio/model/grimoire_mock.dart';
-import 'package:grimorio/model/hero_options_mock.dart';
+import 'package:grimorio/model/compendio_mock.dart';
+import 'package:grimorio/model/opcoes_heroi_mock.dart';
 import 'package:grimorio/view/characters/ficha/components/titulo_secao.dart';
 import 'package:grimorio/view/grimoire/bestiario/bestiario.dart';
-import 'package:grimorio/view/grimoire/bestiario/monstro_detalhe.dart';
-import 'package:grimorio/view/grimoire/classes/classe_detalhe.dart';
+import 'package:grimorio/view/grimoire/bestiario/detalhes_monstro.dart';
 import 'package:grimorio/view/grimoire/classes/classes.dart';
+import 'package:grimorio/view/grimoire/classes/detalhes_classe.dart';
 import 'package:grimorio/view/grimoire/components/busca_compendio.dart';
-import 'package:grimorio/view/grimoire/components/card_categoria.dart';
-import 'package:grimorio/view/grimoire/components/linha_compendio.dart';
-import 'package:grimorio/view/grimoire/components/selo_raridade.dart';
+import 'package:grimorio/view/grimoire/components/categoria_card.dart';
+import 'package:grimorio/view/grimoire/components/compendio_tile.dart';
+import 'package:grimorio/view/grimoire/components/raridade_badge.dart';
 import 'package:grimorio/view/grimoire/condicoes/condicoes.dart';
 import 'package:grimorio/view/grimoire/especies/especies.dart';
-import 'package:grimorio/view/grimoire/itens/item_detalhe.dart';
+import 'package:grimorio/view/grimoire/itens/detalhes_item.dart';
 import 'package:grimorio/view/grimoire/itens/itens.dart';
-import 'package:grimorio/view/grimoire/magias/magia_detalhe.dart';
+import 'package:grimorio/view/grimoire/magias/detalhes_magia.dart';
 import 'package:grimorio/view/grimoire/magias/magias.dart';
 
 class Grimoire extends StatefulWidget {
@@ -43,37 +43,37 @@ class _GrimoireState extends State<Grimoire> {
 
   List<Widget> _categorias() {
     final cards = [
-      CardCategoria(
+      CategoriaCard(
         nome: 'Classes',
         contagem: '${classesMock.length} classes',
         imagem: AppImages.menuGrimorio,
         onTap: () => _abrir(const Classes()),
       ),
-      CardCategoria(
+      CategoriaCard(
         nome: 'Espécies',
         contagem: '${especiesMock.length} espécies',
         imagem: AppImages.especieElfoF,
         onTap: () => _abrir(const Especies()),
       ),
-      CardCategoria(
+      CategoriaCard(
         nome: 'Magias',
         contagem: '${magiasCompendio.length} magias',
         imagem: AppImages.pergMagia,
         onTap: () => _abrir(const Magias()),
       ),
-      CardCategoria(
+      CategoriaCard(
         nome: 'Bestiário',
         contagem: '${monstrosMock.length} criaturas',
         imagem: AppImages.menuBestiario,
         onTap: () => _abrir(const Bestiario()),
       ),
-      CardCategoria(
+      CategoriaCard(
         nome: 'Itens',
         contagem: '${itensMock.length} itens',
         imagem: AppImages.bau,
         onTap: () => _abrir(const Itens()),
       ),
-      CardCategoria(
+      CategoriaCard(
         nome: 'Condições',
         contagem: '${condicoesMock.length} condições',
         imagem: AppImages.pocao7,
@@ -108,12 +108,12 @@ class _GrimoireState extends State<Grimoire> {
           for (final m in magiasCompendio.where(
             (m) => _compendio.contem(m.nome, b),
           ))
-            LinhaCompendio(
+            CompendioTile(
               imagem: imagemDaEscola(m.escola),
               titulo: m.nome,
               subtitulo: '${nomeDoCirculo(m.circulo)} · ${m.escola}',
               tags: TagsMagia(magia: m),
-              onTap: () => _abrir(MagiaDetalhe(magia: m)),
+              onTap: () => _abrir(DetalhesMagia(magia: m)),
             ),
         ],
       ),
@@ -123,11 +123,11 @@ class _GrimoireState extends State<Grimoire> {
           for (final m in monstrosMock.where(
             (m) => _compendio.contem(m.nome, b),
           ))
-            LinhaCompendio(
+            CompendioTile(
               imagem: m.imagem,
               titulo: m.nome,
               subtitulo: '${m.tipo} ${m.tamanho} · ND ${m.nd}',
-              onTap: () => _abrir(MonstroDetalhe(monstro: m)),
+              onTap: () => _abrir(DetalhesMonstro(monstro: m)),
             ),
         ],
       ),
@@ -135,12 +135,12 @@ class _GrimoireState extends State<Grimoire> {
         'Itens',
         [
           for (final i in itensMock.where((i) => _compendio.contem(i.nome, b)))
-            LinhaCompendio(
+            CompendioTile(
               imagem: i.imagem,
               titulo: i.nome,
               subtitulo: i.categoria,
               corBorda: i.raridade.cor,
-              trailing: SeloRaridade(i.raridade),
+              trailing: RaridadeBadge(i.raridade),
               onTap: () => mostrarItem(context, i),
             ),
         ],
@@ -151,11 +151,11 @@ class _GrimoireState extends State<Grimoire> {
           for (final c in classesMock.where(
             (c) => _compendio.contem(c.nome, b),
           ))
-            LinhaCompendio(
+            CompendioTile(
               imagem: c.imagem,
               titulo: c.nome,
               subtitulo: papelDaClasse[c.key] ?? '',
-              onTap: () => _abrir(ClasseDetalhe(classe: c)),
+              onTap: () => _abrir(DetalhesClasse(classe: c)),
             ),
         ],
       ),

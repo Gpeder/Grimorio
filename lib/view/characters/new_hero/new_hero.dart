@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/controller/characters/gerenciador_criacao.dart';
-import 'package:grimorio/model/character.dart';
-import 'package:grimorio/model/hero_options.dart';
-import 'package:grimorio/model/hero_options_mock.dart';
+import 'package:grimorio/model/opcoes_heroi.dart';
+import 'package:grimorio/model/opcoes_heroi_mock.dart';
+import 'package:grimorio/model/personagem.dart';
 import 'package:grimorio/view/characters/new_hero/components/passo_antecedente.dart';
 import 'package:grimorio/view/characters/new_hero/components/passo_atributos.dart';
 import 'package:grimorio/view/characters/new_hero/components/passo_classe.dart';
@@ -59,7 +59,7 @@ class _NewHeroState extends State<NewHero> {
     }
   }
 
-  void _sair([Character? personagem]) {
+  void _sair([Personagem? personagem]) {
     setState(() => _saindo = true);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) Navigator.of(context).pop(personagem);
@@ -96,7 +96,7 @@ class _NewHeroState extends State<NewHero> {
   void _avisar(String texto, {Snackbar tipo = Snackbar.info}) =>
       mostrarAviso(context, texto, tipo: tipo);
 
-  void _mudarValor(Ability a, int? v) {
+  void _mudarValor(Atributo a, int? v) {
     var mudou = false;
     setState(() => mudou = _criacao.mudarValor(a, v));
     if (!mudou) _avisar('Sem pontos disponíveis', tipo: Snackbar.erro);
@@ -244,7 +244,7 @@ class _NewHeroState extends State<NewHero> {
   Widget build(BuildContext context) {
     final passo = _criacao.passo;
 
-    return PopScope<Character>(
+    return PopScope<Personagem>(
       canPop: _saindo || (passo == 1 && !_criacao.temAlgo),
       onPopInvokedWithResult: _aoTentarSair,
       child: Scaffold(

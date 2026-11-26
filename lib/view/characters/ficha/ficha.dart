@@ -6,17 +6,17 @@ import 'package:grimorio/controller/characters/gerenciador_hp.dart';
 import 'package:grimorio/controller/characters/gerenciador_inventario.dart';
 import 'package:grimorio/controller/characters/gerenciador_magias.dart';
 import 'package:grimorio/controller/characters/gerenciador_notas.dart';
-import 'package:grimorio/view/characters/ficha/components/aba_combate.dart';
-import 'package:grimorio/view/characters/ficha/components/aba_diario.dart';
-import 'package:grimorio/view/characters/ficha/components/aba_inventario.dart';
-import 'package:grimorio/view/characters/ficha/components/aba_magias.dart';
-import 'package:grimorio/view/characters/ficha/components/aba_pericias.dart';
-import 'package:grimorio/view/characters/ficha/components/aba_resumo.dart';
-import 'package:grimorio/view/characters/ficha/components/ficha_abas.dart';
-import 'package:grimorio/view/characters/ficha/components/ficha_cabecalho.dart';
+import 'package:grimorio/model/personagem.dart';
+import 'package:grimorio/view/characters/ficha/components/combate_tab.dart';
+import 'package:grimorio/view/characters/ficha/components/diario_tab.dart';
 import 'package:grimorio/view/characters/ficha/components/ficha_condicoes.dart';
+import 'package:grimorio/view/characters/ficha/components/ficha_header.dart';
 import 'package:grimorio/view/characters/ficha/components/ficha_status.dart';
-import 'package:grimorio/model/character.dart';
+import 'package:grimorio/view/characters/ficha/components/ficha_tabs.dart';
+import 'package:grimorio/view/characters/ficha/components/inventario_tab.dart';
+import 'package:grimorio/view/characters/ficha/components/magias_tab.dart';
+import 'package:grimorio/view/characters/ficha/components/pericias_tab.dart';
+import 'package:grimorio/view/characters/ficha/components/resumo_tab.dart';
 import 'package:grimorio/widgets/image_frame.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
 import 'package:pixelarticons/pixel.dart';
@@ -24,14 +24,14 @@ import 'package:pixelarticons/pixel.dart';
 class Ficha extends StatefulWidget {
   const Ficha({super.key, required this.personagem});
 
-  final Character personagem;
+  final Personagem personagem;
 
   @override
   State<Ficha> createState() => _FichaState();
 }
 
 class _FichaState extends State<Ficha> {
-  late Character _p = widget.personagem;
+  late Personagem _p = widget.personagem;
   int _aba = 0;
 
   final _rolagem = ScrollController();
@@ -60,7 +60,7 @@ class _FichaState extends State<Ficha> {
     super.dispose();
   }
 
-  void _atualizar(Character Function(Character p) acao) {
+  void _atualizar(Personagem Function(Personagem p) acao) {
     if (!mounted) return;
     setState(() => _p = acao(_p));
   }
@@ -76,26 +76,26 @@ class _FichaState extends State<Ficha> {
   }
 
   Widget _conteudo() => switch (_aba) {
-    0 => AbaResumo(
+    0 => ResumoTab(
       personagem: _p,
       onInspiracao: () => _atualizar((p) => _condicoes.alternarInspiracao(p)),
       onCurar: (v) => _atualizar((p) => _hp.curar(p, v)),
       onDescansoLongo: () => _atualizar((p) => _hp.descansoLongo(p)),
       onVerPericias: () => setState(() => _aba = 1),
     ),
-    1 => AbaPericias(personagem: _p),
-    2 => AbaCombate(
+    1 => PericiasTab(personagem: _p),
+    2 => CombateTab(
       personagem: _p,
       onIrInventario: () => setState(() => _aba = 4),
     ),
-    3 => AbaMagias(
+    3 => MagiasTab(
       personagem: _p,
       onGastar: (c) => _atualizar((p) => _magias.gastarEspaco(p, c)),
       onRecuperar: (c) => _atualizar((p) => _magias.recuperarEspaco(p, c)),
       onAlternarPreparada: (k) =>
           _atualizar((p) => _magias.alternarPreparada(p, k)),
     ),
-    4 => AbaInventario(
+    4 => InventarioTab(
       personagem: _p,
       onEquipar: (id) => _atualizar((p) => _inventario.equipar(p, id)),
       onDesequipar: (id) => _atualizar((p) => _inventario.desequipar(p, id)),
@@ -103,7 +103,7 @@ class _FichaState extends State<Ficha> {
       onRemover: (id) => _atualizar((p) => _inventario.remover(p, id)),
       onMoedas: (m) => _atualizar((p) => _inventario.definirMoedas(p, m)),
     ),
-    _ => AbaDiario(
+    _ => DiarioTab(
       notas: _p.notas,
       onAdicionar: (n) => _atualizar((p) => _notas.adicionar(p, n)),
       onRemover: (id) => _atualizar((p) => _notas.remover(p, id)),
@@ -112,7 +112,7 @@ class _FichaState extends State<Ficha> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope<Character>(
+    return PopScope<Personagem>(
       canPop: false,
       onPopInvokedWithResult: (saiu, _) {
         if (!saiu) _sair();
@@ -150,7 +150,7 @@ class _FichaState extends State<Ficha> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    FichaCabecalho(
+                    FichaHeader(
                       personagem: _p,
                       onSubirNivel: () => mostrarAviso(context, 'Em breve'),
                     ),
@@ -173,7 +173,7 @@ class _FichaState extends State<Ficha> {
                 ),
               ),
             ),
-            FichaAbas(aba: _aba, onAba: (i) => setState(() => _aba = i)),
+            FichaTabs(aba: _aba, onAba: (i) => setState(() => _aba = i)),
             SliverSafeArea(
               top: false,
               sliver: SliverPadding(
@@ -198,7 +198,7 @@ class _FichaState extends State<Ficha> {
 class _TituloCompacto extends StatelessWidget {
   const _TituloCompacto({required this.personagem});
 
-  final Character personagem;
+  final Personagem personagem;
 
   @override
   Widget build(BuildContext context) {

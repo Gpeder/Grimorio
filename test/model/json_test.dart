@@ -1,19 +1,19 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:grimorio/model/character.dart';
 import 'package:grimorio/model/json.dart';
+import 'package:grimorio/model/personagem.dart';
 
 void main() {
   group('lerEnum', () {
     test('lê pelo nome', () {
       expect(
-        lerEnum(Ability.values, 'carisma', Ability.forca),
-        Ability.carisma,
+        lerEnum(Atributo.values, 'carisma', Atributo.forca),
+        Atributo.carisma,
       );
     });
 
     test('nome inválido volta o padrão', () {
-      expect(lerEnum(Ability.values, 'sorte', Ability.forca), Ability.forca);
-      expect(lerEnumOuNulo(Ability.values, 42), isNull);
+      expect(lerEnum(Atributo.values, 'sorte', Atributo.forca), Atributo.forca);
+      expect(lerEnumOuNulo(Atributo.values, 42), isNull);
     });
   });
 

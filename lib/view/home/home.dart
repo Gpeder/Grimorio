@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/view/home/components/campaign_active.dart';
-import 'package:grimorio/view/home/components/card_personagem_ativo.dart';
-import 'package:grimorio/view/home/components/home_appbar.dart';
-import 'package:grimorio/view/home/components/menu_actions.dart';
-import 'package:grimorio/view/home/components/mission_active.dart';
-import 'package:grimorio/view/home/components/not_hero.dart';
-import 'package:grimorio/model/character.dart';
-import 'package:grimorio/model/character_mock.dart';
+import 'package:grimorio/model/personagem.dart';
+import 'package:grimorio/model/personagem_mock.dart';
+import 'package:grimorio/view/home/components/acoes_menu.dart';
+import 'package:grimorio/view/home/components/campanha_ativa.dart';
+import 'package:grimorio/view/home/components/home_app_bar.dart';
+import 'package:grimorio/view/home/components/missao_ativa_card.dart';
+import 'package:grimorio/view/home/components/personagem_ativo_card.dart';
+import 'package:grimorio/view/home/components/sem_heroi_card.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key, this.personagem = personagemAtivoMock});
 
-  final Character? personagem;
+  final Personagem? personagem;
 
   static const _espacoEntreSecoes = AppSpacing.large;
 
@@ -22,19 +22,19 @@ class Home extends StatelessWidget {
 
     final secoes = <Widget>[
       if (personagem == null)
-        const NotHero()
+        const SemHeroiCard()
       else ...[
-        CardPersonagemAtivo(personagem: personagem),
-        const MenuActions(),
-        const CampaignActive(),
-        const MissionActive(),
+        PersonagemAtivoCard(personagem: personagem),
+        const AcoesMenu(),
+        const CampanhaAtiva(),
+        const MissaoAtivaCard(),
       ],
     ];
 
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          HomeAppbar(avatarPath: personagem?.retrato),
+          HomeAppBar(avatarPath: personagem?.retrato),
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(
               AppSpacing.medium,

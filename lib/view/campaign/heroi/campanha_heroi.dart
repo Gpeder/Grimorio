@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/controller/campaign/gerenciador_visibilidade.dart';
-import 'package:grimorio/model/campaign.dart' as dados;
-import 'package:grimorio/model/character.dart';
+import 'package:grimorio/model/campanha.dart';
+import 'package:grimorio/model/personagem.dart';
 import 'package:grimorio/model/usuario_mock.dart';
-import 'package:grimorio/view/campaign/components/cabecalho_campanha.dart';
-import 'package:grimorio/view/campaign/heroi/components/aba_diario_heroi.dart';
-import 'package:grimorio/view/campaign/heroi/components/aba_grupo.dart';
-import 'package:grimorio/view/campaign/heroi/components/aba_missoes_heroi.dart';
+import 'package:grimorio/view/campaign/components/campanha_header.dart';
 import 'package:grimorio/view/campaign/heroi/components/aviso_sessao.dart';
-import 'package:grimorio/view/campaign/heroi/components/card_meu_heroi.dart';
-import 'package:grimorio/view/campaign/missao/missao_detalhe.dart';
-import 'package:grimorio/view/characters/ficha/components/ficha_abas.dart';
+import 'package:grimorio/view/campaign/heroi/components/diario_heroi_tab.dart';
+import 'package:grimorio/view/campaign/heroi/components/grupo_tab.dart';
+import 'package:grimorio/view/campaign/heroi/components/meu_heroi_card.dart';
+import 'package:grimorio/view/campaign/heroi/components/missoes_heroi_tab.dart';
+import 'package:grimorio/view/campaign/missao/detalhes_missao.dart';
+import 'package:grimorio/view/characters/ficha/components/ficha_tabs.dart';
 import 'package:grimorio/view/characters/ficha/ficha.dart';
 import 'package:pixelarticons/pixel.dart';
 
@@ -27,13 +27,13 @@ class CampanhaHeroi extends StatefulWidget {
     this.modoPrevia = false,
   });
 
-  final dados.Campaign campanha;
+  final Campanha campanha;
 
   // O herói do usuário nesta campanha.
-  final Character? heroi;
+  final Personagem? heroi;
 
   // Todos os heróis da campanha (a aba Grupo mostra os outros).
-  final List<Character> grupo;
+  final List<Personagem> grupo;
 
   // Aberta pelo Mestre em "Ver como herói": só leitura.
   final bool modoPrevia;
@@ -43,30 +43,30 @@ class CampanhaHeroi extends StatefulWidget {
 }
 
 class _CampanhaHeroiState extends State<CampanhaHeroi> {
-  static const _papel = dados.PapelCampanha.heroi;
+  static const _papel = PapelCampanha.heroi;
 
-  late Character? _heroi = widget.heroi;
+  late Personagem? _heroi = widget.heroi;
   int _aba = 0;
 
-  dados.Campaign get _c => widget.campanha;
+  Campanha get _c => widget.campanha;
 
-  void _sair() => Navigator.pop<dados.RetornoCampanha>(context, (
+  void _sair() => Navigator.pop<RetornoCampanha>(context, (
     campanha: _c,
     herois: [?_heroi],
   ));
 
-  Future<void> _abrirFicha(Character heroi) async {
-    final atualizado = await Navigator.of(context).push<Character>(
+  Future<void> _abrirFicha(Personagem heroi) async {
+    final atualizado = await Navigator.of(context).push<Personagem>(
       MaterialPageRoute(builder: (_) => Ficha(personagem: heroi)),
     );
     if (atualizado == null || !mounted) return;
     setState(() => _heroi = atualizado);
   }
 
-  void _abrirMissao(dados.Missao m) {
-    Navigator.of(context).push<dados.RetornoMissao>(
+  void _abrirMissao(Missao m) {
+    Navigator.of(context).push<RetornoMissao>(
       MaterialPageRoute(
-        builder: (_) => MissaoDetalhe(
+        builder: (_) => DetalhesMissao(
           missao: m,
           papel: _papel,
           npcs: _c.npcs,
@@ -77,18 +77,18 @@ class _CampanhaHeroiState extends State<CampanhaHeroi> {
   }
 
   Widget _conteudoAba() => switch (_aba) {
-    0 => AbaMissoesHeroi(
+    0 => MissoesHeroiTab(
       missoes: const GerenciadorVisibilidade().missoes(_c, _papel),
       sessaoAtual: _c.sessaoAtual,
       onAbrir: _abrirMissao,
     ),
-    1 => AbaGrupo(
+    1 => GrupoTab(
       outros: [
         for (final h in widget.grupo)
           if (h.id != _heroi?.id) h,
       ],
     ),
-    _ => AbaDiarioHeroi(
+    _ => DiarioHeroiTab(
       sessoes: _c.sessoes,
       npcs: const GerenciadorVisibilidade().npcs(_c, _papel),
     ),
@@ -102,11 +102,7 @@ class _CampanhaHeroiState extends State<CampanhaHeroi> {
     final rolagem = CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
-          child: CabecalhoCampanha(
-            campanha: _c,
-            papel: _papel,
-            semTopo: previa,
-          ),
+          child: CampanhaHeader(campanha: _c, papel: _papel, semTopo: previa),
         ),
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(
@@ -127,7 +123,7 @@ class _CampanhaHeroiState extends State<CampanhaHeroi> {
                   const SizedBox(height: AppSpacing.medium),
                 ],
                 if (heroi != null)
-                  CardMeuHeroi(
+                  MeuHeroiCard(
                     heroi: heroi,
                     onAbrirFicha: previa ? null : () => _abrirFicha(heroi),
                   ),
@@ -135,7 +131,7 @@ class _CampanhaHeroiState extends State<CampanhaHeroi> {
             ),
           ),
         ),
-        FichaAbas(
+        FichaTabs(
           aba: _aba,
           onAba: (i) => setState(() => _aba = i),
           abas: _abas,
@@ -163,7 +159,7 @@ class _CampanhaHeroiState extends State<CampanhaHeroi> {
       );
     }
 
-    return PopScope<dados.RetornoCampanha>(
+    return PopScope<RetornoCampanha>(
       canPop: false,
       onPopInvokedWithResult: (saiu, _) {
         if (!saiu) _sair();

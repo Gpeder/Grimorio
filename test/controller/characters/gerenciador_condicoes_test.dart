@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/controller/characters/gerenciador_condicoes.dart';
-import 'package:grimorio/model/character.dart';
+import 'package:grimorio/model/personagem.dart';
 
 import 'personagem_teste.dart';
 
@@ -10,7 +10,7 @@ void main() {
   test('adicionar e remover condição', () {
     final p = condicoes.adicionar(
       personagemTeste(),
-      const Condition(nome: 'Caído'),
+      const Condicao(nome: 'Caído'),
     );
     expect(p.condicoes.single.nome, 'Caído');
     expect(condicoes.remover(p, 'Caído').condicoes, isEmpty);
@@ -19,7 +19,7 @@ void main() {
   test('remover condição que não existe não muda nada', () {
     final p = condicoes.adicionar(
       personagemTeste(),
-      const Condition(nome: 'Caído'),
+      const Condicao(nome: 'Caído'),
     );
     expect(condicoes.remover(p, 'Cego').condicoes, hasLength(1));
   });

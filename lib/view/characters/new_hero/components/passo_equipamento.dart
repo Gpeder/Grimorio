@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
+import 'package:grimorio/model/opcoes_heroi.dart';
 import 'package:grimorio/view/characters/new_hero/components/alternador.dart';
 import 'package:grimorio/view/characters/new_hero/components/caixa_opcao.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
-import 'package:grimorio/model/hero_options.dart';
 import 'package:grimorio/widgets/image_frame.dart';
 
 class PassoEquipamento extends StatelessWidget {
@@ -20,7 +20,7 @@ class PassoEquipamento extends StatelessWidget {
     required this.onOuro,
   });
 
-  final ClassOption classe;
+  final OpcaoClasse classe;
   final bool modoOuro;
 
   final Map<int, String> escolhas;

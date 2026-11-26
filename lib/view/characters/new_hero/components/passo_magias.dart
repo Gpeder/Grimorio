@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
+import 'package:grimorio/model/opcoes_heroi.dart';
 import 'package:grimorio/view/characters/new_hero/components/caixa_opcao.dart';
+import 'package:grimorio/view/characters/new_hero/components/check_tile.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
-import 'package:grimorio/view/characters/new_hero/components/linha_check.dart';
-import 'package:grimorio/model/hero_options.dart';
 import 'package:grimorio/widgets/image_frame.dart';
 
 class PassoMagias extends StatelessWidget {
@@ -21,7 +21,7 @@ class PassoMagias extends StatelessWidget {
     required this.onMagia,
   });
 
-  final ClassOption classe;
+  final OpcaoClasse classe;
 
   final List<String> travadas;
   final Set<String> truques;
@@ -180,7 +180,7 @@ class _Linha extends StatelessWidget {
     this.onChanged,
   });
 
-  final SpellOption magia;
+  final OpcaoMagia magia;
   final bool marcado;
   final bool travado;
   final ValueChanged<bool>? onChanged;
@@ -197,7 +197,7 @@ class _Linha extends StatelessWidget {
           ),
         ),
       ),
-      child: LinhaCheck(
+      child: CheckTile(
         marcado: marcado,
         travado: travado,
         onChanged: onChanged,

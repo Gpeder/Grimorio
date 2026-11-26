@@ -1,4 +1,4 @@
-import 'package:grimorio/model/campaign.dart';
+import 'package:grimorio/model/campanha.dart';
 
 // quem ve o que, pensado para virar rls no supabase
 class GerenciadorVisibilidade {
@@ -6,7 +6,7 @@ class GerenciadorVisibilidade {
 
   bool _mestre(PapelCampanha p) => p == PapelCampanha.mestre;
 
-  List<Missao> missoes(Campaign c, PapelCampanha p) => [
+  List<Missao> missoes(Campanha c, PapelCampanha p) => [
     for (final m in c.missoes)
       if (_mestre(p) || m.revelada) m,
   ];
@@ -23,7 +23,7 @@ class GerenciadorVisibilidade {
   bool recompensaVisivel(Missao m, PapelCampanha p) =>
       _mestre(p) || m.estado == EstadoMissao.concluida;
 
-  List<Npc> npcs(Campaign c, PapelCampanha p) => [
+  List<Npc> npcs(Campanha c, PapelCampanha p) => [
     for (final n in c.npcs)
       if (_mestre(p) || n.revelado) n,
   ];

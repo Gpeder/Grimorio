@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/controller/grimoire/gerenciador_compendio.dart';
-import 'package:grimorio/model/grimoire_mock.dart';
-import 'package:grimorio/model/hero_options.dart';
-import 'package:grimorio/model/hero_options_mock.dart';
+import 'package:grimorio/model/compendio_mock.dart';
+import 'package:grimorio/model/opcoes_heroi.dart';
+import 'package:grimorio/model/opcoes_heroi_mock.dart';
 import 'package:grimorio/view/characters/ficha/components/titulo_secao.dart';
+import 'package:grimorio/view/grimoire/components/compendio_tile.dart';
 import 'package:grimorio/view/grimoire/components/filtros.dart';
-import 'package:grimorio/view/grimoire/components/linha_compendio.dart';
 import 'package:grimorio/view/grimoire/components/tela_lista.dart';
-import 'package:grimorio/view/grimoire/magias/magia_detalhe.dart';
+import 'package:grimorio/view/grimoire/magias/detalhes_magia.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
 
 // Círculo escolhido: null = todas, 4 = "4º+".
@@ -76,8 +76,8 @@ class _MagiasState extends State<Magias> {
     setState(() => _classe = escolha.isEmpty ? null : escolha);
   }
 
-  void _abrir(SpellOption m) => Navigator.of(context)
-      .push(MaterialPageRoute<void>(builder: (_) => MagiaDetalhe(magia: m)));
+  void _abrir(OpcaoMagia m) => Navigator.of(context)
+      .push(MaterialPageRoute<void>(builder: (_) => DetalhesMagia(magia: m)));
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +135,7 @@ class _MagiasState extends State<Magias> {
           ),
           for (final m in filtradas)
             if (m.circulo == c)
-              LinhaCompendio(
+              CompendioTile(
                 imagem: imagemDaEscola(m.escola),
                 titulo: m.nome,
                 subtitulo: m.linha,
@@ -151,7 +151,7 @@ class _MagiasState extends State<Magias> {
 class TagsMagia extends StatelessWidget {
   const TagsMagia({super.key, required this.magia});
 
-  final SpellOption magia;
+  final OpcaoMagia magia;
 
   @override
   Widget build(BuildContext context) {

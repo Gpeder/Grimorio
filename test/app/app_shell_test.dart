@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:grimorio/app/components/barra_navegacao.dart';
+import 'package:grimorio/app/components/navegacao_bottom_bar.dart';
 import 'package:grimorio/main.dart';
 import 'package:pixelarticons/pixel.dart';
 
@@ -19,7 +19,7 @@ void main() {
       tester.widget<IndexedStack>(find.byType(IndexedStack).first).index!;
 
   Finder naBarra(String texto) => find.descendant(
-    of: find.byType(BarraNavegacao),
+    of: find.byType(NavegacaoBottomBar),
     matching: find.text(texto),
   );
 
@@ -45,7 +45,7 @@ void main() {
     }
     expect(
       find.descendant(
-        of: find.byType(BarraNavegacao),
+        of: find.byType(NavegacaoBottomBar),
         matching: find.byType(Expanded),
       ),
       findsNWidgets(5),
@@ -60,7 +60,7 @@ void main() {
 
     await tester.tap(naBarra('Campanhas'));
     await tester.pumpAndSettle();
-    expect(abaAtual(tester), BarraNavegacao.indiceCentral);
+    expect(abaAtual(tester), NavegacaoBottomBar.indiceCentral);
   });
 
   testWidgets('a parte do botão central acima da barra recebe o toque', (
@@ -78,12 +78,12 @@ void main() {
     final pontoAcima = Offset(icone.center.dx, icone.center.dy - 20);
     expect(
       pontoAcima.dy,
-      lessThan(tester.getRect(find.byType(BarraNavegacao)).top - 6),
+      lessThan(tester.getRect(find.byType(NavegacaoBottomBar)).top - 6),
     );
 
     await tester.tapAt(pontoAcima);
     await tester.pumpAndSettle();
-    expect(abaAtual(tester), BarraNavegacao.indiceCentral);
+    expect(abaAtual(tester), NavegacaoBottomBar.indiceCentral);
   });
 
   testWidgets('tocar em Ajustes mostra a tela de Ajustes', (tester) async {

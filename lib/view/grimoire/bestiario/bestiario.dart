@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/controller/grimoire/gerenciador_compendio.dart';
-import 'package:grimorio/model/grimoire.dart';
-import 'package:grimorio/model/grimoire_mock.dart';
-import 'package:grimorio/view/grimoire/bestiario/monstro_detalhe.dart';
+import 'package:grimorio/model/compendio.dart';
+import 'package:grimorio/model/compendio_mock.dart';
+import 'package:grimorio/view/grimoire/bestiario/detalhes_monstro.dart';
+import 'package:grimorio/view/grimoire/components/compendio_tile.dart';
 import 'package:grimorio/view/grimoire/components/filtros.dart';
-import 'package:grimorio/view/grimoire/components/linha_compendio.dart';
 import 'package:grimorio/view/grimoire/components/tela_lista.dart';
 
 // Faixas de ND: rótulo → (mínimo, máximo).
@@ -35,7 +35,7 @@ class _BestiarioState extends State<Bestiario> {
 
   void _abrir(Monstro m) => Navigator.of(
     context,
-  ).push(MaterialPageRoute<void>(builder: (_) => MonstroDetalhe(monstro: m)));
+  ).push(MaterialPageRoute<void>(builder: (_) => DetalhesMonstro(monstro: m)));
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +81,7 @@ class _BestiarioState extends State<Bestiario> {
       ],
       itens: [
         for (final m in filtrados)
-          LinhaCompendio(
+          CompendioTile(
             imagem: m.imagem,
             titulo: m.nome,
             subtitulo: '${m.tipo} ${m.tamanho} · ${milhar(m.xp)} XP',

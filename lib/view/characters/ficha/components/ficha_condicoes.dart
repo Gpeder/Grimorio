@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/view/characters/ficha/components/dialogo_numero.dart';
+import 'package:grimorio/model/personagem.dart';
+import 'package:grimorio/view/characters/ficha/components/numero_dialog.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
-import 'package:grimorio/model/character.dart';
 
 const condicoesSrd = [
   'Agarrado',
@@ -32,11 +32,11 @@ class FichaCondicoes extends StatelessWidget {
     required this.onRemover,
   });
 
-  final List<Condition> condicoes;
-  final ValueChanged<Condition> onAdicionar;
+  final List<Condicao> condicoes;
+  final ValueChanged<Condicao> onAdicionar;
   final ValueChanged<String> onRemover;
 
-  Future<void> _remover(BuildContext context, Condition c) async {
+  Future<void> _remover(BuildContext context, Condicao c) async {
     final ok = await confirmar(
       context,
       titulo: 'Remover ${c.nome}?',
@@ -46,7 +46,7 @@ class FichaCondicoes extends StatelessWidget {
   }
 
   Future<void> _adicionar(BuildContext context) async {
-    final nova = await showModalBottomSheet<Condition>(
+    final nova = await showModalBottomSheet<Condicao>(
       context: context,
       isScrollControlled: true,
       backgroundColor: AppColors.surface,
@@ -146,7 +146,7 @@ class _NovaCondicaoState extends State<_NovaCondicao> {
                     ? null
                     : () => Navigator.pop(
                         context,
-                        Condition(
+                        Condicao(
                           nome: nome,
                           rodadas: int.tryParse(_rodadas.text),
                         ),

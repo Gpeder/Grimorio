@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart' hide Characters;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/app/theme/app_theme.dart';
+import 'package:grimorio/model/personagem_mock.dart';
 import 'package:grimorio/view/characters/characters.dart';
-import 'package:grimorio/view/characters/ficha/components/ficha_abas.dart';
+import 'package:grimorio/view/characters/ficha/components/ficha_tabs.dart';
 import 'package:grimorio/view/characters/ficha/ficha.dart';
-import 'package:grimorio/model/character_mock.dart';
 import 'package:pixelarticons/pixel.dart';
 
 void main() {
@@ -70,14 +70,14 @@ void main() {
     await abrir(tester);
 
     final barra = find.descendant(
-      of: find.byType(FichaAbas),
+      of: find.byType(FichaTabs),
       matching: find.byType(Scrollable),
     );
     final tela = find.byType(CustomScrollView);
 
     for (final aba in abasFicha) {
       final alvo = find.descendant(
-        of: find.byType(FichaAbas),
+        of: find.byType(FichaTabs),
         matching: find.text(aba),
       );
       await tester.scrollUntilVisible(alvo, 80, scrollable: barra);

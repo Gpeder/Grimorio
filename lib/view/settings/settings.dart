@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/view/characters/ficha/components/titulo_secao.dart';
-import 'package:grimorio/model/campaign_mock.dart';
-import 'package:grimorio/model/character_mock.dart';
+import 'package:grimorio/model/campanha_mock.dart';
+import 'package:grimorio/model/personagem_mock.dart';
 import 'package:grimorio/model/usuario.dart';
 import 'package:grimorio/model/usuario_mock.dart';
-import 'package:grimorio/view/settings/components/card_perfil.dart';
+import 'package:grimorio/view/characters/ficha/components/titulo_secao.dart';
+import 'package:grimorio/view/settings/components/ajuste_tile.dart';
 import 'package:grimorio/view/settings/components/grupo_ajustes.dart';
-import 'package:grimorio/view/settings/components/linha_ajuste.dart';
-import 'package:grimorio/view/settings/components/sheet_opcoes.dart';
-import 'package:grimorio/view/settings/components/sheet_perfil.dart';
+import 'package:grimorio/view/settings/components/opcoes_sheet.dart';
+import 'package:grimorio/view/settings/components/perfil_card.dart';
+import 'package:grimorio/view/settings/components/perfil_sheet.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
 import 'package:pixelarticons/pixel.dart';
 
@@ -39,7 +39,7 @@ class _SettingsState extends State<Settings> {
     required Usuario Function(T) aplicar,
     String? nota,
   }) async {
-    final escolhido = await mostrarSheetOpcoes<T>(
+    final escolhido = await mostrarOpcoesSheet<T>(
       context,
       titulo: titulo,
       opcoes: opcoes,
@@ -52,7 +52,7 @@ class _SettingsState extends State<Settings> {
   }
 
   Future<void> _editarPerfil() async {
-    final novo = await mostrarSheetPerfil(context, _u);
+    final novo = await mostrarPerfilSheet(context, _u);
     if (novo == null || !mounted) return;
     setState(() => _u = novo);
     _aviso('Perfil atualizado', tipo: Snackbar.sucesso);
@@ -96,7 +96,7 @@ class _SettingsState extends State<Settings> {
     showModalBottomSheet<void>(
       context: context,
       useRootNavigator: true,
-      builder: (context) => const _SheetCreditos(versao: _versao),
+      builder: (context) => const _CreditosSheet(versao: _versao),
     );
   }
 
@@ -118,7 +118,7 @@ class _SettingsState extends State<Settings> {
           fontWeight: FontWeight.bold,
         ),
       ),
-      CardPerfil(
+      PerfilCard(
         usuario: _u,
         herois: personagensMock.length,
         campanhas: campanhasMock.length,
@@ -128,7 +128,7 @@ class _SettingsState extends State<Settings> {
       GrupoAjustes(
         titulo: 'Regras',
         linhas: [
-          LinhaAjuste(
+          AjusteTile(
             icone: Pixel.bookopen,
             titulo: 'Edição das regras',
             valor: _u.edicao.label,
@@ -140,13 +140,13 @@ class _SettingsState extends State<Settings> {
               aplicar: (e) => _u.copyWith(edicao: e),
             ),
           ),
-          LinhaAjuste(
+          AjusteTile(
             icone: Pixel.bookmark,
             titulo: 'Livros adicionais',
             valor: 'Nenhum',
             onTap: _emBreve,
           ),
-          LinhaAjuste(
+          AjusteTile(
             icone: Pixel.sparkles,
             titulo: 'Sistema de magia',
             valor: _u.magia.label,
@@ -159,7 +159,7 @@ class _SettingsState extends State<Settings> {
               nota: 'Pontos de magia é uma regra opcional',
             ),
           ),
-          LinhaAjuste(
+          AjusteTile(
             icone: Pixel.trendingup,
             titulo: 'Subida de nível',
             valor: _u.subida.label,
@@ -176,20 +176,20 @@ class _SettingsState extends State<Settings> {
       GrupoAjustes(
         titulo: 'Na mesa',
         linhas: [
-          LinhaAjuste.alternar(
+          AjusteTile.alternar(
             icone: Pixel.infobox,
             titulo: 'Mostrar dicas de bônus',
             subtitulo: '"Ataque +5" ao lado das armas e magias',
             ligado: _u.dicasBonus,
             onChanged: (v) => setState(() => _u = _u.copyWith(dicasBonus: v)),
           ),
-          LinhaAjuste.alternar(
+          AjusteTile.alternar(
             icone: Pixel.vibrate,
             titulo: 'Vibrar ao tocar',
             ligado: _u.vibrar,
             onChanged: (v) => setState(() => _u = _u.copyWith(vibrar: v)),
           ),
-          LinhaAjuste.alternar(
+          AjusteTile.alternar(
             icone: Pixel.warningdiamond,
             titulo: 'Confirmar antes de apagar',
             ligado: _u.confirmarApagar,
@@ -201,23 +201,23 @@ class _SettingsState extends State<Settings> {
       GrupoAjustes(
         titulo: 'Dados',
         linhas: [
-          LinhaAjuste(
+          AjusteTile(
             icone: Pixel.reload,
             titulo: 'Atualizar compêndio',
             valor: _data(_u.compendioAtualizadoEm),
             onTap: _atualizarCompendio,
           ),
-          LinhaAjuste(
+          AjusteTile(
             icone: Pixel.download,
             titulo: 'Fazer backup',
             onTap: _emBreve,
           ),
-          LinhaAjuste(
+          AjusteTile(
             icone: Pixel.upload,
             titulo: 'Importar backup',
             onTap: _emBreve,
           ),
-          LinhaAjuste(
+          AjusteTile(
             icone: Pixel.trash,
             titulo: 'Apagar todos os dados',
             perigoso: true,
@@ -228,17 +228,17 @@ class _SettingsState extends State<Settings> {
       GrupoAjustes(
         titulo: 'Sobre',
         linhas: [
-          const LinhaAjuste(
+          const AjusteTile(
             icone: Pixel.infobox,
             titulo: 'Versão',
             valor: _versao,
           ),
-          LinhaAjuste(
+          AjusteTile(
             icone: Pixel.script,
             titulo: 'Créditos e licenças',
             onTap: _creditos,
           ),
-          LinhaAjuste(
+          AjusteTile(
             icone: Pixel.star,
             titulo: 'Avaliar o app',
             onTap: _emBreve,
@@ -266,8 +266,8 @@ class _SettingsState extends State<Settings> {
   }
 }
 
-class _SheetCreditos extends StatelessWidget {
-  const _SheetCreditos({required this.versao});
+class _CreditosSheet extends StatelessWidget {
+  const _CreditosSheet({required this.versao});
 
   final String versao;
 

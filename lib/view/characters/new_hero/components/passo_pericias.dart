@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
+import 'package:grimorio/model/opcoes_heroi.dart';
+import 'package:grimorio/model/opcoes_heroi_mock.dart';
 import 'package:grimorio/view/characters/new_hero/components/caixa_opcao.dart';
+import 'package:grimorio/view/characters/new_hero/components/check_tile.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
-import 'package:grimorio/view/characters/new_hero/components/linha_check.dart';
-import 'package:grimorio/model/hero_options.dart';
-import 'package:grimorio/model/hero_options_mock.dart';
 
 class PassoPericias extends StatelessWidget {
   const PassoPericias({
@@ -21,7 +21,7 @@ class PassoPericias extends StatelessWidget {
     required this.onPericiaLivre,
   });
 
-  final ClassOption classe;
+  final OpcaoClasse classe;
 
   final Map<String, String> travadas;
   final Set<String> escolhidas;
@@ -123,7 +123,7 @@ class PassoPericias extends StatelessWidget {
     );
   }
 
-  static SkillOption _buscar(String nome) =>
+  static OpcaoPericia _buscar(String nome) =>
       periciasMock.firstWhere((p) => p.nome == nome);
 }
 
@@ -174,7 +174,7 @@ class _Linha extends StatelessWidget {
     this.onChanged,
   });
 
-  final SkillOption pericia;
+  final OpcaoPericia pericia;
   final bool marcado;
   final bool travado;
   final String? origem;
@@ -194,7 +194,7 @@ class _Linha extends StatelessWidget {
           ),
         ),
       ),
-      child: LinhaCheck(
+      child: CheckTile(
         marcado: marcado,
         travado: travado,
         onChanged: onChanged,

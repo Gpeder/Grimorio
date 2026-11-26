@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
+import 'package:grimorio/model/compendio.dart';
+import 'package:grimorio/model/compendio_mock.dart';
 import 'package:grimorio/view/characters/new_hero/components/caixa_opcao.dart';
 import 'package:grimorio/view/grimoire/components/tela_lista.dart';
-import 'package:grimorio/model/grimoire.dart';
-import 'package:grimorio/model/grimoire_mock.dart';
 import 'package:pixelarticons/pixel.dart';
 
 class Condicoes extends StatefulWidget {
@@ -26,7 +26,7 @@ class _CondicoesState extends State<Condicoes> {
         for (final c in condicoesMock)
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.small),
-            child: _CardCondicao(
+            child: _CondicaoCard(
               condicao: c,
               aberta: _aberta == c.nome,
               onTap: () =>
@@ -38,8 +38,8 @@ class _CondicoesState extends State<Condicoes> {
   }
 }
 
-class _CardCondicao extends StatelessWidget {
-  const _CardCondicao({
+class _CondicaoCard extends StatelessWidget {
+  const _CondicaoCard({
     required this.condicao,
     required this.aberta,
     required this.onTap,

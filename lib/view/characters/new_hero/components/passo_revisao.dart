@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/widgets/etiqueta.dart';
-import 'package:grimorio/model/character.dart';
-import 'package:grimorio/model/hero_options.dart';
+import 'package:grimorio/model/opcoes_heroi.dart';
+import 'package:grimorio/model/personagem.dart';
 import 'package:grimorio/widgets/appcard.dart';
+import 'package:grimorio/widgets/etiqueta.dart';
 import 'package:grimorio/widgets/image_frame.dart';
 import 'package:pixelarticons/pixel.dart';
 
@@ -21,7 +21,7 @@ class PassoRevisao extends StatelessWidget {
     required this.resumoItens,
   });
 
-  final Character personagem;
+  final Personagem personagem;
 
   final String linhaEspecieClasse;
 
@@ -132,7 +132,7 @@ class PassoRevisao extends StatelessWidget {
                 Row(
                   spacing: 6,
                   children: [
-                    for (final a in Ability.values)
+                    for (final a in Atributo.values)
                       Expanded(
                         child: _Medalhao(
                           sigla: a.sigla,

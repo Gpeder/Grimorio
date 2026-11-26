@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/controller/campaign/gerenciador_mesa.dart';
-import 'package:grimorio/model/campaign.dart';
-import 'package:grimorio/model/campaign_mock.dart';
-import 'package:grimorio/model/character.dart';
-import 'package:grimorio/model/character_mock.dart';
-import 'package:grimorio/model/grimoire_mock.dart';
+import 'package:grimorio/model/campanha.dart';
+import 'package:grimorio/model/campanha_mock.dart';
+import 'package:grimorio/model/compendio_mock.dart';
+import 'package:grimorio/model/personagem.dart';
+import 'package:grimorio/model/personagem_mock.dart';
 
 void main() {
   final campanha = campanhasMock.first.copyWith(registros: const []);
@@ -61,7 +61,7 @@ void main() {
   test('dar item e desfazer devolve a mochila', () {
     final mesa = novaMesa();
     final heroi = herois.first;
-    int unidades(List<Character> lista) =>
+    int unidades(List<Personagem> lista) =>
         lista.first.inventario.fold(0, (s, i) => s + i.quantidade);
     final antes = unidades(mesa.herois);
     mesa.darItem(itensMock.first, heroi.id);

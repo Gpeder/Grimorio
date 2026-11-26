@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
+import 'package:grimorio/model/opcoes_heroi.dart';
+import 'package:grimorio/model/opcoes_heroi_mock.dart';
 import 'package:grimorio/view/characters/new_hero/components/caixa_opcao.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
-import 'package:grimorio/model/hero_options.dart';
-import 'package:grimorio/model/hero_options_mock.dart';
 import 'package:pixelarticons/pixel.dart';
 
 class PassoAntecedente extends StatelessWidget {
@@ -15,8 +15,8 @@ class PassoAntecedente extends StatelessWidget {
     required this.onCriar,
   });
 
-  final BackgroundOption? antecedente;
-  final ValueChanged<BackgroundOption> onAntecedente;
+  final OpcaoAntecedente? antecedente;
+  final ValueChanged<OpcaoAntecedente> onAntecedente;
   final VoidCallback onCriar;
 
   @override
@@ -83,15 +83,15 @@ class PassoAntecedente extends StatelessWidget {
                 ],
               ),
             ),
-          _BotaoTracejado(texto: 'Criar antecedente', onTap: onCriar),
+          _TracejadoButton(texto: 'Criar antecedente', onTap: onCriar),
         ],
       ),
     );
   }
 }
 
-class _BotaoTracejado extends StatelessWidget {
-  const _BotaoTracejado({required this.texto, required this.onTap});
+class _TracejadoButton extends StatelessWidget {
+  const _TracejadoButton({required this.texto, required this.onTap});
 
   final String texto;
   final VoidCallback onTap;

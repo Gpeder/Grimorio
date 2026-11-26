@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/controller/characters/gerenciador_magias.dart';
-import 'package:grimorio/model/character.dart';
-import 'package:grimorio/model/character_mock.dart';
+import 'package:grimorio/model/personagem.dart';
+import 'package:grimorio/model/personagem_mock.dart';
 
 import 'personagem_teste.dart';
 
@@ -11,21 +11,21 @@ void main() {
   group('espaços', () {
     test('gastar usa um espaço', () {
       final p = personagemTeste(
-        espacosDeMagia: const [SpellSlot(circulo: 1, total: 2)],
+        espacosDeMagia: const [EspacoMagia(circulo: 1, total: 2)],
       );
       expect(magias.gastarEspaco(p, 1).espacosDeMagia.single.livres, 1);
     });
 
     test('gastar não passa do total', () {
       final p = personagemTeste(
-        espacosDeMagia: const [SpellSlot(circulo: 1, total: 2, usados: 2)],
+        espacosDeMagia: const [EspacoMagia(circulo: 1, total: 2, usados: 2)],
       );
       expect(magias.gastarEspaco(p, 1).espacosDeMagia.single.usados, 2);
     });
 
     test('recuperar devolve um espaço e não passa do total', () {
       final p = personagemTeste(
-        espacosDeMagia: const [SpellSlot(circulo: 1, total: 2, usados: 1)],
+        espacosDeMagia: const [EspacoMagia(circulo: 1, total: 2, usados: 1)],
       );
       final uma = magias.recuperarEspaco(p, 1);
       expect(uma.espacosDeMagia.single.livres, 2);

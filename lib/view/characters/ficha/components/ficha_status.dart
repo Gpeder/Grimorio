@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/view/characters/ficha/components/dialogo_numero.dart';
+import 'package:grimorio/model/opcoes_heroi.dart';
+import 'package:grimorio/model/personagem.dart';
+import 'package:grimorio/view/characters/ficha/components/numero_dialog.dart';
 import 'package:grimorio/view/characters/ficha/components/titulo_secao.dart';
-import 'package:grimorio/model/character.dart';
-import 'package:grimorio/model/hero_options.dart';
 import 'package:grimorio/widgets/appcard.dart';
 import 'package:grimorio/widgets/progress_bar.dart';
 import 'package:pixelarticons/pixel.dart';
@@ -18,7 +18,7 @@ class FichaStatus extends StatelessWidget {
     required this.onHpTemp,
   });
 
-  final Character personagem;
+  final Personagem personagem;
   final ValueChanged<int> onDano;
   final ValueChanged<int> onCura;
   final ValueChanged<int> onHpTemp;
@@ -65,7 +65,7 @@ class FichaStatus extends StatelessWidget {
                   const SizedBox(height: AppSpacing.small),
                   Row(
                     children: [
-                      _BotaoHp(
+                      _HpButton(
                         icone: Pixel.minus,
                         dica: 'Dano recebido',
                         onPressed: () =>
@@ -88,7 +88,7 @@ class FichaStatus extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 6),
-                      _BotaoHp(
+                      _HpButton(
                         icone: Pixel.plus,
                         dica: 'Cura recebida',
                         onPressed: () =>
@@ -143,8 +143,8 @@ class FichaStatus extends StatelessWidget {
   }
 }
 
-class _BotaoHp extends StatelessWidget {
-  const _BotaoHp({
+class _HpButton extends StatelessWidget {
+  const _HpButton({
     required this.icone,
     required this.dica,
     required this.onPressed,

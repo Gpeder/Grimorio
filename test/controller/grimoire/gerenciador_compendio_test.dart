@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/controller/grimoire/gerenciador_compendio.dart';
-import 'package:grimorio/model/grimoire_mock.dart';
+import 'package:grimorio/model/compendio_mock.dart';
 
 void main() {
   const compendio = GerenciadorCompendio();

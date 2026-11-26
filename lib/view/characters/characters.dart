@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart' hide Characters;
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/controller/characters/gerenciador_personagens.dart';
-import 'package:grimorio/view/characters/components/botao_novo_heroi.dart';
-import 'package:grimorio/view/characters/components/characters_header.dart';
+import 'package:grimorio/model/campanha.dart';
+import 'package:grimorio/model/campanha_mock.dart';
+import 'package:grimorio/model/personagem.dart';
+import 'package:grimorio/model/personagem_mock.dart';
 import 'package:grimorio/view/characters/components/lista_personagens.dart';
+import 'package:grimorio/view/characters/components/novo_heroi_button.dart';
+import 'package:grimorio/view/characters/components/personagens_header.dart';
 import 'package:grimorio/view/characters/ficha/ficha.dart';
 import 'package:grimorio/view/characters/new_hero/new_hero.dart';
-import 'package:grimorio/model/campaign.dart';
-import 'package:grimorio/model/campaign_mock.dart';
-import 'package:grimorio/model/character.dart';
-import 'package:grimorio/model/character_mock.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
 
 class Characters extends StatefulWidget {
@@ -20,8 +20,8 @@ class Characters extends StatefulWidget {
     this.onNovoHeroi,
   });
 
-  final List<Character> personagens;
-  final List<Campaign>? campanhas;
+  final List<Personagem> personagens;
+  final List<Campanha>? campanhas;
   final VoidCallback? onNovoHeroi;
 
   @override
@@ -30,7 +30,7 @@ class Characters extends StatefulWidget {
 
 class _CharactersState extends State<Characters> {
   String _busca = '';
-  late List<Character> _personagens = [...widget.personagens];
+  late List<Personagem> _personagens = [...widget.personagens];
 
   static const _espacoEntreSecoes = AppSpacing.medium;
   static const _gerenciador = GerenciadorPersonagens();
@@ -39,7 +39,7 @@ class _CharactersState extends State<Characters> {
     final novo = await Navigator.of(
       context,
       rootNavigator: true,
-    ).push<Character>(MaterialPageRoute(builder: (_) => const NewHero()));
+    ).push<Personagem>(MaterialPageRoute(builder: (_) => const NewHero()));
     if (novo == null || !mounted) return;
 
     setState(() {
@@ -53,11 +53,11 @@ class _CharactersState extends State<Characters> {
     );
   }
 
-  Future<void> _abrirFicha(Character p) async {
+  Future<void> _abrirFicha(Personagem p) async {
     final atualizado = await Navigator.of(
       context,
       rootNavigator: true,
-    ).push<Character>(MaterialPageRoute(builder: (_) => Ficha(personagem: p)));
+    ).push<Personagem>(MaterialPageRoute(builder: (_) => Ficha(personagem: p)));
     if (atualizado == null || !mounted) return;
 
     setState(() {
@@ -68,7 +68,7 @@ class _CharactersState extends State<Characters> {
   @override
   Widget build(BuildContext context) {
     final secoes = <Widget>[
-      CharactersHeader(onBusca: (v) => setState(() => _busca = v)),
+      PersonagensHeader(onBusca: (v) => setState(() => _busca = v)),
       ListaPersonagens(
         personagens: _gerenciador.filtrar(_personagens, _busca),
         campanhas: widget.campanhas ?? campanhasMock,
@@ -77,7 +77,7 @@ class _CharactersState extends State<Characters> {
     ];
 
     return Scaffold(
-      floatingActionButton: BotaoNovoHeroi(
+      floatingActionButton: NovoHeroiButton(
         onPressed: widget.onNovoHeroi ?? _abrirNovoHeroi,
       ),
       body: CustomScrollView(

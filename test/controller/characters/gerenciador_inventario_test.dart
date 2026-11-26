@@ -1,25 +1,25 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/controller/characters/gerenciador_inventario.dart';
-import 'package:grimorio/model/character.dart';
-import 'package:grimorio/model/grimoire.dart';
+import 'package:grimorio/model/compendio.dart';
+import 'package:grimorio/model/personagem.dart';
 
 import 'personagem_teste.dart';
 
 void main() {
   const inventario = GerenciadorInventario();
 
-  const pocao = InventoryItem(
+  const pocao = ItemInventario(
     id: 'pocao',
     nome: 'Poção',
     imagem: '',
     quantidade: 2,
     consumivel: true,
   );
-  const escudo = InventoryItem(
+  const escudo = ItemInventario(
     id: 'escudo',
     nome: 'Escudo',
     imagem: '',
-    slot: EquipSlot.maoSecundaria,
+    slot: SlotEquipamento.maoSecundaria,
     bonusCa: 2,
   );
 
@@ -33,7 +33,10 @@ void main() {
   test('equipar e desequipar ajustam o slot e a CA', () {
     final p = personagemTeste(inventario: const [escudo]);
     final equipado = inventario.equipar(p, 'escudo');
-    expect(equipado.inventario.single.equipadoEm, EquipSlot.maoSecundaria);
+    expect(
+      equipado.inventario.single.equipadoEm,
+      SlotEquipamento.maoSecundaria,
+    );
     expect(equipado.ca, 12);
 
     final solto = inventario.desequipar(equipado, 'escudo');
@@ -42,16 +45,16 @@ void main() {
   });
 
   test('equipar troca o item que estava no mesmo slot', () {
-    const outro = InventoryItem(
+    const outro = ItemInventario(
       id: 'outro',
       nome: 'Adaga',
       imagem: '',
-      slot: EquipSlot.maoSecundaria,
-      equipadoEm: EquipSlot.maoSecundaria,
+      slot: SlotEquipamento.maoSecundaria,
+      equipadoEm: SlotEquipamento.maoSecundaria,
     );
     final p = personagemTeste(inventario: const [outro, escudo]);
     final trocado = inventario.equipar(p, 'escudo');
-    expect(trocado.itensEm(EquipSlot.maoSecundaria).single.id, 'escudo');
+    expect(trocado.itensEm(SlotEquipamento.maoSecundaria).single.id, 'escudo');
   });
 
   test('receber item repetido soma na quantidade', () {
@@ -63,7 +66,7 @@ void main() {
   });
 
   test('removerUmaUnidade tira a linha quando sobra 1', () {
-    const uma = InventoryItem(id: 'x', nome: 'X', imagem: '');
+    const uma = ItemInventario(id: 'x', nome: 'X', imagem: '');
     final p = personagemTeste(inventario: const [uma]);
     expect(inventario.removerUmaUnidade(p, 'x').inventario, isEmpty);
   });

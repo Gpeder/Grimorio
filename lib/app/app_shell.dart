@@ -1,7 +1,7 @@
 // `Characters` do Flutter (pacote characters) colide com a tela de personagens.
 import 'package:flutter/material.dart' hide Characters;
 import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
-import 'package:grimorio/app/components/barra_navegacao.dart';
+import 'package:grimorio/app/components/navegacao_bottom_bar.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/view/campaign/campaign.dart';
@@ -63,13 +63,13 @@ class _AppShellState extends State<AppShell> {
             border: Border.all(color: AppColors.secondary, width: 1.5),
           ),
           items: const BottomBarItemThemeData(
-            centerAction: BarraNavegacao.temaBotaoCentral,
+            centerAction: NavegacaoBottomBar.temaBotaoCentral,
           ),
         ),
         body: IndexedStack(index: _index, children: _pages),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-          child: BarraNavegacao(selectedIndex: _index, onSelected: _irPara),
+          child: NavegacaoBottomBar(selectedIndex: _index, onSelected: _irPara),
         ),
       ),
     );

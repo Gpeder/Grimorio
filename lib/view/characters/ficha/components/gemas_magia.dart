@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/model/character.dart';
+import 'package:grimorio/model/personagem.dart';
 
 class GemasMagia extends StatelessWidget {
   const GemasMagia({
@@ -13,7 +13,7 @@ class GemasMagia extends StatelessWidget {
     required this.onRecuperar,
   });
 
-  final List<SpellSlot> espacos;
+  final List<EspacoMagia> espacos;
   final ValueChanged<int> onGastar;
   final ValueChanged<int> onRecuperar;
 

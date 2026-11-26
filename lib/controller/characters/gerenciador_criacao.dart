@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 
-import 'package:grimorio/model/character.dart';
-import 'package:grimorio/model/hero_options.dart';
-import 'package:grimorio/model/hero_options_mock.dart';
+import 'package:grimorio/model/opcoes_heroi.dart';
+import 'package:grimorio/model/opcoes_heroi_mock.dart';
+import 'package:grimorio/model/personagem.dart';
 
 enum ModoAtributos { rolagem, compra, array }
 
@@ -12,18 +12,18 @@ class GerenciadorCriacao {
 
   int passo = 1;
 
-  SpeciesOption? especie;
+  OpcaoEspecie? especie;
   String? subespecieKey;
   bool feminino = true;
 
-  ClassOption? classe;
+  OpcaoClasse? classe;
   String? subclasseKey;
 
   ModoAtributos modo = ModoAtributos.rolagem;
-  Map<Ability, int?> base = {for (final a in Ability.values) a: null};
-  Set<Ability> bonusMeioElfo = {};
+  Map<Atributo, int?> base = {for (final a in Atributo.values) a: null};
+  Set<Atributo> bonusMeioElfo = {};
 
-  BackgroundOption? antecedente;
+  OpcaoAntecedente? antecedente;
 
   Set<String> pericias = {};
   Set<String> periciasMeioElfo = {};
@@ -44,10 +44,10 @@ class GerenciadorCriacao {
   // regras
 
   static int bonusDeEspecie(
-    Ability a, {
-    SpeciesOption? especie,
-    SubspeciesOption? subespecie,
-    Set<Ability> livres = const {},
+    Atributo a, {
+    OpcaoEspecie? especie,
+    OpcaoSubespecie? subespecie,
+    Set<Atributo> livres = const {},
   }) =>
       (especie?.bonus[a] ?? 0) +
       (subespecie?.bonus[a] ?? 0) +
@@ -98,7 +98,7 @@ class GerenciadorCriacao {
     return base + (escudo ? 2 : 0);
   }
 
-  static int limiteDeMagias(ClassOption classe, {required int valorAtributo}) {
+  static int limiteDeMagias(OpcaoClasse classe, {required int valorAtributo}) {
     if (classe.atributoPreparo == null) return classe.magias;
     return math.max(1, modificador(valorAtributo) + 1);
   }
@@ -112,17 +112,17 @@ class GerenciadorCriacao {
 
   bool get temAlgo => especie != null || classe != null;
 
-  SubspeciesOption? get subespecie =>
+  OpcaoSubespecie? get subespecie =>
       especie?.subespecies.where((s) => s.key == subespecieKey).firstOrNull;
 
-  SubclassOption? get subclasse =>
+  OpcaoSubclasse? get subclasse =>
       classe?.subclasses.where((s) => s.key == subclasseKey).firstOrNull;
 
   bool get temMagia => classe?.temMagia ?? false;
 
   bool get usaOuro => modoOuro || !(classe?.temPacote ?? true);
 
-  int? total(Ability a) {
+  int? total(Atributo a) {
     final valor = base[a];
     if (valor == null) return null;
     return valor +
@@ -134,9 +134,9 @@ class GerenciadorCriacao {
         );
   }
 
-  int valor(Ability a) => total(a) ?? 10;
+  int valor(Atributo a) => total(a) ?? 10;
 
-  String? rotuloBonus(Ability a) {
+  String? rotuloBonus(Atributo a) {
     final partes = [
       if (especie?.bonus[a] case final b?) '+$b ${especie!.nome}',
       if (subespecie?.bonus[a] case final b?) '+$b ${subespecie!.nome}',
@@ -165,7 +165,7 @@ class GerenciadorCriacao {
     );
   }
 
-  List<EquipmentItem> get itens {
+  List<ItemEquipamento> get itens {
     final classe = this.classe;
     if (classe == null || usaOuro) return const [];
     return [
@@ -184,20 +184,20 @@ class GerenciadorCriacao {
 
   int get hp => hpNivel1(
     dadoDeVida: classe?.dadoDeVida ?? 0,
-    constituicao: valor(Ability.constituicao),
+    constituicao: valor(Atributo.constituicao),
     extraPorNivel: subespecie?.hpPorNivel ?? 0,
   );
 
   int get ca => calcularCA(
-    destreza: valor(Ability.destreza),
-    constituicao: valor(Ability.constituicao),
-    sabedoria: valor(Ability.sabedoria),
+    destreza: valor(Atributo.destreza),
+    constituicao: valor(Atributo.constituicao),
+    sabedoria: valor(Atributo.sabedoria),
     armadura: armadura,
     escudo: escudo,
     classeKey: classe?.key,
   );
 
-  Ability? get atributoMagia => classe?.atributoPreparo;
+  Atributo? get atributoMagia => classe?.atributoPreparo;
 
   int get limiteMagias {
     final classe = this.classe;
@@ -282,7 +282,7 @@ class GerenciadorCriacao {
     if (!conjunto.remove(valor)) conjunto.add(valor);
   }
 
-  void escolherEspecie(SpeciesOption e) {
+  void escolherEspecie(OpcaoEspecie e) {
     if (e.key == especie?.key) return;
     especie = e;
     // uma sub-especie so ja vem escolhida
@@ -303,7 +303,7 @@ class GerenciadorCriacao {
     }
   }
 
-  void escolherClasse(ClassOption c) {
+  void escolherClasse(OpcaoClasse c) {
     if (c.key == classe?.key) return;
     classe = c;
     subclasseKey = null;
@@ -318,11 +318,11 @@ class GerenciadorCriacao {
     if (m == modo) return;
     modo = m;
     base = {
-      for (final a in Ability.values) a: m == ModoAtributos.compra ? 8 : null,
+      for (final a in Atributo.values) a: m == ModoAtributos.compra ? 8 : null,
     };
   }
 
-  void escolherAntecedente(BackgroundOption a) {
+  void escolherAntecedente(OpcaoAntecedente a) {
     if (a.key == antecedente?.key) return;
     antecedente = a;
     pericias.removeAll(a.pericias);
@@ -331,10 +331,10 @@ class GerenciadorCriacao {
   }
 
   // false quando a compra passa do limite
-  bool mudarValor(Ability a, int? v) {
+  bool mudarValor(Atributo a, int? v) {
     if (modo == ModoAtributos.compra && (v ?? 8) > (base[a] ?? 8)) {
       final gastos = pontosGastos([
-        for (final b in Ability.values) b == a ? v : base[b] ?? 8,
+        for (final b in Atributo.values) b == a ? v : base[b] ?? 8,
       ]);
       if (gastos == null || gastos > limiteCompra) return false;
     }
@@ -352,16 +352,16 @@ class GerenciadorCriacao {
 
   // heroi pronto
 
-  Character montarPersonagem() {
+  Personagem montarPersonagem() {
     final classe = this.classe!;
     final especie = this.especie!;
-    return Character(
+    return Personagem(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       nome: nome.trim(),
       retrato: retrato ?? especie.retratoPara(feminino: feminino),
       especie: especie.nomePara(feminino: feminino),
       classes: [
-        CharacterClass(
+        ClassePersonagem(
           apiKey: classe.key,
           nome: classe.nomePara(feminino: feminino),
           nivel: 1,
@@ -369,13 +369,13 @@ class GerenciadorCriacao {
           subclasse: subclasse?.nome,
         ),
       ],
-      atributos: AbilityScores(
-        forca: valor(Ability.forca),
-        destreza: valor(Ability.destreza),
-        constituicao: valor(Ability.constituicao),
-        inteligencia: valor(Ability.inteligencia),
-        sabedoria: valor(Ability.sabedoria),
-        carisma: valor(Ability.carisma),
+      atributos: Atributos(
+        forca: valor(Atributo.forca),
+        destreza: valor(Atributo.destreza),
+        constituicao: valor(Atributo.constituicao),
+        inteligencia: valor(Atributo.inteligencia),
+        sabedoria: valor(Atributo.sabedoria),
+        carisma: valor(Atributo.carisma),
       ),
       xp: 0,
       hpMax: hp,
@@ -385,7 +385,8 @@ class GerenciadorCriacao {
       salvaguardas: classe.salvaguardas,
       pericias: proficientes,
       espacosDeMagia: [
-        if (classe.temMagia) SpellSlot(circulo: 1, total: classe.espacosNivel1),
+        if (classe.temMagia)
+          EspacoMagia(circulo: 1, total: classe.espacosNivel1),
       ],
       inventario: [for (final i in itens) i.paraInventario()],
       moedas: Moedas(ouro: usaOuro ? ouro ?? 0 : 0),
@@ -402,14 +403,14 @@ class GerenciadorCriacao {
   String get explicacaoHp {
     final classe = this.classe!;
     final extra = subespecie?.hpPorNivel ?? 0;
-    final con = sinal(modificador(valor(Ability.constituicao)));
+    final con = sinal(modificador(valor(Atributo.constituicao)));
     return 'dado de vida cheio (${classe.dadoDeVida}) + CON ($con)'
         '${extra > 0 ? ' + ${subespecie!.nome} (+$extra)' : ''}'
         ' = $hp. Sem rolagem.';
   }
 
   String get explicacaoCa {
-    final des = sinal(modificador(valor(Ability.destreza)));
+    final des = sinal(modificador(valor(Atributo.destreza)));
     final base = switch (armadura) {
       TipoArmadura.couro => 'armadura de couro 11 + DES ($des)',
       TipoArmadura.escamas => 'cota de escamas 14 + DES (máx. 2)',
@@ -417,10 +418,10 @@ class GerenciadorCriacao {
       _ => switch (classe?.key) {
         'srd_barbarian' =>
           'sem armadura 10 + DES ($des) + CON '
-              '(${sinal(modificador(valor(Ability.constituicao)))})',
+              '(${sinal(modificador(valor(Atributo.constituicao)))})',
         'srd_monk' when !escudo =>
           'sem armadura 10 + DES ($des) + SAB '
-              '(${sinal(modificador(valor(Ability.sabedoria)))})',
+              '(${sinal(modificador(valor(Atributo.sabedoria)))})',
         _ => 'sem armadura 10 + DES ($des)',
       },
     };

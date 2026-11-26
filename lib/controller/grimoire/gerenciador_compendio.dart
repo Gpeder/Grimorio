@@ -1,5 +1,5 @@
-import 'package:grimorio/model/grimoire.dart';
-import 'package:grimorio/model/hero_options.dart';
+import 'package:grimorio/model/compendio.dart';
+import 'package:grimorio/model/opcoes_heroi.dart';
 
 enum FiltroItem { magicos, equipamento, armas, armaduras }
 
@@ -27,8 +27,8 @@ class GerenciadorCompendio {
       normalizar(texto).contains(normalizar(busca));
 
   // circulo 4 = 4º ou mais
-  List<SpellOption> filtrarMagias(
-    List<SpellOption> magias, {
+  List<OpcaoMagia> filtrarMagias(
+    List<OpcaoMagia> magias, {
     String busca = '',
     int? circulo,
     String? classe,

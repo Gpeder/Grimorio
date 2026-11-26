@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
+import 'package:grimorio/model/opcoes_heroi_mock.dart';
 import 'package:grimorio/view/characters/new_hero/components/alternador.dart';
 import 'package:grimorio/view/characters/new_hero/components/caixa_opcao.dart';
-import 'package:grimorio/widgets/etiqueta.dart';
 import 'package:grimorio/view/characters/new_hero/components/grade_imagens.dart';
-import 'package:grimorio/model/hero_options_mock.dart';
+import 'package:grimorio/widgets/etiqueta.dart';
 import 'package:grimorio/widgets/image_frame.dart';
 import 'package:pixelarticons/pixel.dart';
 

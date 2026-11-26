@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/app/theme/app_theme.dart';
-import 'package:grimorio/model/campaign_mock.dart';
-import 'package:grimorio/model/character_mock.dart';
+import 'package:grimorio/model/campanha_mock.dart';
+import 'package:grimorio/model/personagem_mock.dart';
 import 'package:grimorio/model/usuario.dart';
 import 'package:grimorio/model/usuario_mock.dart';
-import 'package:grimorio/view/settings/components/card_perfil.dart';
-import 'package:grimorio/view/settings/components/linha_ajuste.dart';
+import 'package:grimorio/view/settings/components/ajuste_tile.dart';
+import 'package:grimorio/view/settings/components/perfil_card.dart';
 import 'package:grimorio/view/settings/settings.dart';
 
 void main() {
@@ -29,7 +29,7 @@ void main() {
 
   // A lista é preguiçosa: rola até a linha existir antes de procurar nela.
   Future<Finder> rolarAte(WidgetTester tester, String titulo) async {
-    final alvo = find.widgetWithText(LinhaAjuste, titulo);
+    final alvo = find.widgetWithText(AjusteTile, titulo);
     await tester.scrollUntilVisible(
       alvo,
       200,
@@ -40,7 +40,7 @@ void main() {
   }
 
   Finder noPerfil(String texto) =>
-      find.descendant(of: find.byType(CardPerfil), matching: find.text(texto));
+      find.descendant(of: find.byType(PerfilCard), matching: find.text(texto));
 
   testWidgets('mostra nome, e-mail e os 3 contadores', (tester) async {
     await abrir(tester);

@@ -34,7 +34,7 @@ class TelaLista extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            BarraVoltar(
+            VoltarHeader(
               titulo: titulo,
               direita: Text(
                 '$contagem',
@@ -91,8 +91,8 @@ class TelaLista extends StatelessWidget {
 }
 
 // Linha do topo das telas internas: voltar, título e algo à direita.
-class BarraVoltar extends StatelessWidget {
-  const BarraVoltar({super.key, this.titulo, this.direita});
+class VoltarHeader extends StatelessWidget {
+  const VoltarHeader({super.key, this.titulo, this.direita});
 
   final String? titulo;
   final Widget? direita;
@@ -144,8 +144,8 @@ class BarraVoltar extends StatelessWidget {
 }
 
 // Botão fixo no rodapé das telas de detalhe.
-class BotaoRodape extends StatelessWidget {
-  const BotaoRodape({super.key, required this.texto, required this.onPressed});
+class RodapeButton extends StatelessWidget {
+  const RodapeButton({super.key, required this.texto, required this.onPressed});
 
   final String texto;
   final VoidCallback onPressed;

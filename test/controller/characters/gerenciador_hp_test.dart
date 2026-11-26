@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/controller/characters/gerenciador_hp.dart';
-import 'package:grimorio/model/character.dart';
+import 'package:grimorio/model/personagem.dart';
 
 import 'personagem_teste.dart';
 
@@ -54,8 +54,8 @@ void main() {
         hpAtual: 12,
         hpTemp: 4,
         espacosDeMagia: const [
-          SpellSlot(circulo: 1, total: 4, usados: 3),
-          SpellSlot(circulo: 2, total: 2, usados: 2),
+          EspacoMagia(circulo: 1, total: 4, usados: 3),
+          EspacoMagia(circulo: 2, total: 2, usados: 2),
         ],
       ),
     );

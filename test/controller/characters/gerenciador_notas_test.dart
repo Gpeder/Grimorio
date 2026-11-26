@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/controller/characters/gerenciador_notas.dart';
-import 'package:grimorio/model/character.dart';
+import 'package:grimorio/model/personagem.dart';
 
 import 'personagem_teste.dart';
 
