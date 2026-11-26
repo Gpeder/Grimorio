@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/model/opcoes_heroi.dart';
-import 'package:grimorio/model/opcoes_heroi_mock.dart';
 import 'package:grimorio/view/characters/new_hero/components/caixa_opcao.dart';
 import 'package:grimorio/view/characters/new_hero/components/check_tile.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
@@ -10,6 +9,7 @@ import 'package:grimorio/widgets/etiqueta.dart';
 class PassoPericias extends StatelessWidget {
   const PassoPericias({
     super.key,
+    required this.pericias,
     required this.classe,
     required this.travadas,
     required this.escolhidas,
@@ -21,6 +21,7 @@ class PassoPericias extends StatelessWidget {
     required this.onPericiaLivre,
   });
 
+  final List<OpcaoPericia> pericias;
   final OpcaoClasse classe;
 
   final Map<String, String> travadas;
@@ -39,14 +40,14 @@ class PassoPericias extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final n = classe.qtdePericias;
     final listaClasse = [
-      for (final p in periciasMock)
+      for (final p in pericias)
         if ((classe.pericias.isEmpty || classe.pericias.contains(p.nome)) &&
             !travadas.containsKey(p.nome) &&
             !escolhidasLivres.contains(p.nome))
           p,
     ];
     final listaLivre = [
-      for (final p in periciasMock)
+      for (final p in pericias)
         if (!travadas.containsKey(p.nome) && !escolhidas.contains(p.nome)) p,
     ];
 
@@ -123,8 +124,8 @@ class PassoPericias extends StatelessWidget {
     );
   }
 
-  static OpcaoPericia _buscar(String nome) =>
-      periciasMock.firstWhere((p) => p.nome == nome);
+  OpcaoPericia _buscar(String nome) =>
+      pericias.firstWhere((p) => p.nome == nome);
 }
 
 class _Contador extends StatelessWidget {

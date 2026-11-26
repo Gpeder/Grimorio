@@ -9,6 +9,7 @@ import 'package:grimorio/controller/campaign/gerenciador_visibilidade.dart';
 import 'package:grimorio/controller/characters/personagens_provider.dart';
 import 'package:grimorio/model/campanha.dart';
 import 'package:grimorio/model/compendio.dart';
+import 'package:grimorio/model/compendio_mock.dart';
 import 'package:grimorio/model/personagem.dart';
 import 'package:grimorio/view/campaign/components/caixa_tracejada.dart';
 import 'package:grimorio/view/campaign/components/missao_sheet.dart';
@@ -111,7 +112,7 @@ class _DetalhesMissaoState extends State<DetalhesMissao> {
   }
 
   Future<void> _adicionarItem() async {
-    final escolha = await pedirItem(context);
+    final escolha = await pedirItem(context, itens: itensMock);
     if (escolha == null || !mounted) return;
     setState(() => _missoes.adicionarItem(escolha.item.key));
   }
@@ -337,6 +338,10 @@ class _DetalhesMissaoState extends State<DetalhesMissao> {
                     RecompensaCard(
                       missao: _m,
                       papel: papel,
+                      itens: [
+                        for (final key in _m.recompensaItens)
+                          ?itensMock.where((i) => i.key == key).firstOrNull,
+                      ],
                       onEditarXp: _editarXp,
                       onAdicionarItem: _adicionarItem,
                       onRemoverItem: _removerItem,

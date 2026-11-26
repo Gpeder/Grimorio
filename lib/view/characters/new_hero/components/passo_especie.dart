@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/model/opcoes_heroi.dart';
-import 'package:grimorio/model/opcoes_heroi_mock.dart';
 import 'package:grimorio/view/characters/new_hero/components/alternador.dart';
 import 'package:grimorio/view/characters/new_hero/components/grade_imagens.dart';
 import 'package:grimorio/widgets/appcard.dart';
@@ -11,6 +10,7 @@ import 'package:grimorio/widgets/etiqueta.dart';
 class PassoEspecie extends StatelessWidget {
   const PassoEspecie({
     super.key,
+    required this.especies,
     required this.especie,
     required this.subespecieKey,
     required this.feminino,
@@ -19,6 +19,7 @@ class PassoEspecie extends StatelessWidget {
     required this.onFeminino,
   });
 
+  final List<OpcaoEspecie> especies;
   final OpcaoEspecie? especie;
   final String? subespecieKey;
   final bool feminino;
@@ -46,7 +47,7 @@ class PassoEspecie extends StatelessWidget {
               padding: const EdgeInsets.all(AppSpacing.medium),
               child: GradeImagens(
                 itens: [
-                  for (final e in especiesMock)
+                  for (final e in especies)
                     ItemImagem(
                       imagem: e.retratoPara(feminino: feminino),
                       rotulo: e.nome,

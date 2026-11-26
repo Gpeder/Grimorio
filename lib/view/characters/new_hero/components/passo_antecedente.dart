@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/model/opcoes_heroi.dart';
-import 'package:grimorio/model/opcoes_heroi_mock.dart';
 import 'package:grimorio/view/characters/new_hero/components/caixa_opcao.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
 import 'package:pixelarticons/pixel.dart';
@@ -10,11 +9,13 @@ import 'package:pixelarticons/pixel.dart';
 class PassoAntecedente extends StatelessWidget {
   const PassoAntecedente({
     super.key,
+    required this.antecedentes,
     required this.antecedente,
     required this.onAntecedente,
     required this.onCriar,
   });
 
+  final List<OpcaoAntecedente> antecedentes;
   final OpcaoAntecedente? antecedente;
   final ValueChanged<OpcaoAntecedente> onAntecedente;
   final VoidCallback onCriar;
@@ -41,7 +42,7 @@ class PassoAntecedente extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          for (final a in antecedentesMock)
+          for (final a in antecedentes)
             CaixaOpcao(
               selecionado: a.key == antecedente?.key,
               onTap: () => onAntecedente(a),

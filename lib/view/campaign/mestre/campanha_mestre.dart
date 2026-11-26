@@ -7,6 +7,7 @@ import 'package:grimorio/controller/campaign/formatos.dart';
 import 'package:grimorio/controller/campaign/gerenciador_mesa.dart';
 import 'package:grimorio/controller/characters/personagens_provider.dart';
 import 'package:grimorio/model/campanha.dart';
+import 'package:grimorio/model/compendio_mock.dart';
 import 'package:grimorio/model/personagem.dart';
 import 'package:grimorio/view/campaign/components/campanha_header.dart';
 import 'package:grimorio/view/campaign/components/missao_sheet.dart';
@@ -87,7 +88,12 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
   }
 
   Future<void> _darItem(Personagem heroi) async {
-    final r = await pedirItem(context, herois: _herois, heroiId: heroi.id);
+    final r = await pedirItem(
+      context,
+      itens: itensMock,
+      herois: _herois,
+      heroiId: heroi.id,
+    );
     final destino = r?.heroiId;
     if (r == null || destino == null || !mounted) return;
     _naMesa((mesa) => mesa.darItem(r.item, destino));

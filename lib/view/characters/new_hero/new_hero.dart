@@ -111,6 +111,7 @@ class _NewHeroState extends State<NewHero> {
 
     return switch (c.passo) {
       1 => PassoEspecie(
+        especies: especiesMock,
         especie: especie,
         subespecieKey: c.subespecieKey,
         feminino: c.feminino,
@@ -119,6 +120,7 @@ class _NewHeroState extends State<NewHero> {
         onFeminino: (f) => setState(() => c.mudarSexo(f)),
       ),
       2 => PassoClasse(
+        classes: classesMock,
         classe: classe,
         subclasseKey: c.subclasseKey,
         onClasse: (k) => setState(() => c.escolherClasse(k)),
@@ -142,11 +144,13 @@ class _NewHeroState extends State<NewHero> {
         onBonusLivre: (a) => _alternar(c.bonusMeioElfo, a),
       ),
       4 => PassoAntecedente(
+        antecedentes: antecedentesMock,
         antecedente: c.antecedente,
         onAntecedente: (a) => setState(() => c.escolherAntecedente(a)),
         onCriar: () => _avisar('Em breve'),
       ),
       5 => PassoPericias(
+        pericias: periciasMock,
         classe: classe!,
         travadas: c.periciasTravadas,
         escolhidas: c.pericias,
@@ -187,6 +191,7 @@ class _NewHeroState extends State<NewHero> {
         retrato: c.retrato,
         feminino: c.feminino,
         alinhamento: c.alinhamento,
+        alinhamentos: alinhamentosMock,
         idiomas: c.idiomas,
         idiomasDisponiveis: [
           for (final i in idiomasMock)

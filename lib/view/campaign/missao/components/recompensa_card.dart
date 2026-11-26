@@ -4,7 +4,7 @@ import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/controller/campaign/formatos.dart';
 import 'package:grimorio/controller/campaign/gerenciador_visibilidade.dart';
 import 'package:grimorio/model/campanha.dart';
-import 'package:grimorio/model/compendio_mock.dart';
+import 'package:grimorio/model/compendio.dart';
 import 'package:grimorio/view/campaign/components/caixa_tracejada.dart';
 import 'package:grimorio/widgets/appcard.dart';
 import 'package:grimorio/widgets/image_frame.dart';
@@ -15,6 +15,7 @@ class RecompensaCard extends StatelessWidget {
     super.key,
     required this.missao,
     required this.papel,
+    required this.itens,
     this.onEditarXp,
     this.onAdicionarItem,
     this.onRemoverItem,
@@ -22,6 +23,9 @@ class RecompensaCard extends StatelessWidget {
 
   final Missao missao;
   final PapelCampanha papel;
+
+  // itens da recompensa ja achados pela tela
+  final List<ItemCompendio> itens;
   final VoidCallback? onEditarXp;
   final VoidCallback? onAdicionarItem;
   final ValueChanged<String>? onRemoverItem;
@@ -49,10 +53,6 @@ class RecompensaCard extends StatelessWidget {
       );
     }
 
-    final itens = [
-      for (final key in missao.recompensaItens)
-        ?itensMock.where((i) => i.key == key).firstOrNull,
-    ];
     final editavel = mestre && missao.ativa;
     final onRemoverItem = this.onRemoverItem;
 

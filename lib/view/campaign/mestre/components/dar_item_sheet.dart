@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/model/compendio.dart';
-import 'package:grimorio/model/compendio_mock.dart';
 import 'package:grimorio/model/personagem.dart';
 import 'package:grimorio/view/characters/ficha/components/titulo_secao.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
@@ -14,18 +13,25 @@ typedef DarItem = ({ItemCompendio item, String? heroiId});
 // sem herois so escolhe o item
 Future<DarItem?> pedirItem(
   BuildContext context, {
+  required List<ItemCompendio> itens,
   List<Personagem> herois = const [],
   String? heroiId,
 }) => showModalBottomSheet<DarItem>(
   context: context,
   useRootNavigator: true,
   isScrollControlled: true,
-  builder: (_) => DarItemSheet(herois: herois, heroiId: heroiId),
+  builder: (_) => DarItemSheet(itens: itens, herois: herois, heroiId: heroiId),
 );
 
 class DarItemSheet extends StatefulWidget {
-  const DarItemSheet({super.key, this.herois = const [], this.heroiId});
+  const DarItemSheet({
+    super.key,
+    required this.itens,
+    this.herois = const [],
+    this.heroiId,
+  });
 
+  final List<ItemCompendio> itens;
   final List<Personagem> herois;
   final String? heroiId;
 
@@ -42,7 +48,7 @@ class _DarItemSheetState extends State<DarItemSheet> {
     final textTheme = Theme.of(context).textTheme;
     final busca = _busca.trim().toLowerCase();
     final itens = [
-      for (final i in itensMock)
+      for (final i in widget.itens)
         if (i.nome.toLowerCase().contains(busca)) i,
     ];
 

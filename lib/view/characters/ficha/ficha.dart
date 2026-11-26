@@ -8,6 +8,7 @@ import 'package:grimorio/controller/characters/gerenciador_inventario.dart';
 import 'package:grimorio/controller/characters/gerenciador_magias.dart';
 import 'package:grimorio/controller/characters/gerenciador_notas.dart';
 import 'package:grimorio/controller/characters/personagens_provider.dart';
+import 'package:grimorio/model/opcoes_heroi_mock.dart';
 import 'package:grimorio/model/personagem.dart';
 import 'package:grimorio/view/characters/ficha/components/combate_tab.dart';
 import 'package:grimorio/view/characters/ficha/components/diario_tab.dart';
@@ -85,12 +86,13 @@ class _FichaState extends State<Ficha> {
   Widget _conteudo() => switch (_aba) {
     0 => ResumoTab(
       personagem: _p,
+      pericias: periciasMock,
       onInspiracao: () => _atualizar((p) => _condicoes.alternarInspiracao(p)),
       onCurar: (v) => _atualizar((p) => _hp.curar(p, v)),
       onDescansoLongo: () => _atualizar((p) => _hp.descansoLongo(p)),
       onVerPericias: () => setState(() => _aba = 1),
     ),
-    1 => PericiasTab(personagem: _p),
+    1 => PericiasTab(personagem: _p, pericias: periciasMock),
     2 => CombateTab(
       personagem: _p,
       onIrInventario: () => setState(() => _aba = 4),

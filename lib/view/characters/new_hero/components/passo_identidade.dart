@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/model/opcoes_heroi_mock.dart';
 import 'package:grimorio/view/characters/new_hero/components/alternador.dart';
 import 'package:grimorio/view/characters/new_hero/components/caixa_opcao.dart';
 import 'package:grimorio/view/characters/new_hero/components/grade_imagens.dart';
@@ -17,6 +16,7 @@ class PassoIdentidade extends StatelessWidget {
     required this.retrato,
     required this.feminino,
     required this.alinhamento,
+    required this.alinhamentos,
     required this.idiomas,
     required this.idiomasDisponiveis,
     required this.qtdeIdiomas,
@@ -34,6 +34,7 @@ class PassoIdentidade extends StatelessWidget {
   final String? retrato;
   final bool feminino;
   final String? alinhamento;
+  final List<String> alinhamentos;
   final Set<String> idiomas;
   final List<String> idiomasDisponiveis;
   final int qtdeIdiomas;
@@ -142,7 +143,11 @@ class PassoIdentidade extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.medium - 4),
           const RotuloSecao('Alinhamento'),
-          _GradeAlinhamento(valor: alinhamento, onChanged: onAlinhamento),
+          _GradeAlinhamento(
+            alinhamentos: alinhamentos,
+            valor: alinhamento,
+            onChanged: onAlinhamento,
+          ),
           if (qtdeIdiomas > 0) ...[
             const SizedBox(height: AppSpacing.medium - 4),
             RotuloSecao(
@@ -183,8 +188,13 @@ class PassoIdentidade extends StatelessWidget {
 }
 
 class _GradeAlinhamento extends StatelessWidget {
-  const _GradeAlinhamento({required this.valor, required this.onChanged});
+  const _GradeAlinhamento({
+    required this.alinhamentos,
+    required this.valor,
+    required this.onChanged,
+  });
 
+  final List<String> alinhamentos;
   final String? valor;
   final ValueChanged<String> onChanged;
 
@@ -202,14 +212,14 @@ class _GradeAlinhamento extends StatelessWidget {
               for (var col = 0; col < 3; col++)
                 Expanded(
                   child: CaixaOpcao(
-                    selecionado: alinhamentosMock[linha * 3 + col] == valor,
-                    onTap: () => onChanged(alinhamentosMock[linha * 3 + col]),
+                    selecionado: alinhamentos[linha * 3 + col] == valor,
+                    onTap: () => onChanged(alinhamentos[linha * 3 + col]),
                     padding: const EdgeInsets.symmetric(
                       vertical: 10,
                       horizontal: 4,
                     ),
                     child: Text(
-                      alinhamentosMock[linha * 3 + col],
+                      alinhamentos[linha * 3 + col],
                       textAlign: TextAlign.center,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

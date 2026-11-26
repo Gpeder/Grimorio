@@ -3,7 +3,6 @@ import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/model/opcoes_heroi.dart';
-import 'package:grimorio/model/opcoes_heroi_mock.dart';
 import 'package:grimorio/model/personagem.dart';
 import 'package:grimorio/view/characters/ficha/components/medalhao_atributo.dart';
 import 'package:grimorio/view/characters/ficha/components/numero_dialog.dart';
@@ -19,6 +18,7 @@ class ResumoTab extends StatelessWidget {
   const ResumoTab({
     super.key,
     required this.personagem,
+    required this.pericias,
     required this.onInspiracao,
     required this.onCurar,
     required this.onDescansoLongo,
@@ -26,6 +26,7 @@ class ResumoTab extends StatelessWidget {
   });
 
   final Personagem personagem;
+  final List<OpcaoPericia> pericias;
   final VoidCallback onInspiracao;
   final ValueChanged<int> onCurar;
   final VoidCallback onDescansoLongo;
@@ -75,7 +76,7 @@ class ResumoTab extends StatelessWidget {
       ...Atributo.values.where((a) => !p.salvaguardas.contains(a)),
     ];
     final emDestaque = [
-      for (final s in periciasMock)
+      for (final s in pericias)
         if (p.pericias.contains(s.nome) || s.nome == 'Percepção') s,
     ];
 
@@ -159,7 +160,7 @@ class ResumoTab extends StatelessWidget {
         const SizedBox(height: AppSpacing.medium - 4),
         TextButton(
           onPressed: onVerPericias,
-          child: Text('Ver as ${periciasMock.length} perícias ›'),
+          child: Text('Ver as ${pericias.length} perícias ›'),
         ),
         _espaco,
         AppCard(

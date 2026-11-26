@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/model/opcoes_heroi.dart';
-import 'package:grimorio/model/opcoes_heroi_mock.dart';
 import 'package:grimorio/model/personagem.dart';
 import 'package:grimorio/view/characters/ficha/components/pericia_tile.dart';
 
 class PericiasTab extends StatelessWidget {
-  const PericiasTab({super.key, required this.personagem});
+  const PericiasTab({
+    super.key,
+    required this.personagem,
+    required this.pericias,
+  });
 
   final Personagem personagem;
+  final List<OpcaoPericia> pericias;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +29,7 @@ class PericiasTab extends StatelessWidget {
               ?.copyWith(color: AppColors.onSurface.withValues(alpha: 0.6)),
         ),
         const SizedBox(height: AppSpacing.small),
-        for (final s in periciasMock)
+        for (final s in pericias)
           PericiaTile(
             nome: s.nome,
             sigla: s.atributo.sigla,
