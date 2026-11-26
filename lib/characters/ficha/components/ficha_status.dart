@@ -9,7 +9,6 @@ import 'package:grimorio/widgets/appcard.dart';
 import 'package:grimorio/widgets/progress_bar.dart';
 import 'package:pixelarticons/pixel.dart';
 
- HP (− valor +), CA, Iniciativa e Deslocamento.
 class FichaStatus extends StatelessWidget {
   const FichaStatus({
     super.key,

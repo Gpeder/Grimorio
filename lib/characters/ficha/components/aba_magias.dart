@@ -22,7 +22,6 @@ const _imagemEscola = {
   'Transmutação': AppImages.magoTransmutacao,
 };
 
- Filtros: preparadas, todas, ou um círculo (0 = truques).
 enum _Filtro {
   preparadas('Preparadas'),
   todas('Todas'),

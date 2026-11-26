@@ -10,6 +10,7 @@ class ImageFrame extends StatelessWidget {
   final double aspectRatio;
   final bool selected;
   final VoidCallback? onTap;
+  final Color? borderColor;
 
   const ImageFrame({
     super.key,
@@ -20,6 +21,7 @@ class ImageFrame extends StatelessWidget {
     this.aspectRatio = 1,
     this.selected = false,
     this.onTap,
+    this.borderColor,
   });
 
   @override
@@ -36,7 +38,7 @@ class ImageFrame extends StatelessWidget {
             color: AppColors.background,
             borderRadius: radius,
             border: Border.all(
-              color: AppColors.alerta,
+              color: borderColor ?? AppColors.alerta,
               width: selected ? 2 : 1.5,
             ),
           ),

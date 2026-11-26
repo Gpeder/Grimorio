@@ -11,7 +11,6 @@ const abasFicha = [
   'Diário',
 ];
 
- Barra de abas que fica presa no topo ao rolar. É um sliver.
 class FichaAbas extends StatelessWidget {
   const FichaAbas({super.key, required this.aba, required this.onAba});
 

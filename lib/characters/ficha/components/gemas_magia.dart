@@ -5,7 +5,6 @@ import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/models/character.dart';
 
- Uma linha por círculo. Gema cheia = livre; vazia = gasta.
 class GemasMagia extends StatelessWidget {
   const GemasMagia({
     super.key,

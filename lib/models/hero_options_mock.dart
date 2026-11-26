@@ -352,6 +352,12 @@ const _luz = SpellOption(
   circulo: 0,
   escola: 'Evocação',
   linha: '1 ação · toque',
+  tempo: '1 ação',
+  alcance: 'Toque',
+  componentes: 'V, M (um vaga-lume ou musgo fosforescente)',
+  duracao: '1 hora',
+  descricao: 'Você toca um objeto de até 3 metros em qualquer dimensão. Até a magia acabar, ele emite luz plena num raio de 6 metros e penumbra por mais 6 metros. Cobrir o objeto com algo opaco bloqueia a luz. A magia acaba se você a conjurar de novo ou dissipá-la com uma ação.',
+  classes: ['Bardo', 'Clérigo', 'Feiticeiro', 'Mago'],
 );
 const _maosMagicas = SpellOption(
   key: 'maos_magicas',
@@ -359,6 +365,12 @@ const _maosMagicas = SpellOption(
   circulo: 0,
   escola: 'Conjuração',
   linha: '1 ação · 9 m',
+  tempo: '1 ação',
+  alcance: '9 m',
+  componentes: 'V, S',
+  duracao: '1 minuto',
+  descricao: 'Uma mão espectral flutuante aparece num ponto à sua escolha dentro do alcance. Com sua ação, você a controla para manipular objetos, abrir portas e recipientes destrancados ou guardar e pegar itens. A mão não pode atacar, ativar itens mágicos nem carregar mais de 5 kg.',
+  classes: ['Bardo', 'Bruxo', 'Feiticeiro', 'Mago'],
 );
 const _prestidigitacao = SpellOption(
   key: 'prestidigitacao',
@@ -366,6 +378,12 @@ const _prestidigitacao = SpellOption(
   circulo: 0,
   escola: 'Transmutação',
   linha: '1 ação · 3 m',
+  tempo: '1 ação',
+  alcance: '3 m',
+  componentes: 'V, S',
+  duracao: 'Até 1 hora',
+  descricao: 'Um truque simples que aprendizes usam para praticar. Você cria pequenos efeitos sensoriais inofensivos, acende ou apaga uma vela, limpa ou suja um objeto pequeno, esfria, esquenta ou dá sabor a até 0,5 kg de matéria, ou cria uma bugiganga ilusória que dura até o fim do seu próximo turno.',
+  classes: ['Bardo', 'Bruxo', 'Feiticeiro', 'Mago'],
 );
 const _orientacao = SpellOption(
   key: 'orientacao',
@@ -373,6 +391,12 @@ const _orientacao = SpellOption(
   circulo: 0,
   escola: 'Adivinhação',
   linha: '1 ação · toque',
+  tempo: '1 ação',
+  alcance: 'Toque',
+  componentes: 'V, S',
+  duracao: 'Concentração, até 1 minuto',
+  descricao: 'Você toca uma criatura voluntária. Uma vez antes da magia acabar, ela pode somar 1d4 a um teste de atributo à escolha dela.',
+  classes: ['Clérigo', 'Druida'],
   concentracao: true,
 );
 const _raioDeFogo = SpellOption(
@@ -381,6 +405,13 @@ const _raioDeFogo = SpellOption(
   circulo: 0,
   escola: 'Evocação',
   linha: '1 ação · 36 m · ataque',
+  tempo: '1 ação',
+  alcance: '36 m',
+  componentes: 'V, S',
+  duracao: 'Instantânea',
+  descricao: 'Você arremessa um cisco de fogo numa criatura ou objeto dentro do alcance. Faça um ataque mágico à distância; se acertar, o alvo sofre 1d10 de dano de fogo. Um objeto inflamável atingido pega fogo se não estiver sendo vestido ou carregado.',
+  superior: 'O dano aumenta em 1d10 nos níveis 5 (2d10), 11 (3d10) e 17 (4d10).',
+  classes: ['Feiticeiro', 'Mago'],
 );
 const _raioDeGelo = SpellOption(
   key: 'raio_de_gelo',
@@ -388,6 +419,13 @@ const _raioDeGelo = SpellOption(
   circulo: 0,
   escola: 'Evocação',
   linha: '1 ação · 18 m · ataque',
+  tempo: '1 ação',
+  alcance: '18 m',
+  componentes: 'V, S',
+  duracao: 'Instantânea',
+  descricao: 'Um raio gélido de luz azul-esbranquiçada dispara em direção a uma criatura dentro do alcance. Faça um ataque mágico à distância; se acertar, o alvo sofre 1d8 de dano de frio e seu deslocamento diminui 3 metros até o início do seu próximo turno.',
+  superior: 'O dano aumenta em 1d8 nos níveis 5 (2d8), 11 (3d8) e 17 (4d8).',
+  classes: ['Feiticeiro', 'Mago'],
 );
 const _curarFerimentos = SpellOption(
   key: 'curar_ferimentos',
@@ -395,6 +433,13 @@ const _curarFerimentos = SpellOption(
   circulo: 1,
   escola: 'Evocação',
   linha: '1 ação · toque',
+  tempo: '1 ação',
+  alcance: 'Toque',
+  componentes: 'V, S',
+  duracao: 'Instantânea',
+  descricao: 'Uma criatura que você tocar recupera pontos de vida iguais a 1d8 + seu modificador de atributo de conjuração. A magia não tem efeito em mortos-vivos nem em constructos.',
+  superior: '+1d8 de cura para cada círculo acima do 1º.',
+  classes: ['Bardo', 'Clérigo', 'Druida', 'Paladino', 'Patrulheiro'],
 );
 const _palavraCurativa = SpellOption(
   key: 'palavra_curativa',
@@ -402,6 +447,13 @@ const _palavraCurativa = SpellOption(
   circulo: 1,
   escola: 'Evocação',
   linha: '1 ação bônus · 18 m',
+  tempo: '1 ação bônus',
+  alcance: '18 m',
+  componentes: 'V',
+  duracao: 'Instantânea',
+  descricao: 'Uma criatura que você possa ver dentro do alcance recupera pontos de vida iguais a 1d4 + seu modificador de atributo de conjuração. A magia não tem efeito em mortos-vivos nem em constructos.',
+  superior: '+1d4 de cura para cada círculo acima do 1º.',
+  classes: ['Bardo', 'Clérigo', 'Druida'],
 );
 const _detectarMagia = SpellOption(
   key: 'detectar_magia',
@@ -409,6 +461,12 @@ const _detectarMagia = SpellOption(
   circulo: 1,
   escola: 'Adivinhação',
   linha: '1 ação · pessoal',
+  tempo: '1 ação',
+  alcance: 'Pessoal',
+  componentes: 'V, S',
+  duracao: 'Concentração, até 10 minutos',
+  descricao: 'Você sente a presença de magia a até 9 metros. Se sentir, pode usar sua ação para ver uma aura tênue ao redor de qualquer criatura ou objeto visível na área que carregue magia e descobrir a escola dela, se houver. A magia atravessa a maioria das barreiras, mas é bloqueada por 30 cm de pedra, 2,5 cm de metal comum, uma folha fina de chumbo ou 90 cm de madeira ou terra.',
+  classes: ['Bardo', 'Clérigo', 'Druida', 'Feiticeiro', 'Mago', 'Paladino', 'Patrulheiro'],
   concentracao: true,
   ritual: true,
 );
@@ -418,6 +476,13 @@ const _enfeiticarPessoa = SpellOption(
   circulo: 1,
   escola: 'Encantamento',
   linha: '1 ação · 9 m · Salv. SAB',
+  tempo: '1 ação',
+  alcance: '9 m',
+  componentes: 'V, S',
+  duracao: '1 hora',
+  descricao: 'Você tenta enfeitiçar um humanoide que possa ver dentro do alcance. Ele faz uma salvaguarda de Sabedoria, com vantagem se você ou seus aliados estiverem lutando contra ele. Se falhar, fica enfeitiçado até a magia acabar ou até você ou seus aliados o ferirem, e trata você como um conhecido amigável. Quando a magia acaba, ele sabe que foi enfeitiçado.',
+  superior: '+1 alvo para cada círculo acima do 1º; os alvos precisam estar a até 9 m uns dos outros.',
+  classes: ['Bardo', 'Bruxo', 'Druida', 'Feiticeiro', 'Mago'],
 );
 const _ondaTrovejante = SpellOption(
   key: 'onda_trovejante',
@@ -425,6 +490,13 @@ const _ondaTrovejante = SpellOption(
   circulo: 1,
   escola: 'Evocação',
   linha: '1 ação · cubo 4,5 m · Salv. CON',
+  tempo: '1 ação',
+  alcance: 'Pessoal (cubo de 4,5 m)',
+  componentes: 'V, S',
+  duracao: 'Instantânea',
+  descricao: 'Uma onda de força trovejante varre um cubo de 4,5 metros a partir de você. Cada criatura na área faz uma salvaguarda de Constituição: se falhar, sofre 2d8 de dano trovejante e é empurrada 3 metros para longe; se passar, sofre metade do dano e não é empurrada. O estrondo é ouvido a até 90 metros.',
+  superior: '+1d8 de dano para cada círculo acima do 1º.',
+  classes: ['Bardo', 'Druida', 'Feiticeiro', 'Mago'],
 );
 const _sono = SpellOption(
   key: 'sono',
@@ -432,6 +504,13 @@ const _sono = SpellOption(
   circulo: 1,
   escola: 'Encantamento',
   linha: '1 ação · 27 m',
+  tempo: '1 ação',
+  alcance: '27 m',
+  componentes: 'V, S, M (uma pitada de areia fina, pétalas de rosa ou um grilo)',
+  duracao: '1 minuto',
+  descricao: 'A magia põe criaturas num sono mágico numa esfera de 6 metros de raio. Role 5d8: o total é quantos pontos de vida de criaturas ela afeta, começando pela de menos PV atuais. Cada criatura afetada cai inconsciente até a magia acabar, sofrer dano ou alguém usar uma ação para acordá-la. Mortos-vivos e criaturas imunes a enfeitiçamento não são afetados.',
+  superior: '+2d8 para cada círculo acima do 1º.',
+  classes: ['Bardo', 'Feiticeiro', 'Mago'],
 );
 const _misseisMagicos = SpellOption(
   key: 'misseis_magicos',
@@ -439,6 +518,13 @@ const _misseisMagicos = SpellOption(
   circulo: 1,
   escola: 'Evocação',
   linha: '1 ação · 36 m',
+  tempo: '1 ação',
+  alcance: '36 m',
+  componentes: 'V, S',
+  duracao: 'Instantânea',
+  descricao: 'Você cria três dardos brilhantes de força mágica. Cada dardo atinge uma criatura à sua escolha que você possa ver dentro do alcance e causa 1d4 + 1 de dano de energia. Os dardos acertam ao mesmo tempo, e você pode mirá-los numa criatura ou em várias.',
+  superior: '+1 dardo para cada círculo acima do 1º.',
+  classes: ['Feiticeiro', 'Mago'],
 );
 const _escudoArcano = SpellOption(
   key: 'escudo_arcano',
@@ -446,6 +532,12 @@ const _escudoArcano = SpellOption(
   circulo: 1,
   escola: 'Abjuração',
   linha: '1 reação · pessoal',
+  tempo: '1 reação, ao ser atingido por um ataque',
+  alcance: 'Pessoal',
+  componentes: 'V, S',
+  duracao: '1 rodada',
+  descricao: 'Uma barreira invisível de força mágica aparece e protege você. Até o início do seu próximo turno, você recebe +5 na CA, inclusive contra o ataque que disparou a magia, e não sofre dano de Mísseis Mágicos.',
+  classes: ['Feiticeiro', 'Mago'],
 );
 const _maosFlamejantes = SpellOption(
   key: 'maos_flamejantes',
@@ -453,6 +545,13 @@ const _maosFlamejantes = SpellOption(
   circulo: 1,
   escola: 'Evocação',
   linha: '1 ação · cone 4,5 m · Salv. DES',
+  tempo: '1 ação',
+  alcance: 'Pessoal (cone de 4,5 m)',
+  componentes: 'V, S',
+  duracao: 'Instantânea',
+  descricao: 'Com os polegares encostados e os dedos abertos, você solta uma lâmina fina de chamas. Cada criatura num cone de 4,5 metros faz uma salvaguarda de Destreza: sofre 3d6 de dano de fogo se falhar, ou metade se passar. Objetos inflamáveis na área que não estejam sendo vestidos ou carregados pegam fogo.',
+  superior: '+1d6 de dano para cada círculo acima do 1º.',
+  classes: ['Feiticeiro', 'Mago'],
 );
 const _compreenderIdiomas = SpellOption(
   key: 'compreender_idiomas',
@@ -460,6 +559,12 @@ const _compreenderIdiomas = SpellOption(
   circulo: 1,
   escola: 'Adivinhação',
   linha: '1 ação · pessoal',
+  tempo: '1 ação',
+  alcance: 'Pessoal',
+  componentes: 'V, S, M (uma pitada de fuligem e sal)',
+  duracao: '1 hora',
+  descricao: 'Você entende o significado literal de qualquer idioma falado que ouvir e de qualquer idioma escrito que vir, desde que toque a superfície onde está escrito. Ler uma página leva cerca de 1 minuto. A magia não decifra mensagens secretas nem glifos mágicos.',
+  classes: ['Bardo', 'Bruxo', 'Feiticeiro', 'Mago'],
   ritual: true,
 );
 
@@ -470,6 +575,13 @@ const _magiasClerigo = [
     circulo: 0,
     escola: 'Evocação',
     linha: '1 ação · 18 m · Salv. DES',
+    tempo: '1 ação',
+    alcance: '18 m',
+    componentes: 'V, S',
+    duracao: 'Instantânea',
+    descricao: 'Um brilho semelhante a chamas desce sobre uma criatura que você possa ver dentro do alcance. Ela faz uma salvaguarda de Destreza e, se falhar, sofre 1d8 de dano radiante. O alvo não se beneficia de cobertura nessa salvaguarda.',
+    superior: 'O dano aumenta em 1d8 nos níveis 5 (2d8), 11 (3d8) e 17 (4d8).',
+    classes: ['Clérigo'],
   ),
   _luz,
   SpellOption(
@@ -478,6 +590,12 @@ const _magiasClerigo = [
     circulo: 0,
     escola: 'Transmutação',
     linha: '1 ação · 9 m',
+    tempo: '1 ação',
+    alcance: '9 m',
+    componentes: 'V',
+    duracao: 'Até 1 minuto',
+    descricao: 'Você manifesta um sinal menor de poder sobrenatural: sua voz troveja três vezes mais alto, chamas tremulam ou mudam de cor, o chão treme de leve, um som instantâneo ecoa, uma porta ou janela destrancada se abre ou fecha, ou seus olhos mudam de aparência. Você pode manter até três efeitos de 1 minuto ao mesmo tempo.',
+    classes: ['Clérigo'],
   ),
   _orientacao,
   SpellOption(
@@ -486,6 +604,12 @@ const _magiasClerigo = [
     circulo: 0,
     escola: 'Necromancia',
     linha: '1 ação · toque',
+    tempo: '1 ação',
+    alcance: 'Toque',
+    componentes: 'V, S',
+    duracao: 'Instantânea',
+    descricao: 'Você toca uma criatura viva com 0 pontos de vida, e ela fica estável. A magia não tem efeito em mortos-vivos nem em constructos.',
+    classes: ['Clérigo'],
   ),
   SpellOption(
     key: 'bencao',
@@ -493,6 +617,13 @@ const _magiasClerigo = [
     circulo: 1,
     escola: 'Encantamento',
     linha: '1 ação · 9 m',
+    tempo: '1 ação',
+    alcance: '9 m',
+    componentes: 'V, S, M (um borrifo de água benta)',
+    duracao: 'Concentração, até 1 minuto',
+    descricao: 'Você abençoa até três criaturas à sua escolha dentro do alcance. Sempre que um alvo fizer uma jogada de ataque ou uma salvaguarda antes da magia acabar, ele soma 1d4 ao resultado.',
+    superior: '+1 alvo para cada círculo acima do 1º.',
+    classes: ['Clérigo', 'Paladino'],
     concentracao: true,
   ),
   SpellOption(
@@ -501,6 +632,13 @@ const _magiasClerigo = [
     circulo: 1,
     escola: 'Encantamento',
     linha: '1 ação · 18 m · Salv. SAB',
+    tempo: '1 ação',
+    alcance: '18 m',
+    componentes: 'V',
+    duracao: '1 rodada',
+    descricao: 'Você dá uma ordem de uma palavra a uma criatura que possa ver dentro do alcance: aproxime-se, largue, fuja, deite ou pare. Ela faz uma salvaguarda de Sabedoria e, se falhar, obedece no próximo turno dela. A magia não tem efeito em mortos-vivos, em quem não entende seu idioma ou se a ordem for diretamente prejudicial ao alvo.',
+    superior: '+1 alvo para cada círculo acima do 1º.',
+    classes: ['Clérigo', 'Paladino'],
   ),
   _curarFerimentos,
   _detectarMagia,
@@ -510,6 +648,12 @@ const _magiasClerigo = [
     circulo: 1,
     escola: 'Abjuração',
     linha: '1 ação bônus · 18 m',
+    tempo: '1 ação bônus',
+    alcance: '18 m',
+    componentes: 'V, S, M (um pergaminho com um texto sagrado)',
+    duracao: 'Concentração, até 10 minutos',
+    descricao: 'Um campo cintilante envolve uma criatura à sua escolha dentro do alcance e lhe dá +2 na CA enquanto a magia durar.',
+    classes: ['Clérigo', 'Paladino'],
     concentracao: true,
   ),
   _palavraCurativa,
@@ -519,6 +663,13 @@ const _magiasClerigo = [
     circulo: 1,
     escola: 'Evocação',
     linha: '1 ação · 36 m · ataque',
+    tempo: '1 ação',
+    alcance: '36 m',
+    componentes: 'V, S',
+    duracao: '1 rodada',
+    descricao: 'Um lampejo de luz dispara em direção a uma criatura à sua escolha dentro do alcance. Faça um ataque mágico à distância; se acertar, o alvo sofre 4d6 de dano radiante, e a próxima jogada de ataque contra ele antes do fim do seu próximo turno tem vantagem.',
+    superior: '+1d6 de dano para cada círculo acima do 1º.',
+    classes: ['Clérigo'],
   ),
 ];
 
@@ -539,6 +690,12 @@ const _magiasMago = [
     circulo: 1,
     escola: 'Abjuração',
     linha: '1 ação · toque',
+    tempo: '1 ação',
+    alcance: 'Toque',
+    componentes: 'V, S, M (um pedaço de couro curtido)',
+    duracao: '8 horas',
+    descricao: 'Você toca uma criatura voluntária que não esteja usando armadura. Até a magia acabar, a CA base dela passa a ser 13 + modificador de Destreza. A magia acaba se o alvo vestir uma armadura ou se você dissipá-la com uma ação.',
+    classes: ['Feiticeiro', 'Mago'],
   ),
   SpellOption(
     key: 'identificacao',
@@ -546,6 +703,12 @@ const _magiasMago = [
     circulo: 1,
     escola: 'Adivinhação',
     linha: '1 minuto · toque',
+    tempo: '1 minuto',
+    alcance: 'Toque',
+    componentes: 'V, S, M (uma pérola de 100 PO e uma pena de coruja)',
+    duracao: 'Instantânea',
+    descricao: 'Você escolhe um objeto que precisa tocar durante a conjuração. Se for um item mágico, você descobre suas propriedades, como usá-las, se exige sintonia e quantas cargas tem. Também descobre se alguma magia está afetando o item e qual é.',
+    classes: ['Bardo', 'Mago'],
     ritual: true,
   ),
   _compreenderIdiomas,
@@ -558,6 +721,13 @@ const _magiasBardo = [
     circulo: 0,
     escola: 'Encantamento',
     linha: '1 ação · 18 m · Salv. SAB',
+    tempo: '1 ação',
+    alcance: '18 m',
+    componentes: 'V',
+    duracao: 'Instantânea',
+    descricao: 'Você solta uma sequência de insultos com encantamentos sutis contra uma criatura que possa ver e ouvir você. Ela faz uma salvaguarda de Sabedoria e, se falhar, sofre 1d4 de dano psíquico e tem desvantagem na próxima jogada de ataque antes do fim do próximo turno dela.',
+    superior: 'O dano aumenta em 1d4 nos níveis 5 (2d4), 11 (3d4) e 17 (4d4).',
+    classes: ['Bardo'],
   ),
   _luz,
   _maosMagicas,
@@ -577,6 +747,13 @@ const _magiasBruxo = [
     circulo: 0,
     escola: 'Evocação',
     linha: '1 ação · 36 m · ataque',
+    tempo: '1 ação',
+    alcance: '36 m',
+    componentes: 'V, S',
+    duracao: 'Instantânea',
+    descricao: 'Um feixe de energia crepitante dispara em direção a uma criatura dentro do alcance. Faça um ataque mágico à distância; se acertar, o alvo sofre 1d10 de dano de energia.',
+    superior: 'Mais feixes nos níveis 5 (dois), 11 (três) e 17 (quatro); cada feixe faz seu próprio ataque.',
+    classes: ['Bruxo'],
   ),
   SpellOption(
     key: 'toque_arrepiante',
@@ -584,6 +761,13 @@ const _magiasBruxo = [
     circulo: 0,
     escola: 'Necromancia',
     linha: '1 ação · 36 m · ataque',
+    tempo: '1 ação',
+    alcance: '36 m',
+    componentes: 'V, S',
+    duracao: '1 rodada',
+    descricao: 'Uma mão esquelética e fantasmagórica surge no espaço de uma criatura dentro do alcance. Faça um ataque mágico à distância; se acertar, o alvo sofre 1d8 de dano necrótico e não pode recuperar pontos de vida até o início do seu próximo turno. Se for um morto-vivo, também tem desvantagem nos ataques contra você até o fim do seu próximo turno.',
+    superior: 'O dano aumenta em 1d8 nos níveis 5 (2d8), 11 (3d8) e 17 (4d8).',
+    classes: ['Bruxo', 'Feiticeiro', 'Mago'],
   ),
   _maosMagicas,
   SpellOption(
@@ -592,6 +776,12 @@ const _magiasBruxo = [
     circulo: 0,
     escola: 'Ilusão',
     linha: '1 ação · 9 m',
+    tempo: '1 ação',
+    alcance: '9 m',
+    componentes: 'S, M (um pouco de lã)',
+    duracao: '1 minuto',
+    descricao: 'Você cria um som ou a imagem de um objeto dentro do alcance, que dura até a magia acabar. A imagem cabe num cubo de 1,5 metro e não pode produzir som, luz, cheiro nem outro efeito sensorial. Interagir fisicamente revela a ilusão, e uma criatura pode usar a ação para examiná-la com um teste de Inteligência (Investigação) contra a CD da sua magia.',
+    classes: ['Bardo', 'Bruxo', 'Feiticeiro', 'Mago'],
   ),
   SpellOption(
     key: 'bracos_de_hadar',
@@ -599,6 +789,13 @@ const _magiasBruxo = [
     circulo: 1,
     escola: 'Conjuração',
     linha: '1 ação · 3 m · Salv. FOR',
+    tempo: '1 ação',
+    alcance: 'Pessoal (raio de 3 m)',
+    componentes: 'V, S',
+    duracao: 'Instantânea',
+    descricao: 'Você invoca o poder de Hadar, o Faminto Sombrio. Tentáculos de energia escura brotam de você e golpeiam todas as criaturas a até 3 metros. Cada uma faz uma salvaguarda de Força: se falhar, sofre 2d6 de dano necrótico e não pode usar reações até o próximo turno dela; se passar, sofre metade do dano.',
+    superior: '+1d6 de dano para cada círculo acima do 1º.',
+    classes: ['Bruxo'],
   ),
   _enfeiticarPessoa,
   SpellOption(
@@ -607,6 +804,13 @@ const _magiasBruxo = [
     circulo: 1,
     escola: 'Evocação',
     linha: '1 reação · 18 m · Salv. DES',
+    tempo: '1 reação, ao sofrer dano de uma criatura que você vê',
+    alcance: '18 m',
+    componentes: 'V, S',
+    duracao: 'Instantânea',
+    descricao: 'Você aponta o dedo, e a criatura que o feriu é envolta por chamas infernais por um instante. Ela faz uma salvaguarda de Destreza: sofre 2d10 de dano de fogo se falhar, ou metade se passar.',
+    superior: '+1d10 de dano para cada círculo acima do 1º.',
+    classes: ['Bruxo'],
   ),
   SpellOption(
     key: 'protecao_bem_mal',
@@ -614,6 +818,12 @@ const _magiasBruxo = [
     circulo: 1,
     escola: 'Abjuração',
     linha: '1 ação · toque',
+    tempo: '1 ação',
+    alcance: 'Toque',
+    componentes: 'V, S, M (água benta ou pó de prata e ferro, consumidos)',
+    duracao: 'Concentração, até 10 minutos',
+    descricao: 'Uma criatura voluntária que você tocar fica protegida contra aberrações, celestiais, elementais, fadas, corruptores e mortos-vivos. Essas criaturas têm desvantagem nos ataques contra ela, e ela não pode ser enfeitiçada, amedrontada nem possuída por elas.',
+    classes: ['Bruxo', 'Clérigo', 'Mago', 'Paladino'],
     concentracao: true,
   ),
   SpellOption(
@@ -622,6 +832,12 @@ const _magiasBruxo = [
     circulo: 1,
     escola: 'Transmutação',
     linha: '1 ação bônus · pessoal',
+    tempo: '1 ação bônus',
+    alcance: 'Pessoal',
+    componentes: 'V, S',
+    duracao: 'Concentração, até 10 minutos',
+    descricao: 'A magia permite que você se mova num ritmo impressionante. Ao conjurá-la, e depois como ação bônus em cada um dos seus turnos até ela acabar, você pode usar a ação de Disparada.',
+    classes: ['Bruxo', 'Feiticeiro', 'Mago'],
     concentracao: true,
   ),
   _compreenderIdiomas,
@@ -634,6 +850,12 @@ const _magiasDruida = [
     circulo: 0,
     escola: 'Transmutação',
     linha: '1 ação bônus · toque',
+    tempo: '1 ação bônus',
+    alcance: 'Toque',
+    componentes: 'V, S, M (visco, uma folha de trevo e uma clava ou bordão)',
+    duracao: '1 minuto',
+    descricao: 'A madeira de uma clava ou bordão que você segura é imbuída com o poder da natureza. Enquanto a magia durar, você pode usar seu atributo de conjuração no lugar da Força nas jogadas de ataque e de dano com essa arma, e o dado de dano dela vira d8. A magia acaba se você conjurá-la de novo ou soltar a arma.',
+    classes: ['Druida'],
   ),
   _orientacao,
   SpellOption(
@@ -642,6 +864,13 @@ const _magiasDruida = [
     circulo: 0,
     escola: 'Conjuração',
     linha: '1 ação · pessoal',
+    tempo: '1 ação',
+    alcance: 'Pessoal',
+    componentes: 'V, S',
+    duracao: '10 minutos',
+    descricao: 'Uma chama tremeluzente surge na sua mão, sem ferir você nem seu equipamento. Ela emite luz plena num raio de 3 metros e penumbra por mais 3 metros. Você também pode arremessá-la numa criatura a até 9 metros com um ataque mágico à distância, que causa 1d8 de dano de fogo se acertar.',
+    superior: 'O dano aumenta em 1d8 nos níveis 5 (2d8), 11 (3d8) e 17 (4d8).',
+    classes: ['Druida'],
   ),
   SpellOption(
     key: 'resistencia',
@@ -649,6 +878,12 @@ const _magiasDruida = [
     circulo: 0,
     escola: 'Abjuração',
     linha: '1 ação · toque',
+    tempo: '1 ação',
+    alcance: 'Toque',
+    componentes: 'V, S, M (um manto em miniatura)',
+    duracao: 'Concentração, até 1 minuto',
+    descricao: 'Você toca uma criatura voluntária. Uma vez antes da magia acabar, ela pode somar 1d4 a uma salvaguarda à escolha dela.',
+    classes: ['Clérigo', 'Druida'],
     concentracao: true,
   ),
   SpellOption(
@@ -657,6 +892,12 @@ const _magiasDruida = [
     circulo: 1,
     escola: 'Conjuração',
     linha: '1 ação · 27 m · Salv. FOR',
+    tempo: '1 ação',
+    alcance: '27 m',
+    componentes: 'V, S',
+    duracao: 'Concentração, até 1 minuto',
+    descricao: 'Plantas agarradoras brotam num quadrado de 6 metros a partir de um ponto dentro do alcance, e a área vira terreno difícil. Cada criatura na área quando a magia é conjurada faz uma salvaguarda de Força e, se falhar, fica contida até a magia acabar. Uma criatura contida pode usar a ação para tentar se soltar com um teste de Força contra a CD da sua magia.',
+    classes: ['Druida'],
     concentracao: true,
   ),
   _curarFerimentos,
@@ -666,6 +907,12 @@ const _magiasDruida = [
     circulo: 1,
     escola: 'Evocação',
     linha: '1 ação · 18 m · Salv. DES',
+    tempo: '1 ação',
+    alcance: '18 m',
+    componentes: 'V',
+    duracao: 'Concentração, até 1 minuto',
+    descricao: 'Cada objeto num cubo de 6 metros dentro do alcance fica contornado por uma luz azul, verde ou violeta. Cada criatura na área faz uma salvaguarda de Destreza e, se falhar, também brilha. Ataques contra criaturas e objetos contornados têm vantagem se o atacante puder vê-los, e eles não se beneficiam de ficar invisíveis.',
+    classes: ['Bardo', 'Druida'],
     concentracao: true,
   ),
   _ondaTrovejante,
@@ -675,6 +922,12 @@ const _magiasDruida = [
     circulo: 1,
     escola: 'Transmutação',
     linha: '1 ação · toque',
+    tempo: '1 ação',
+    alcance: 'Toque',
+    componentes: 'V, S, M (um raminho de visco)',
+    duracao: 'Instantânea',
+    descricao: 'Até dez frutinhas aparecem na sua mão, imbuídas de magia. Uma criatura pode usar a ação para comer uma, que recupera 1 ponto de vida e alimenta por um dia inteiro. As frutinhas perdem o poder se não forem consumidas em 24 horas.',
+    classes: ['Druida', 'Patrulheiro'],
   ),
   SpellOption(
     key: 'falar_com_animais',
@@ -682,6 +935,12 @@ const _magiasDruida = [
     circulo: 1,
     escola: 'Adivinhação',
     linha: '1 ação · pessoal',
+    tempo: '1 ação',
+    alcance: 'Pessoal',
+    componentes: 'V, S',
+    duracao: '10 minutos',
+    descricao: 'Você ganha a capacidade de compreender feras e se comunicar verbalmente com elas enquanto a magia durar. O que elas sabem é limitado pela inteligência delas, mas no mínimo podem contar sobre locais e monstros próximos, incluindo o que viram no último dia.',
+    classes: ['Bardo', 'Druida', 'Patrulheiro'],
     ritual: true,
   ),
 ];
@@ -702,6 +961,13 @@ const _magiasFeiticeiro = [
     circulo: 1,
     escola: 'Conjuração',
     linha: '1 ação · 36 m',
+    tempo: '1 ação',
+    alcance: '36 m',
+    componentes: 'V, S',
+    duracao: 'Concentração, até 1 hora',
+    descricao: 'Você cria uma esfera de névoa com 6 metros de raio centrada num ponto dentro do alcance. A névoa contorna cantos e deixa a área com escuridão densa. Ela dura até a magia acabar ou até um vento moderado (16 km/h ou mais) dispersá-la.',
+    superior: 'O raio aumenta 6 metros para cada círculo acima do 1º.',
+    classes: ['Druida', 'Feiticeiro', 'Mago', 'Patrulheiro'],
     concentracao: true,
   ),
 ];
@@ -1198,8 +1464,6 @@ const classesMock = [
   ),
 ];
 
- Todas as magias das listas de classe. Uma magia pode aparecer em mais de
- uma lista; [magiaPorKey] devolve a primeira.
 const magiasMock = [
   ..._magiasClerigo,
   ..._magiasMago,
@@ -1207,6 +1471,123 @@ const magiasMock = [
   ..._magiasBruxo,
   ..._magiasDruida,
   ..._magiasFeiticeiro,
+  ..._magiasAvancadas,
+];
+
+const _magiasAvancadas = [
+  SpellOption(
+    key: 'arma_espiritual',
+    nome: 'Arma Espiritual',
+    circulo: 2,
+    escola: 'Evocação',
+    linha: '1 ação bônus · 18 m',
+    tempo: '1 ação bônus',
+    alcance: '18 m',
+    componentes: 'V, S',
+    duracao: '1 minuto',
+    descricao:
+        'Você cria uma arma espectral flutuante dentro do alcance. Ao '
+        'conjurar, pode fazer um ataque mágico corpo a corpo contra uma '
+        'criatura a até 1,5 metro dela; se acertar, o alvo sofre dano de '
+        'energia igual a 1d8 + seu modificador de atributo de conjuração. '
+        'Como ação bônus nos seus turnos, você pode mover a arma até 6 '
+        'metros e repetir o ataque.',
+    superior: '+1d8 de dano para cada dois círculos acima do 2º.',
+    classes: ['Clérigo'],
+  ),
+  SpellOption(
+    key: 'restauracao_menor',
+    nome: 'Restauração Menor',
+    circulo: 2,
+    escola: 'Abjuração',
+    linha: '1 ação · toque',
+    tempo: '1 ação',
+    alcance: 'Toque',
+    componentes: 'V, S',
+    duracao: 'Instantânea',
+    descricao:
+        'Você toca uma criatura e encerra uma doença ou uma condição que a '
+        'afete. A condição pode ser cego, surdo, paralisado ou envenenado.',
+    classes: ['Bardo', 'Clérigo', 'Druida', 'Paladino', 'Patrulheiro'],
+  ),
+  SpellOption(
+    key: 'guardioes_espirituais',
+    nome: 'Guardiões Espirituais',
+    circulo: 3,
+    escola: 'Conjuração',
+    linha: '1 ação · pessoal (4,5 m) · Salv. SAB',
+    concentracao: true,
+    tempo: '1 ação',
+    alcance: 'Pessoal (raio de 4,5 m)',
+    componentes: 'V, S, M (um símbolo sagrado)',
+    duracao: 'Concentração, até 10 minutos',
+    descricao:
+        'Espíritos protetores voam ao seu redor num raio de 4,5 metros, e '
+        'você escolhe quais criaturas eles poupam. O deslocamento de '
+        'criaturas afetadas na área cai pela metade. Quando uma delas entra '
+        'na área pela primeira vez no turno, ou começa o turno nela, faz uma '
+        'salvaguarda de Sabedoria: sofre 3d8 de dano radiante (necrótico, se '
+        'você for maligno) se falhar, ou metade se passar.',
+    superior: '+1d8 de dano para cada círculo acima do 3º.',
+    classes: ['Clérigo'],
+  ),
+  SpellOption(
+    key: 'bola_de_fogo',
+    nome: 'Bola de Fogo',
+    circulo: 3,
+    escola: 'Evocação',
+    linha: '1 ação · 45 m · Salv. DES',
+    tempo: '1 ação',
+    alcance: '45 m',
+    componentes: 'V, S, M (guano de morcego e enxofre)',
+    duracao: 'Instantânea',
+    descricao:
+        'Um raio brilhante sai do seu dedo até um ponto dentro do alcance e '
+        'explode em chamas. Cada criatura numa esfera de 6 metros de raio '
+        'faz uma salvaguarda de Destreza: sofre 8d6 de dano de fogo se '
+        'falhar, ou metade se passar. O fogo contorna cantos e incendeia '
+        'objetos inflamáveis que não estejam sendo vestidos ou carregados.',
+    superior: '+1d6 de dano para cada círculo acima do 3º.',
+    classes: ['Feiticeiro', 'Mago'],
+  ),
+  SpellOption(
+    key: 'contramagica',
+    nome: 'Contramágica',
+    circulo: 3,
+    escola: 'Abjuração',
+    linha: '1 reação · 18 m',
+    tempo: '1 reação, ao ver uma criatura conjurar uma magia',
+    alcance: '18 m',
+    componentes: 'S',
+    duracao: 'Instantânea',
+    descricao:
+        'Você tenta interromper uma criatura no ato de conjurar uma magia. '
+        'Se ela for de 3º círculo ou menor, falha e não tem efeito. Se for '
+        'de 4º círculo ou maior, faça um teste do seu atributo de conjuração '
+        'com CD 10 + o círculo da magia; se passar, ela falha.',
+    superior:
+        'Conjurada num círculo maior, interrompe sem teste magias de círculo '
+        'igual ou menor.',
+    classes: ['Bruxo', 'Feiticeiro', 'Mago'],
+  ),
+  SpellOption(
+    key: 'porta_dimensional',
+    nome: 'Porta Dimensional',
+    circulo: 4,
+    escola: 'Conjuração',
+    linha: '1 ação · 150 m',
+    tempo: '1 ação',
+    alcance: '150 m',
+    componentes: 'V',
+    duracao: 'Instantânea',
+    descricao:
+        'Você se teleporta para qualquer ponto dentro do alcance que possa '
+        'ver, descrever ou indicar por distância e direção. Pode levar o que '
+        'carrega e uma criatura voluntária do seu tamanho ou menor a até 1,5 '
+        'metro de você. Se o destino estiver ocupado, cada um sofre 4d6 de '
+        'dano de energia e a magia falha.',
+    classes: ['Bardo', 'Bruxo', 'Feiticeiro', 'Mago'],
+  ),
 ];
 
 SpellOption? magiaPorKey(String key) =>

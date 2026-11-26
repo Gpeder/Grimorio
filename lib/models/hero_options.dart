@@ -119,7 +119,6 @@ class EquipmentItem {
   final bool consumivel;
   final String? descricao;
 
-   Arma sem slot pode ser equipada depois na mão principal.
   InventoryItem paraInventario() => InventoryItem(
     id: key,
     nome: nome,
@@ -151,12 +150,24 @@ class SpellOption {
     required this.linha,
     this.concentracao = false,
     this.ritual = false,
+    this.tempo = '',
+    this.alcance = '',
+    this.componentes = '',
+    this.duracao = '',
+    this.descricao = '',
+    this.superior = '',
+    this.classes = const [],
   });
 
   final String key;
   final String nome;
-
-   0 = truque.
+  final String tempo;
+  final String alcance;
+  final String componentes;
+  final String duracao;
+  final String descricao;
+  final String superior;
+  final List<String> classes;
   final int circulo;
   final String escola;
 

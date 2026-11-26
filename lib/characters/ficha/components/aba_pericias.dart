@@ -6,8 +6,6 @@ import 'package:grimorio/models/character.dart';
 import 'package:grimorio/models/hero_options.dart';
 import 'package:grimorio/models/hero_options_mock.dart';
 
- As 18 perícias, só para consulta. `periciasMock` já está em ordem
- alfabética (com acentos), então não reordena.
 class AbaPericias extends StatelessWidget {
   const AbaPericias({super.key, required this.personagem});
 

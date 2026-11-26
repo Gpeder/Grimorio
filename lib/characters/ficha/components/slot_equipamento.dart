@@ -6,7 +6,6 @@ import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/models/character.dart';
 import 'package:grimorio/widgets/image_frame.dart';
 
- Quadrado com a imagem do item, ou borda tracejada quando vazio.
 class SlotEquipamento extends StatelessWidget {
   const SlotEquipamento({
     super.key,
@@ -61,7 +60,6 @@ class SlotEquipamento extends StatelessWidget {
 class SlotVazio extends StatelessWidget {
   const SlotVazio({super.key, this.lado});
 
-   Nulo = ocupa o espaço disponível.
   final double? lado;
 
   @override

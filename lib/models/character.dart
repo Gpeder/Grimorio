@@ -137,19 +137,15 @@ class InventoryItem {
   final double pesoKg;
   final EquipSlot? equipadoEm;
 
-   Onde o item pode ser equipado. Se nulo, vale o [equipadoEm].
   final EquipSlot? slot;
 
-   Dado de dano da arma, ex.: '1d6'.
   final String? dano;
   final String? tipoDano;
 
-   Atributo do ataque; nulo = FOR.
   final Ability? atributoAtaque;
   final bool consumivel;
   final String? descricao;
 
-   Somado à CA enquanto equipado (escudo = 2).
   final int bonusCa;
 
   bool get equipado => equipadoEm != null;
@@ -196,7 +192,6 @@ class Nota {
          dataMs: data.millisecondsSinceEpoch,
        );
 
-   Versão `const`, para mocks: a data vai em milissegundos.
   const Nota.fixa({
     required this.id,
     required this.titulo,
@@ -280,7 +275,6 @@ class Character {
   final Set<String> idiomas;
   final String historia;
 
-   Keys de `SpellOption` (truques + magias).
   final Set<String> magias;
   final Set<String> magiasPreparadas;
   final bool inspiracao;
@@ -351,7 +345,6 @@ class Character {
       if (i.equipadoEm == slot) i,
   ];
 
-   Bônus de CA dos itens equipados (escudo).
   int get bonusCaEquipado =>
       inventario.fold(0, (s, i) => s + (i.equipado ? i.bonusCa : 0));
 
@@ -382,8 +375,6 @@ class Character {
         : {...magiasPreparadas, key},
   );
 
-   Equipa no slot do item. Dois anéis cabem; nos outros slots, o item
-   que estava lá volta para a mochila.
   Character equipar(String itemId) {
     final item = inventario.where((i) => i.id == itemId).firstOrNull;
     final slot = item?.slotEquipavel;

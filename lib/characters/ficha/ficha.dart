@@ -16,7 +16,6 @@ import 'package:grimorio/widgets/image_frame.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
 import 'package:pixelarticons/pixel.dart';
 
- Ficha completa. Ao sair, devolve o personagem atualizado.
 class Ficha extends StatefulWidget {
   const Ficha({super.key, required this.personagem});
 
@@ -33,7 +32,6 @@ class _FichaState extends State<Ficha> {
   final _rolagem = ScrollController();
   bool _compacto = false;
 
-   A partir daqui o nome aparece na barra do topo.
   static const _limiteCompacto = 190.0;
 
   @override

@@ -15,7 +15,6 @@ class MedalhaoAtributo extends StatelessWidget {
   final Ability atributo;
   final int valor;
 
-   Atributo de magia (ou o maior): borda mais grossa.
   final bool destaque;
 
   static const _vao = 4.0;

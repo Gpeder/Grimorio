@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 
- Título de seção das abas da ficha ("Salvaguardas", "Mochila"…).
 class TituloSecao extends StatelessWidget {
   const TituloSecao(this.texto, {super.key, this.trailing});
 
@@ -33,7 +32,6 @@ class TituloSecao extends StatelessWidget {
   }
 }
 
- Rótulo pequeno em caixa alta ("ATAQUE MÁGICO", "CARGA").
 class RotuloFicha extends StatelessWidget {
   const RotuloFicha(this.texto, {super.key, this.icone, this.corIcone});
 

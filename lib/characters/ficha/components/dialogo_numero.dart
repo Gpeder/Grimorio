@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 
- Abre o [DialogoNumero] e devolve o número digitado (ou null se cancelar).
 Future<int?> pedirNumero(
   BuildContext context, {
   required String titulo,
@@ -101,7 +100,6 @@ class _DialogoNumeroState extends State<DialogoNumero> {
   }
 }
 
- Dialog de sim/não. Devolve true se confirmar.
 Future<bool> confirmar(
   BuildContext context, {
   required String titulo,
