@@ -1,33 +1,98 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
+import 'package:grimorio/controller/grimoire/estado_lista.dart';
+import 'package:grimorio/view/characters/ficha/components/titulo_secao.dart';
 import 'package:grimorio/view/grimoire/components/busca_compendio.dart';
+import 'package:grimorio/widgets/lista_paginada.dart';
 import 'package:pixelarticons/pixel.dart';
 
-// base das listas do grimorio
-class TelaLista extends StatelessWidget {
+// base das listas do grimorio, recebe tudo por parametro
+class TelaLista<T> extends StatefulWidget {
   const TelaLista({
     super.key,
     required this.titulo,
-    required this.contagem,
-    required this.itens,
+    required this.estado,
+    required this.itemBuilder,
+    required this.onCarregarMais,
+    required this.onTentarDeNovo,
+    required this.onAtualizar,
+    required this.vazioTitulo,
     this.dicaBusca,
+    this.buscaInicial,
     this.onBusca,
     this.filtros = const [],
+    this.secaoDe,
   });
 
   final String titulo;
-  final int contagem;
+  final EstadoLista<T> estado;
+  final Widget Function(BuildContext context, T item) itemBuilder;
+  final VoidCallback onCarregarMais;
+  final VoidCallback onTentarDeNovo;
+  final Future<void> Function() onAtualizar;
+  final String vazioTitulo;
   final String? dicaBusca;
-  final ValueChanged<String>? onBusca;
+  final String? buscaInicial;
+
+  // ja com a espera; null volta para a lista sem busca
+  final ValueChanged<String?>? onBusca;
   final List<Widget> filtros;
-  final List<Widget> itens;
+  final String Function(T item)? secaoDe;
+
+  static const espera = Duration(milliseconds: 400);
+  static const minimoBusca = 2;
+
+  // falta isso de scroll para pedir a proxima pagina
+  static const faltaParaFim = 300.0;
+
+  @override
+  State<TelaLista<T>> createState() => _TelaListaState<T>();
+}
+
+class _TelaListaState<T> extends State<TelaLista<T>> {
+  final _scroll = ScrollController();
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _scroll.addListener(_aoRolar);
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  void _aoRolar() {
+    final e = widget.estado;
+    if (!_scroll.hasClients) return;
+    final perto = _scroll.position.extentAfter < TelaLista.faltaParaFim;
+    final livre =
+        e.temMais && !e.carregandoMais && e.erroAoCarregarMais == null;
+    if (perto && livre) widget.onCarregarMais();
+  }
+
+  // espera parar de digitar
+  void _digitou(String texto) {
+    _timer?.cancel();
+    _timer = Timer(TelaLista.espera, () {
+      final t = texto.trim();
+      widget.onBusca?.call(t.length < TelaLista.minimoBusca ? null : t);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final dicaBusca = this.dicaBusca;
-    final onBusca = this.onBusca;
+    final e = widget.estado;
+    final dicaBusca = widget.dicaBusca;
+    final busca = e.busca;
 
     return Scaffold(
       body: SafeArea(
@@ -35,15 +100,16 @@ class TelaLista extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             VoltarHeader(
-              titulo: titulo,
+              titulo: widget.titulo,
               direita: Text(
-                '$contagem',
+                e.carregamento == Carregamento.pronto ? '${e.total}' : '',
                 style: textTheme.labelMedium?.copyWith(
                   color: AppColors.onSurface.withValues(alpha: 0.5),
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
+            // busca e filtros ficam em todos os estados
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.medium,
@@ -52,35 +118,39 @@ class TelaLista extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 spacing: AppSpacing.small,
                 children: [
-                  if (dicaBusca != null && onBusca != null)
-                    BuscaCompendio(dica: dicaBusca, onChanged: onBusca),
-                  ...filtros,
+                  if (dicaBusca != null && widget.onBusca != null)
+                    BuscaCompendio(
+                      dica: dicaBusca,
+                      inicial: widget.buscaInicial,
+                      onChanged: _digitou,
+                    ),
+                  ...widget.filtros,
                 ],
               ),
             ),
+            const SizedBox(height: AppSpacing.small),
             Expanded(
-              child: SingleChildScrollView(
+              child: ListaPaginada<T>(
+                estado: e,
+                controller: _scroll,
+                itemBuilder: widget.itemBuilder,
+                onCarregarMais: widget.onCarregarMais,
+                onTentarDeNovo: widget.onTentarDeNovo,
+                onAtualizar: widget.onAtualizar,
+                vazioTitulo: busca == null
+                    ? widget.vazioTitulo
+                    : 'Nada encontrado para "$busca"',
+                secaoDe: widget.secaoDe,
+                secaoBuilder: (_, secao) => Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.small),
+                  child: TituloSecao(secao),
+                ),
                 padding: const EdgeInsets.fromLTRB(
                   AppSpacing.medium,
-                  AppSpacing.medium,
+                  0,
                   AppSpacing.medium,
                   AppSpacing.large,
                 ),
-                child: itens.isEmpty
-                    ? Padding(
-                        padding: const EdgeInsets.only(top: AppSpacing.large),
-                        child: Text(
-                          'Nada encontrado.',
-                          textAlign: TextAlign.center,
-                          style: textTheme.bodyLarge?.copyWith(
-                            color: AppColors.onSurface.withValues(alpha: 0.6),
-                          ),
-                        ),
-                      )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: itens,
-                      ),
               ),
             ),
           ],

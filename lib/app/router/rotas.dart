@@ -47,6 +47,11 @@ class TipoCompendio {
   static const magias = 'magias';
   static const bestiario = 'bestiario';
   static const itens = 'itens';
+
+  // abas de itens, no detalhe dizem de onde buscar
+  static const itensMagicos = 'itens-magicos';
+  static const armas = 'armas';
+  static const armaduras = 'armaduras';
   static const classes = 'classes';
   static const especies = 'especies';
   static const condicoes = 'condicoes';

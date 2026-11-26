@@ -2,24 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
-import 'package:grimorio/controller/grimoire/gerenciador_compendio.dart';
-import 'package:grimorio/model/compendio.dart';
-import 'package:grimorio/model/compendio_mock.dart';
-import 'package:grimorio/view/grimoire/bestiario/detalhes_monstro.dart';
+import 'package:grimorio/controller/grimoire/compendio_provider.dart';
+import 'package:grimorio/controller/grimoire/filtros_srd.dart';
+import 'package:grimorio/controller/grimoire/traducao_srd.dart';
+import 'package:grimorio/model/srd/monstro_srd.dart';
 import 'package:grimorio/view/grimoire/components/compendio_tile.dart';
 import 'package:grimorio/view/grimoire/components/filtros.dart';
 import 'package:grimorio/view/grimoire/components/tela_lista.dart';
+import 'package:grimorio/view/grimoire/components/visual_srd.dart';
+import 'package:provider/provider.dart';
 
-// faixas de nd: rótulo -> min e max
-const _faixas = <String, (double, double)?>{
-  'Todos': null,
-  'ND 0–1': (0, 1),
-  'ND 2–4': (2, 4),
-  'ND 5–10': (5, 10),
-  'ND 11+': (11, 30),
-};
+// rotulo, nd minimo e maximo
+const _faixas = <(String, double?, double?)>[
+  ('Todos', null, null),
+  ('ND 0–1', null, 1),
+  ('ND 2–4', 2, 4),
+  ('ND 5–10', 5, 10),
+  ('ND 11+', 11, null),
+];
 
-const _tipos = ['Humanoide', 'Fera', 'Morto-vivo', 'Gigante', 'Dragão'];
+// keys da api
+const _tipos = ['humanoid', 'beast', 'undead', 'giant', 'dragon', 'fiend'];
 
 class Bestiario extends StatefulWidget {
   const Bestiario({super.key});
@@ -29,13 +32,22 @@ class Bestiario extends StatefulWidget {
 }
 
 class _BestiarioState extends State<Bestiario> {
-  String _busca = '';
-  String _faixa = 'Todos';
-  String? _tipo;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _compendio.carregarMonstros(busca: _compendio.monstros.busca),
+    );
+  }
 
-  static const _compendio = GerenciadorCompendio();
+  CompendioProvider get _compendio => context.read<CompendioProvider>();
 
-  void _abrir(Monstro m) => context.pushNamed(
+  void _filtrar(FiltroMonstro filtro) => _compendio.carregarMonstros(
+    busca: _compendio.monstros.busca,
+    filtro: filtro,
+  );
+
+  void _abrir(MonstroSrd m) => context.pushNamed(
     Rotas.nomeDetalheCompendio,
     pathParameters: {Rotas.tipo: TipoCompendio.bestiario, Rotas.key: m.key},
   );
@@ -43,26 +55,33 @@ class _BestiarioState extends State<Bestiario> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final filtrados = _compendio.filtrarMonstros(
-      monstrosMock,
-      busca: _busca,
-      faixa: _faixas[_faixa],
-      tipo: _tipo,
-    );
+    final c = context.watch<CompendioProvider>();
+    final f = c.filtroMonstros;
 
-    return TelaLista(
+    return TelaLista<MonstroSrd>(
       titulo: 'Bestiário',
-      contagem: monstrosMock.length,
+      estado: c.monstros,
       dicaBusca: 'Buscar criatura',
-      onBusca: (v) => setState(() => _busca = v),
+      buscaInicial: c.monstros.busca,
+      onBusca: (b) => _compendio.carregarMonstros(busca: b),
+      onCarregarMais: () => _compendio.carregarMaisMonstros(),
+      onTentarDeNovo: () =>
+          _compendio.carregarMonstros(busca: _compendio.monstros.busca),
+      onAtualizar: () => _compendio.carregarMonstros(
+        busca: _compendio.monstros.busca,
+        forcar: true,
+      ),
+      vazioTitulo: 'Nenhuma criatura encontrada',
       filtros: [
         Filtros(
           itens: [
-            for (final f in _faixas.keys)
+            for (final (rotulo, minimo, maximo) in _faixas)
               Filtro(
-                f,
-                selecionado: _faixa == f,
-                onTap: () => setState(() => _faixa = f),
+                rotulo,
+                selecionado: f.ndMinimo == minimo && f.ndMaximo == maximo,
+                onTap: () => _filtrar(
+                  f.copyWith(ndMinimo: () => minimo, ndMaximo: () => maximo),
+                ),
               ),
           ],
         ),
@@ -70,45 +89,47 @@ class _BestiarioState extends State<Bestiario> {
           itens: [
             Filtro(
               'Tipo: todos',
-              selecionado: _tipo == null,
-              onTap: () => setState(() => _tipo = null),
+              selecionado: f.tipo == null,
+              onTap: () => _filtrar(f.copyWith(tipo: () => null)),
             ),
             for (final t in _tipos)
               Filtro(
-                t,
-                selecionado: _tipo == t,
-                onTap: () => setState(() => _tipo = _tipo == t ? null : t),
+                TraducaoSrd.tipoMonstro(t),
+                selecionado: f.tipo == t,
+                onTap: () =>
+                    _filtrar(f.copyWith(tipo: () => f.tipo == t ? null : t)),
               ),
           ],
         ),
       ],
-      itens: [
-        for (final m in filtrados)
-          CompendioTile(
-            imagem: m.imagem,
-            titulo: m.nome,
-            subtitulo: '${m.tipo} ${m.tamanho} · ${milhar(m.xp)} XP',
-            onTap: () => _abrir(m),
-            trailing: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  'ND ${m.nd}',
-                  style: textTheme.labelLarge?.copyWith(
-                    color: AppColors.alerta,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  'CA ${m.ca} · PV ${m.pv}',
-                  style: textTheme.labelSmall?.copyWith(
-                    color: AppColors.onSurface.withValues(alpha: 0.6),
-                  ),
-                ),
-              ],
+      itemBuilder: (_, m) => CompendioTile(
+        imagem: VisualSrd.monstro,
+        imagemUrl: m.imagem,
+        titulo: m.nome,
+        subtitulo: [
+          '${TraducaoSrd.tipoMonstro(m.tipo)} ${TraducaoSrd.tamanho(m.tamanho)}',
+          if (m.xp case final xp?) '${VisualSrd.milhar(xp)} XP',
+        ].join(' · '),
+        onTap: () => _abrir(m),
+        trailing: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              'ND ${VisualSrd.nd(m.nd)}',
+              style: textTheme.labelLarge?.copyWith(
+                color: AppColors.alerta,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-      ],
+            Text(
+              'CA ${m.ca ?? '—'} · PV ${m.pv ?? '—'}',
+              style: textTheme.labelSmall?.copyWith(
+                color: AppColors.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

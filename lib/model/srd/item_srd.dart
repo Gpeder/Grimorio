@@ -89,7 +89,8 @@ class ItemSrd {
       caBase: lerInteiro(a['ac_base']),
       caTexto: a['ac_display'] as String?,
       categoriaArmadura: identical(a, json) ? null : a['category'] as String?,
-      desvantagemFurtividade: a['grants_stealth_disadvantage'] as bool? ?? false,
+      desvantagemFurtividade:
+          a['grants_stealth_disadvantage'] as bool? ?? false,
       forcaMinima: lerInteiro(a['strength_score_required']),
     );
   }

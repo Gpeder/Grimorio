@@ -1,20 +1,28 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/controller/grimoire/gerenciador_compendio.dart';
-import 'package:grimorio/model/compendio_mock.dart';
-import 'package:grimorio/model/opcoes_heroi_mock.dart';
+import 'package:grimorio/controller/grimoire/compendio_provider.dart';
+import 'package:grimorio/controller/grimoire/estado_lista.dart';
+import 'package:grimorio/controller/grimoire/filtros_srd.dart';
+import 'package:grimorio/controller/grimoire/traducao_srd.dart';
+import 'package:grimorio/model/srd/item_srd.dart';
 import 'package:grimorio/view/characters/ficha/components/titulo_secao.dart';
 import 'package:grimorio/view/grimoire/components/busca_compendio.dart';
 import 'package:grimorio/view/grimoire/components/categoria_card.dart';
 import 'package:grimorio/view/grimoire/components/compendio_tile.dart';
 import 'package:grimorio/view/grimoire/components/raridade_badge.dart';
-import 'package:grimorio/view/grimoire/itens/detalhes_item.dart';
-import 'package:grimorio/view/grimoire/magias/detalhes_magia.dart';
+import 'package:grimorio/view/grimoire/components/tela_lista.dart';
+import 'package:grimorio/view/grimoire/components/visual_srd.dart';
 import 'package:grimorio/view/grimoire/magias/magias.dart';
+import 'package:grimorio/widgets/estado_carregando.dart';
+import 'package:grimorio/widgets/estado_erro.dart';
+import 'package:grimorio/widgets/estado_vazio.dart';
+import 'package:provider/provider.dart';
 
 class Grimoire extends StatefulWidget {
   const Grimoire({super.key});
@@ -24,67 +32,96 @@ class Grimoire extends StatefulWidget {
 }
 
 class _GrimoireState extends State<Grimoire> {
-  static const _compendio = GerenciadorCompendio();
-
-  String _busca = '';
-
   static const _porGrupo = 5;
 
-  List<Widget> _categorias() {
+  // so busca com 2 letras ou mais
+  String? _busca;
+  Timer? _timer;
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _digitou(String texto) {
+    _timer?.cancel();
+    _timer = Timer(TelaLista.espera, () {
+      final t = texto.trim();
+      final busca = t.length < TelaLista.minimoBusca ? null : t;
+      setState(() => _busca = busca);
+      if (busca != null) context.read<CompendioProvider>().buscarTudo(busca);
+    });
+  }
+
+  void _abrir(String tipo, String key) => context.pushNamed(
+    Rotas.nomeDetalheCompendio,
+    pathParameters: {Rotas.tipo: tipo, Rotas.key: key},
+  );
+
+  void _lista(String tipo) => context.pushNamed(
+    Rotas.nomeListaCompendio,
+    pathParameters: {Rotas.tipo: tipo},
+  );
+
+  // total so quando a lista carregou sem busca nem filtro
+  static String _contagem(
+    EstadoLista<Object?> e,
+    bool semFiltro,
+    String nome,
+  ) => e.carregamento == Carregamento.pronto && e.busca == null && semFiltro
+      ? '${e.total} $nome'
+      : 'SRD 5.1';
+
+  List<Widget> _categorias(CompendioProvider c) {
     final cards = [
       CategoriaCard(
         nome: 'Classes',
-        contagem: '${classesMock.length} classes',
+        contagem: _contagem(c.classes, true, 'classes'),
         imagem: AppImages.menuGrimorio,
-        onTap: () => context.pushNamed(
-          Rotas.nomeListaCompendio,
-          pathParameters: {Rotas.tipo: TipoCompendio.classes},
-        ),
+        onTap: () => _lista(TipoCompendio.classes),
       ),
       CategoriaCard(
         nome: 'Espécies',
-        contagem: '${especiesMock.length} espécies',
+        contagem: _contagem(c.especies, true, 'espécies'),
         imagem: AppImages.especieElfoF,
-        onTap: () => context.pushNamed(
-          Rotas.nomeListaCompendio,
-          pathParameters: {Rotas.tipo: TipoCompendio.especies},
-        ),
+        onTap: () => _lista(TipoCompendio.especies),
       ),
       CategoriaCard(
         nome: 'Magias',
-        contagem: '${magiasCompendio.length} magias',
-        imagem: AppImages.pergMagia,
-        onTap: () => context.pushNamed(
-          Rotas.nomeListaCompendio,
-          pathParameters: {Rotas.tipo: TipoCompendio.magias},
+        contagem: _contagem(
+          c.magias,
+          c.filtroMagias == const FiltroMagia(),
+          'magias',
         ),
+        imagem: AppImages.pergMagia,
+        onTap: () => _lista(TipoCompendio.magias),
       ),
       CategoriaCard(
         nome: 'Bestiário',
-        contagem: '${monstrosMock.length} criaturas',
-        imagem: AppImages.menuBestiario,
-        onTap: () => context.pushNamed(
-          Rotas.nomeListaCompendio,
-          pathParameters: {Rotas.tipo: TipoCompendio.bestiario},
+        contagem: _contagem(
+          c.monstros,
+          c.filtroMonstros == const FiltroMonstro(),
+          'criaturas',
         ),
+        imagem: AppImages.menuBestiario,
+        onTap: () => _lista(TipoCompendio.bestiario),
       ),
       CategoriaCard(
         nome: 'Itens',
-        contagem: '${itensMock.length} itens',
-        imagem: AppImages.bau,
-        onTap: () => context.pushNamed(
-          Rotas.nomeListaCompendio,
-          pathParameters: {Rotas.tipo: TipoCompendio.itens},
+        contagem: _contagem(
+          c.itensMagicos,
+          c.filtroItensMagicos == const FiltroItemMagico(),
+          'mágicos',
         ),
+        imagem: AppImages.bau,
+        onTap: () => _lista(TipoCompendio.itens),
       ),
       CategoriaCard(
         nome: 'Condições',
-        contagem: '${condicoesMock.length} condições',
+        contagem: _contagem(c.condicoes, true, 'condições'),
         imagem: AppImages.pocao7,
-        onTap: () => context.pushNamed(
-          Rotas.nomeListaCompendio,
-          pathParameters: {Rotas.tipo: TipoCompendio.condicoes},
-        ),
+        onTap: () => _lista(TipoCompendio.condicoes),
       ),
     ];
 
@@ -106,81 +143,90 @@ class _GrimoireState extends State<Grimoire> {
     ];
   }
 
-  List<Widget> _resultados() {
-    final b = _busca;
+  static String _tipoDoItem(ItemSrd i) => i.arma
+      ? TipoCompendio.armas
+      : i.armadura
+      ? TipoCompendio.armaduras
+      : TipoCompendio.itens;
+
+  List<Widget> _resultados(CompendioProvider c, String busca) {
+    final estados = [
+      c.buscaMagias,
+      c.buscaMonstros,
+      c.buscaItensMagicos,
+      c.buscaItens,
+    ];
+    if (estados.any((e) => e.carregamento == Carregamento.erro)) {
+      final erro = estados.firstWhere(
+        (e) => e.carregamento == Carregamento.erro,
+      );
+      return [
+        EstadoErro(
+          mensagem: erro.mensagemErro ?? 'Algo deu errado',
+          onTentarDeNovo: () =>
+              context.read<CompendioProvider>().buscarTudo(busca),
+        ),
+      ];
+    }
+    if (estados.any((e) => e.carregamento != Carregamento.pronto)) {
+      return [const EstadoCarregando()];
+    }
+
     final grupos = <(String, List<Widget>)>[
       (
         'Magias',
         [
-          for (final m in magiasCompendio.where(
-            (m) => _compendio.contem(m.nome, b),
-          ))
+          for (final m in c.buscaMagias.itens.take(_porGrupo))
             CompendioTile(
-              imagem: imagemDaEscola(m.escola),
+              imagem: VisualSrd.escola(m.escola),
               titulo: m.nome,
-              subtitulo: '${nomeDoCirculo(m.circulo)} · ${m.escola}',
-              tags: TagsMagia(magia: m),
-              onTap: () => context.pushNamed(
-                Rotas.nomeDetalheCompendio,
-                pathParameters: {
-                  Rotas.tipo: TipoCompendio.magias,
-                  Rotas.key: m.key,
-                },
-              ),
+              subtitulo:
+                  '${VisualSrd.nivel(m.nivel)} · ${TraducaoSrd.escola(m.escola)}',
+              tags: TagsMagia(concentracao: m.concentracao, ritual: m.ritual),
+              onTap: () => _abrir(TipoCompendio.magias, m.key),
             ),
         ],
       ),
       (
         'Criaturas',
         [
-          for (final m in monstrosMock.where(
-            (m) => _compendio.contem(m.nome, b),
-          ))
+          for (final m in c.buscaMonstros.itens.take(_porGrupo))
             CompendioTile(
-              imagem: m.imagem,
+              imagem: VisualSrd.monstro,
+              imagemUrl: m.imagem,
               titulo: m.nome,
-              subtitulo: '${m.tipo} ${m.tamanho} · ND ${m.nd}',
-              onTap: () => context.pushNamed(
-                Rotas.nomeDetalheCompendio,
-                pathParameters: {
-                  Rotas.tipo: TipoCompendio.bestiario,
-                  Rotas.key: m.key,
-                },
-              ),
+              subtitulo:
+                  '${TraducaoSrd.tipoMonstro(m.tipo)} · ND ${VisualSrd.nd(m.nd)}',
+              onTap: () => _abrir(TipoCompendio.bestiario, m.key),
+            ),
+        ],
+      ),
+      (
+        'Itens mágicos',
+        [
+          for (final i in c.buscaItensMagicos.itens.take(_porGrupo))
+            CompendioTile(
+              imagem: VisualSrd.item(i),
+              titulo: i.nome,
+              subtitulo: TraducaoSrd.categoriaItem(i.categoria),
+              corBorda: VisualSrd.raridade(i.raridade)?.cor,
+              trailing: switch (VisualSrd.raridade(i.raridade)) {
+                final r? => RaridadeBadge(r),
+                null => null,
+              },
+              onTap: () => _abrir(TipoCompendio.itensMagicos, i.key),
             ),
         ],
       ),
       (
         'Itens',
         [
-          for (final i in itensMock.where((i) => _compendio.contem(i.nome, b)))
+          for (final i in c.buscaItens.itens.take(_porGrupo))
             CompendioTile(
-              imagem: i.imagem,
+              imagem: VisualSrd.item(i),
               titulo: i.nome,
-              subtitulo: i.categoria,
-              corBorda: i.raridade.cor,
-              trailing: RaridadeBadge(i.raridade),
-              onTap: () => mostrarItem(context, i),
-            ),
-        ],
-      ),
-      (
-        'Classes',
-        [
-          for (final c in classesMock.where(
-            (c) => _compendio.contem(c.nome, b),
-          ))
-            CompendioTile(
-              imagem: c.imagem,
-              titulo: c.nome,
-              subtitulo: papelDaClasse[c.key] ?? '',
-              onTap: () => context.pushNamed(
-                Rotas.nomeDetalheCompendio,
-                pathParameters: {
-                  Rotas.tipo: TipoCompendio.classes,
-                  Rotas.key: c.key,
-                },
-              ),
+              subtitulo: TraducaoSrd.categoriaItem(i.categoria),
+              onTap: () => _abrir(_tipoDoItem(i), i.key),
             ),
         ],
       ),
@@ -188,17 +234,7 @@ class _GrimoireState extends State<Grimoire> {
 
     final comResultado = grupos.where((g) => g.$2.isNotEmpty).toList();
     if (comResultado.isEmpty) {
-      return [
-        Padding(
-          padding: const EdgeInsets.only(top: AppSpacing.large),
-          child: Text(
-            'Nada encontrado.',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyLarge
-                ?.copyWith(color: AppColors.onSurface.withValues(alpha: 0.6)),
-          ),
-        ),
-      ];
+      return [EstadoVazio(titulo: 'Nada encontrado para "$busca"')];
     }
     return [
       for (final (titulo, linhas) in comResultado) ...[
@@ -206,7 +242,7 @@ class _GrimoireState extends State<Grimoire> {
           padding: const EdgeInsets.only(top: AppSpacing.small),
           child: TituloSecao(titulo),
         ),
-        ...linhas.take(_porGrupo),
+        ...linhas,
         const SizedBox(height: AppSpacing.medium),
       ],
     ];
@@ -215,7 +251,8 @@ class _GrimoireState extends State<Grimoire> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final buscando = _compendio.normalizar(_busca).length >= 2;
+    final c = context.watch<CompendioProvider>();
+    final busca = _busca;
 
     return Scaffold(
       body: SafeArea(
@@ -240,13 +277,13 @@ class _GrimoireState extends State<Grimoire> {
               const SizedBox(height: AppSpacing.medium),
               BuscaCompendio(
                 dica: 'Buscar magias, monstros, itens…',
-                onChanged: (v) => setState(() => _busca = v),
+                onChanged: _digitou,
               ),
               const SizedBox(height: AppSpacing.medium),
-              ...buscando ? _resultados() : _categorias(),
+              ...busca == null ? _categorias(c) : _resultados(c, busca),
               const SizedBox(height: AppSpacing.medium),
               Text(
-                'Fonte: SRD 5.1 · salvo no aparelho',
+                'Fonte: SRD 5.1 · Open5e',
                 textAlign: TextAlign.center,
                 style: textTheme.bodySmall?.copyWith(
                   color: AppColors.onSurface.withValues(alpha: 0.5),

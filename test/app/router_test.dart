@@ -9,12 +9,16 @@ import 'package:grimorio/model/personagem_mock.dart';
 import 'package:grimorio/view/characters/ficha/ficha.dart';
 import 'package:grimorio/view/grimoire/magias/magias.dart';
 
+import '../helpers/dio_falso.dart';
+
 void main() {
   Future<void> abrir(WidgetTester tester, [String rota = Rotas.inicio]) async {
     tester.view.physicalSize = const Size(1800, 2796);
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
-    await tester.pumpWidget(GrimorioApp(inicial: rota));
+    await tester.pumpWidget(
+      GrimorioApp(inicial: rota, api: clienteFalso(DioFalso())),
+    );
     await tester.pumpAndSettle();
   }
 

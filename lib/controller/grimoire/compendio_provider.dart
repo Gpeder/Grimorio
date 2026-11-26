@@ -129,6 +129,30 @@ class CompendioProvider extends ChangeNotifier {
          (c) => c.key,
          null,
          (p, b, _) => condicoes.listar(pagina: p, busca: b),
+       ),
+       _buscaMagias = _Lista(
+         'BuscaMagias',
+         (m) => m.key,
+         null,
+         (p, b, _) => magias.listar(pagina: p, busca: b),
+       ),
+       _buscaMonstros = _Lista(
+         'BuscaMonstros',
+         (m) => m.key,
+         null,
+         (p, b, _) => monstros.listar(pagina: p, busca: b),
+       ),
+       _buscaItensMagicos = _Lista(
+         'BuscaItensMagicos',
+         (i) => i.key,
+         null,
+         (p, b, _) => itens.listarMagicos(pagina: p, busca: b),
+       ),
+       _buscaItens = _Lista(
+         'BuscaItens',
+         (i) => i.key,
+         null,
+         (p, b, _) => itens.listarTodos(pagina: p, busca: b),
        );
 
   final MagiaService _magiaService;
@@ -148,6 +172,12 @@ class CompendioProvider extends ChangeNotifier {
   final _Lista<Especie, Object?> _especies;
   final _Lista<CondicaoSrd, Object?> _condicoes;
 
+  // busca da home do grimorio, separada das listas das telas
+  final _Lista<Magia, Object?> _buscaMagias;
+  final _Lista<MonstroSrd, Object?> _buscaMonstros;
+  final _Lista<ItemSrd, Object?> _buscaItensMagicos;
+  final _Lista<ItemSrd, Object?> _buscaItens;
+
   // tipo + key
   final _detalhes = <String, EstadoDetalhe<Object>>{};
 
@@ -164,6 +194,11 @@ class CompendioProvider extends ChangeNotifier {
   EstadoLista<ClasseSrd> get classes => _classes.estado;
   EstadoLista<Especie> get especies => _especies.estado;
   EstadoLista<CondicaoSrd> get condicoes => _condicoes.estado;
+
+  EstadoLista<Magia> get buscaMagias => _buscaMagias.estado;
+  EstadoLista<MonstroSrd> get buscaMonstros => _buscaMonstros.estado;
+  EstadoLista<ItemSrd> get buscaItensMagicos => _buscaItensMagicos.estado;
+  EstadoLista<ItemSrd> get buscaItens => _buscaItens.estado;
 
   // filtros atuais, a tela comeca deles ao voltar
 
@@ -218,6 +253,14 @@ class CompendioProvider extends ChangeNotifier {
   Future<void> carregarMaisClasses() => _carregarMais(_classes);
   Future<void> carregarMaisEspecies() => _carregarMais(_especies);
   Future<void> carregarMaisCondicoes() => _carregarMais(_condicoes);
+
+  // uma pagina de cada, so quando a home busca
+  Future<void> buscarTudo(String busca) => Future.wait([
+    _carregar(_buscaMagias, busca, null, forcar: false),
+    _carregar(_buscaMonstros, busca, null, forcar: false),
+    _carregar(_buscaItensMagicos, busca, null, forcar: false),
+    _carregar(_buscaItens, busca, null, forcar: false),
+  ]);
 
   // detalhe
 
@@ -280,12 +323,13 @@ class CompendioProvider extends ChangeNotifier {
   static String _chave(TipoSrd tipo, String key) => '${tipo.name}:$key';
 
   Object? _naLista(TipoSrd tipo, String key) => switch (tipo) {
-    TipoSrd.magia => _magias.porKey(key),
-    TipoSrd.monstro => _monstros.porKey(key),
-    TipoSrd.item => _itens.porKey(key),
-    TipoSrd.itemMagico => _itensMagicos.porKey(key),
-    TipoSrd.arma => _armas.porKey(key),
-    TipoSrd.armadura => _armaduras.porKey(key),
+    TipoSrd.magia => _magias.porKey(key) ?? _buscaMagias.porKey(key),
+    TipoSrd.monstro => _monstros.porKey(key) ?? _buscaMonstros.porKey(key),
+    TipoSrd.item => _itens.porKey(key) ?? _buscaItens.porKey(key),
+    TipoSrd.itemMagico =>
+      _itensMagicos.porKey(key) ?? _buscaItensMagicos.porKey(key),
+    TipoSrd.arma => _armas.porKey(key) ?? _buscaItens.porKey(key),
+    TipoSrd.armadura => _armaduras.porKey(key) ?? _buscaItens.porKey(key),
     TipoSrd.classe => _classes.porKey(key),
     TipoSrd.especie => _especies.porKey(key),
     TipoSrd.condicao => _condicoes.porKey(key),

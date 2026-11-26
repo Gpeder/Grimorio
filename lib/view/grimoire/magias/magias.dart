@@ -3,26 +3,39 @@ import 'package:go_router/go_router.dart';
 import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/controller/grimoire/gerenciador_compendio.dart';
-import 'package:grimorio/model/compendio_mock.dart';
-import 'package:grimorio/model/opcoes_heroi.dart';
-import 'package:grimorio/model/opcoes_heroi_mock.dart';
+import 'package:grimorio/controller/grimoire/compendio_provider.dart';
+import 'package:grimorio/controller/grimoire/estado_lista.dart';
+import 'package:grimorio/controller/grimoire/filtros_srd.dart';
+import 'package:grimorio/controller/grimoire/traducao_srd.dart';
+import 'package:grimorio/model/srd/magia.dart';
 import 'package:grimorio/view/characters/ficha/components/titulo_secao.dart';
 import 'package:grimorio/view/grimoire/components/compendio_tile.dart';
 import 'package:grimorio/view/grimoire/components/filtros.dart';
 import 'package:grimorio/view/grimoire/components/tela_lista.dart';
-import 'package:grimorio/view/grimoire/magias/detalhes_magia.dart';
+import 'package:grimorio/view/grimoire/components/visual_srd.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
+import 'package:provider/provider.dart';
 
-// null é todas, 4 é 4º ou mais
-const _circulos = <int?, String>{
-  null: 'Todas',
-  0: 'Truques',
-  1: '1º',
-  2: '2º',
-  3: '3º',
-  4: '4º+',
-};
+// rotulo, nivel exato e nivel minimo
+const _circulos = <(String, int?, int?)>[
+  ('Todas', null, null),
+  ('Truques', 0, null),
+  ('1º', 1, null),
+  ('2º', 2, null),
+  ('3º', 3, null),
+  ('4º+', null, 4),
+];
+
+const _escolas = [
+  'abjuration',
+  'conjuration',
+  'divination',
+  'enchantment',
+  'evocation',
+  'illusion',
+  'necromancy',
+  'transmutation',
+];
 
 class Magias extends StatefulWidget {
   const Magias({super.key});
@@ -32,130 +45,173 @@ class Magias extends StatefulWidget {
 }
 
 class _MagiasState extends State<Magias> {
-  String _busca = '';
-  int? _circulo;
-  String? _classe;
-  bool _concentracao = false;
-  bool _ritual = false;
-
-  static const _compendio = GerenciadorCompendio();
-
-  Future<void> _escolherClasse() async {
-    final escolha = await showModalBottomSheet<String>(
-      context: context,
-      backgroundColor: AppColors.surface,
-      builder: (sheet) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.medium),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const TituloSecao('Classe'),
-              Wrap(
-                spacing: 6,
-                runSpacing: 6,
-                children: [
-                  Etiqueta(
-                    'Todas',
-                    selecionado: _classe == null,
-                    onTap: () => Navigator.pop(sheet, ''),
-                  ),
-                  for (final c in classesMock)
-                    Etiqueta(
-                      c.nome,
-                      selecionado: _classe == c.nome,
-                      onTap: () => Navigator.pop(sheet, c.nome),
-                    ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-    if (escolha == null) return;
-    setState(() => _classe = escolha.isEmpty ? null : escolha);
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final c = context.read<CompendioProvider>();
+      c.carregarMagias(busca: c.magias.busca);
+    });
   }
 
-  void _abrir(OpcaoMagia m) => context.pushNamed(
+  CompendioProvider get _compendio => context.read<CompendioProvider>();
+
+  void _filtrar(FiltroMagia filtro) =>
+      _compendio.carregarMagias(busca: _compendio.magias.busca, filtro: filtro);
+
+  // sheet simples de escolha, devolve '' para todas
+  Future<String?> _escolher(
+    String titulo,
+    String? atual,
+    Map<String, String> opcoes,
+  ) => showModalBottomSheet<String>(
+    context: context,
+    backgroundColor: AppColors.surface,
+    builder: (sheet) => SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.medium),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TituloSecao(titulo),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                Etiqueta(
+                  'Todas',
+                  selecionado: atual == null,
+                  onTap: () => Navigator.pop(sheet, ''),
+                ),
+                for (final MapEntry(:key, :value) in opcoes.entries)
+                  Etiqueta(
+                    value,
+                    selecionado: atual == key,
+                    onTap: () => Navigator.pop(sheet, key),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  // classes vem da api
+  Future<void> _escolherClasse(FiltroMagia f) async {
+    final classes = _compendio.classes;
+    if (classes.carregamento != Carregamento.pronto) {
+      await _compendio.carregarClasses();
+    }
+    if (!mounted) return;
+    final escolha = await _escolher('Classe', f.classeKey, {
+      for (final c in _compendio.classes.itens) c.key: c.nome,
+    });
+    if (escolha == null) return;
+    _filtrar(f.copyWith(classeKey: () => escolha.isEmpty ? null : escolha));
+  }
+
+  Future<void> _escolherEscola(FiltroMagia f) async {
+    final escolha = await _escolher('Escola', f.escolaKey, {
+      for (final e in _escolas) e: TraducaoSrd.escola(e),
+    });
+    if (escolha == null) return;
+    _filtrar(f.copyWith(escolaKey: () => escolha.isEmpty ? null : escolha));
+  }
+
+  void _abrir(Magia m) => context.pushNamed(
     Rotas.nomeDetalheCompendio,
     pathParameters: {Rotas.tipo: TipoCompendio.magias, Rotas.key: m.key},
   );
 
+  String? _nomeClasse(CompendioProvider c, String? key) {
+    for (final x in c.classes.itens) {
+      if (x.key == key) return x.nome;
+    }
+    return key;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final filtradas = _compendio.filtrarMagias(
-      magiasCompendio,
-      busca: _busca,
-      circulo: _circulo,
-      classe: _classe,
-      concentracao: _concentracao,
-      ritual: _ritual,
-    );
-    final circulos = {for (final m in filtradas) m.circulo};
+    final c = context.watch<CompendioProvider>();
+    final f = c.filtroMagias;
+    final classe = f.classeKey;
+    final escola = f.escolaKey;
 
-    return TelaLista(
+    return TelaLista<Magia>(
       titulo: 'Magias',
-      contagem: magiasCompendio.length,
+      estado: c.magias,
       dicaBusca: 'Buscar magia',
-      onBusca: (v) => setState(() => _busca = v),
+      buscaInicial: c.magias.busca,
+      onBusca: (b) => _compendio.carregarMagias(busca: b),
+      onCarregarMais: () => _compendio.carregarMaisMagias(),
+      onTentarDeNovo: () =>
+          _compendio.carregarMagias(busca: _compendio.magias.busca),
+      onAtualizar: () => _compendio.carregarMagias(
+        busca: _compendio.magias.busca,
+        forcar: true,
+      ),
+      vazioTitulo: 'Nenhuma magia encontrada',
+      secaoDe: (m) => m.nivel == 0 ? 'Truques' : VisualSrd.nivel(m.nivel),
       filtros: [
         Filtros(
           itens: [
-            for (final MapEntry(key: c, value: rotulo) in _circulos.entries)
+            for (final (rotulo, nivel, minimo) in _circulos)
               Filtro(
                 rotulo,
-                selecionado: _circulo == c,
-                onTap: () => setState(() => _circulo = c),
+                selecionado: f.nivel == nivel && f.nivelMinimo == minimo,
+                onTap: () => _filtrar(
+                  f.copyWith(nivel: () => nivel, nivelMinimo: () => minimo),
+                ),
               ),
           ],
         ),
         Filtros(
           itens: [
             Filtro(
-              _classe == null ? 'Classe' : 'Classe: $_classe',
-              selecionado: _classe != null,
-              onTap: _escolherClasse,
+              classe == null ? 'Classe' : 'Classe: ${_nomeClasse(c, classe)}',
+              selecionado: classe != null,
+              onTap: () => _escolherClasse(f),
+            ),
+            Filtro(
+              escola == null
+                  ? 'Escola'
+                  : 'Escola: ${TraducaoSrd.escola(escola)}',
+              selecionado: escola != null,
+              onTap: () => _escolherEscola(f),
             ),
             Filtro(
               'Concentração',
-              selecionado: _concentracao,
-              onTap: () => setState(() => _concentracao = !_concentracao),
-            ),
-            Filtro(
-              'Ritual',
-              selecionado: _ritual,
-              onTap: () => setState(() => _ritual = !_ritual),
+              selecionado: f.concentracao,
+              onTap: () => _filtrar(f.copyWith(concentracao: !f.concentracao)),
             ),
           ],
         ),
       ],
-      itens: [
-        for (final c in circulos) ...[
-          Padding(
-            padding: const EdgeInsets.only(top: AppSpacing.small),
-            child: TituloSecao(c == 0 ? 'Truques' : nomeDoCirculo(c)),
-          ),
-          for (final m in filtradas)
-            if (m.circulo == c)
-              CompendioTile(
-                imagem: imagemDaEscola(m.escola),
-                titulo: m.nome,
-                subtitulo: m.linha,
-                tags: TagsMagia(magia: m),
-                onTap: () => _abrir(m),
-              ),
-        ],
-      ],
+      itemBuilder: (_, m) => CompendioTile(
+        imagem: VisualSrd.escola(m.escola),
+        titulo: m.nome,
+        subtitulo: [
+          TraducaoSrd.escola(m.escola),
+          TraducaoSrd.tempo(m.tempo),
+        ].join(' · '),
+        tags: TagsMagia(concentracao: m.concentracao, ritual: m.ritual),
+        onTap: () => _abrir(m),
+      ),
     );
   }
 }
 
 class TagsMagia extends StatelessWidget {
-  const TagsMagia({super.key, required this.magia});
+  const TagsMagia({
+    super.key,
+    required this.concentracao,
+    required this.ritual,
+  });
 
-  final OpcaoMagia magia;
+  final bool concentracao;
+  final bool ritual;
 
   @override
   Widget build(BuildContext context) {
@@ -163,9 +219,9 @@ class TagsMagia extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       spacing: 4,
       children: [
-        if (magia.concentracao)
+        if (concentracao)
           const Etiqueta('C', pequena: true, cor: AppColors.mana),
-        if (magia.ritual)
+        if (ritual)
           const Etiqueta('R', pequena: true, cor: AppColors.secondary),
       ],
     );

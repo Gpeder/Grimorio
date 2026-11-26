@@ -15,6 +15,10 @@ class ListaPaginada<T> extends StatelessWidget {
     required this.onCarregarMais,
     this.vazioTitulo = 'Nada por aqui',
     this.vazioMensagem,
+    this.controller,
+    this.onAtualizar,
+    this.secaoDe,
+    this.secaoBuilder,
     this.padding = const EdgeInsets.fromLTRB(
       AppSpacing.medium,
       0,
@@ -29,6 +33,15 @@ class ListaPaginada<T> extends StatelessWidget {
   final VoidCallback onCarregarMais;
   final String vazioTitulo;
   final String? vazioMensagem;
+  final ScrollController? controller;
+
+  // puxar para atualizar
+  final Future<void> Function()? onAtualizar;
+
+  // titulo antes do primeiro item de cada secao
+  final String Function(T item)? secaoDe;
+  final Widget Function(BuildContext context, String secao)? secaoBuilder;
+
   final EdgeInsetsGeometry padding;
 
   @override
@@ -49,11 +62,29 @@ class ListaPaginada<T> extends StatelessWidget {
     }
 
     final rodape = _rodape(e);
-    return ListView.builder(
+    final lista = ListView.builder(
+      controller: controller,
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: padding,
       itemCount: e.itens.length + (rodape == null ? 0 : 1),
       itemBuilder: (context, i) =>
-          i < e.itens.length ? itemBuilder(context, e.itens[i]) : rodape!,
+          i < e.itens.length ? _item(context, e.itens, i) : rodape!,
+    );
+    final onAtualizar = this.onAtualizar;
+    if (onAtualizar == null) return lista;
+    return RefreshIndicator(onRefresh: onAtualizar, child: lista);
+  }
+
+  Widget _item(BuildContext context, List<T> itens, int i) {
+    final item = itemBuilder(context, itens[i]);
+    final secaoDe = this.secaoDe;
+    final secaoBuilder = this.secaoBuilder;
+    if (secaoDe == null || secaoBuilder == null) return item;
+    final secao = secaoDe(itens[i]);
+    if (i > 0 && secaoDe(itens[i - 1]) == secao) return item;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [secaoBuilder(context, secao), item],
     );
   }
 

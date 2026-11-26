@@ -1,34 +1,51 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/app/router/rotas.dart';
-import 'package:grimorio/model/compendio_mock.dart';
-import 'package:grimorio/model/opcoes_heroi_mock.dart';
+import 'package:grimorio/service/api/api_rotas.dart';
+import 'package:grimorio/widgets/estado_carregando.dart';
+import 'package:grimorio/widgets/estado_vazio.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
 
 import '../../helpers/app_teste.dart';
+import '../../helpers/dio_falso.dart';
+
+// api inteira com as fixtures
+DioFalso apiSrd() => DioFalso({
+  ApiRotas.magias: RespostaFalsa(json: fixture('magias.json')),
+  ApiRotas.monstros: RespostaFalsa(json: fixture('monstros.json')),
+  ApiRotas.itens: RespostaFalsa(json: fixture('itens.json')),
+  ApiRotas.itensMagicos: RespostaFalsa(json: fixture('itens_magicos.json')),
+  ApiRotas.classes: RespostaFalsa(json: fixture('classes.json')),
+  ApiRotas.especies: RespostaFalsa(json: fixture('especies.json')),
+  ApiRotas.condicoes: RespostaFalsa(json: fixture('condicoes.json')),
+});
+
+Future<void> abrirGrimorio(
+  WidgetTester tester,
+  DioFalso dio, {
+  String rota = Rotas.grimorio,
+}) async {
+  tester.view.physicalSize = const Size(1080, 2400);
+  tester.view.devicePixelRatio = 3;
+  addTearDown(tester.view.reset);
+  await tester.pumpWidget(appDeTeste(rota, dio: dio));
+  await tester.pumpAndSettle();
+}
+
+Future<void> tocar(WidgetTester tester, Finder alvo) async {
+  await tester.ensureVisible(alvo);
+  await tester.pumpAndSettle();
+  await tester.tap(alvo);
+  await tester.pumpAndSettle();
+}
+
+Finder filtro(String rotulo) => find.widgetWithText(Etiqueta, rotulo);
 
 void main() {
-  Future<void> abrir(WidgetTester tester) async {
-    tester.view.physicalSize = const Size(1080, 2400);
-    tester.view.devicePixelRatio = 3;
-    addTearDown(tester.view.reset);
-
-    await tester.pumpWidget(appDeTeste(Rotas.grimorio));
-  }
-
-  Future<void> tocar(WidgetTester tester, Finder alvo) async {
-    await tester.ensureVisible(alvo);
-    await tester.pumpAndSettle();
-    await tester.tap(alvo);
-    await tester.pumpAndSettle();
-  }
-
-  Finder filtro(String rotulo) => find.widgetWithText(Etiqueta, rotulo);
-
-  testWidgets('mostra as 6 categorias com as contagens do mock', (
-    tester,
-  ) async {
-    await abrir(tester);
+  testWidgets('home mostra as 6 categorias sem chamar a api', (tester) async {
+    final dio = apiSrd();
+    await abrirGrimorio(tester, dio);
 
     for (final nome in [
       'Classes',
@@ -40,100 +57,144 @@ void main() {
     ]) {
       expect(find.text(nome), findsOneWidget);
     }
-    expect(find.text('${classesMock.length} classes'), findsOneWidget);
-    expect(find.text('${especiesMock.length} espécies'), findsOneWidget);
-    expect(find.text('${magiasCompendio.length} magias'), findsOneWidget);
-    expect(find.text('${monstrosMock.length} criaturas'), findsOneWidget);
-    expect(find.text('${itensMock.length} itens'), findsOneWidget);
-    expect(find.text('${condicoesMock.length} condições'), findsOneWidget);
+    expect(dio.pedidos, isEmpty);
   });
 
-  testWidgets('buscar "cura" agrupa magias e itens', (tester) async {
-    await abrir(tester);
-
-    await tester.enterText(find.byType(TextField), 'cura');
-    await tester.pumpAndSettle();
-
-    expect(find.text('Classes'), findsNothing);
-    expect(find.text('Magias'), findsOneWidget);
-    expect(find.text('Curar Ferimentos'), findsOneWidget);
-    expect(find.text('Itens'), findsOneWidget);
-    expect(find.text('Poção de Cura'), findsOneWidget);
-  });
-
-  testWidgets('Magias: filtrar Truques esconde o 1º círculo', (tester) async {
-    await abrir(tester);
-    await tocar(tester, find.text('Magias'));
-
-    expect(find.text('Curar Ferimentos'), findsOneWidget);
-
-    await tocar(tester, filtro('Truques'));
-    expect(find.text('Curar Ferimentos'), findsNothing);
-    expect(find.text('Luz'), findsOneWidget);
-  });
-
-  testWidgets('Bestiário: ND 2–4 mostra só o Ogro', (tester) async {
-    await abrir(tester);
-    await tocar(tester, find.text('Bestiário'));
-
-    await tocar(tester, filtro('ND 2–4'));
-    expect(find.text('Ogro'), findsOneWidget);
-    expect(find.text('Goblin'), findsNothing);
-    expect(find.text('Jovem Dragão Verde'), findsNothing);
-  });
-
-  testWidgets('ficha do Goblin mostra ND, CA e o ataque', (tester) async {
-    await abrir(tester);
-    await tocar(tester, find.text('Bestiário'));
-    await tocar(tester, find.text('Goblin'));
-
-    expect(find.textContaining('ND 1/4'), findsOneWidget);
-    expect(find.textContaining('Classe de Armadura 15'), findsOneWidget);
-    expect(find.text('+4 para acertar'), findsWidgets);
-
-    await tocar(tester, find.bySemanticsLabel('Voltar'));
-    expect(find.text('Goblin'), findsOneWidget);
-  });
-
-  testWidgets('listas e detalhes abrem sem erro de layout em 360 px', (
+  testWidgets('categoria mostra o total da api depois de carregar', (
     tester,
   ) async {
-    await abrir(tester);
-    final voltar = find.bySemanticsLabel('Voltar');
+    await abrirGrimorio(tester, apiSrd());
+    await tocar(tester, find.text('Magias'));
+    await tocar(tester, find.bySemanticsLabel('Voltar'));
 
-    for (final (categoria, detalhe) in [
-      ('Classes', 'Clérigo'),
-      ('Classes', 'Bruxo'),
-      ('Espécies', 'Elfo'),
-      ('Magias', 'Guardiões Espirituais'),
-      ('Bestiário', 'Jovem Dragão Verde'),
-    ]) {
-      await tocar(tester, find.text(categoria));
-      await tocar(tester, find.text(detalhe).first);
-      if (categoria == 'Classes') {
-        await tocar(tester, find.text('Ver níveis 6 a 20 ›'));
-      }
-      await tocar(tester, voltar.first);
-      await tocar(tester, voltar.first);
-    }
-
-    await tocar(tester, find.text('Itens'));
-    await tocar(tester, find.text('Espada Vorpal'));
-    expect(find.text('Requer sintonia'), findsOneWidget);
-    expect(tester.takeException(), isNull);
+    expect(find.text('319 magias'), findsOneWidget);
   });
 
-  testWidgets('Condições: abre uma por vez', (tester) async {
-    await abrir(tester);
-    await tocar(tester, find.text('Condições'));
+  testWidgets('Magias: carregando e depois a lista da api', (tester) async {
+    final dio = DioFalso({
+      ApiRotas.magias: RespostaFalsa(
+        json: fixture('magias.json'),
+        atraso: const Duration(milliseconds: 50),
+      ),
+    });
+    await tester.pumpWidget(
+      appDeTeste('${Rotas.grimorio}/${TipoCompendio.magias}', dio: dio),
+    );
+    await tester.pump();
+    await tester.pump();
+    expect(find.byType(EstadoCarregando), findsOneWidget);
 
-    const envenenado = 'Desvantagem em jogadas de ataque e testes de atributo.';
-    expect(find.text(envenenado), findsNothing);
+    await tester.pumpAndSettle();
+    expect(find.text('Acid Arrow'), findsOneWidget);
+    expect(find.text('319'), findsOneWidget);
+    expect(find.text('2º círculo'), findsOneWidget);
+  });
 
-    await tocar(tester, find.text('Envenenado'));
-    expect(find.text(envenenado), findsOneWidget);
+  testWidgets('Magias: filtro 4º+ vai como level__gte', (tester) async {
+    final dio = apiSrd();
+    await abrirGrimorio(tester, dio, rota: '${Rotas.grimorio}/magias');
 
-    await tocar(tester, find.text('Cego'));
-    expect(find.text(envenenado), findsNothing);
+    await tocar(tester, filtro('4º+'));
+    expect(dio.ultimo.queryParameters[ApiRotas.filtroNivelMinimo], 4);
+    expect(dio.ultimo.queryParameters[ApiRotas.filtroNivel], isNull);
+
+    await tocar(tester, filtro('Concentração'));
+    expect(dio.ultimo.queryParameters[ApiRotas.filtroConcentracao], true);
+    expect(dio.ultimo.queryParameters[ApiRotas.filtroNivelMinimo], 4);
+  });
+
+  testWidgets('Bestiário: ND 2–4 e tipo vão na query', (tester) async {
+    final dio = apiSrd();
+    await abrirGrimorio(tester, dio, rota: '${Rotas.grimorio}/bestiario');
+    expect(find.text('Aboleth'), findsOneWidget);
+    expect(dio.ultimo.queryParameters[ApiRotas.ordem], ApiRotas.ordemNd);
+
+    await tocar(tester, filtro('ND 2–4'));
+    expect(dio.ultimo.queryParameters[ApiRotas.filtroNdMinimo], 2);
+    expect(dio.ultimo.queryParameters[ApiRotas.filtroNdMaximo], 4);
+
+    await tocar(tester, filtro('Dragão'));
+    expect(dio.ultimo.queryParameters[ApiRotas.filtroTipo], 'dragon');
+  });
+
+  testWidgets('Itens: cada aba usa a sua lista', (tester) async {
+    final dio = apiSrd();
+    await abrirGrimorio(tester, dio, rota: '${Rotas.grimorio}/itens');
+    expect(dio.ultimo.path, ApiRotas.itensMagicos);
+    expect(find.text('Incomum'), findsWidgets);
+
+    await tocar(tester, filtro('Raro'));
+    expect(dio.ultimo.queryParameters[ApiRotas.filtroRaridade], 'rare');
+
+    dio.respostas[ApiRotas.itens] = RespostaFalsa(json: fixture('armas.json'));
+    await tocar(tester, filtro('Armas'));
+    expect(dio.ultimo.path, ApiRotas.itens);
+    expect(
+      dio.ultimo.queryParameters[ApiRotas.filtroCategoria],
+      ApiRotas.categoriasArma,
+    );
+    expect(find.text('Longsword'), findsOneWidget);
+    expect(filtro('Raro'), findsNothing);
+  });
+
+  testWidgets('lista vazia mostra EstadoVazio', (tester) async {
+    final dio = DioFalso({
+      ApiRotas.condicoes: const RespostaFalsa(
+        json: {'count': 0, 'next': null, 'results': []},
+      ),
+    });
+    await abrirGrimorio(tester, dio, rota: '${Rotas.grimorio}/condicoes');
+
+    expect(find.byType(EstadoVazio), findsOneWidget);
+    expect(find.text('Nenhuma condição encontrada'), findsOneWidget);
+  });
+
+  testWidgets('Condições: nome traduzido e abre uma por vez', (tester) async {
+    final cego = fixture('condicoes.json')['results'][0];
+    final dio = DioFalso({
+      ApiRotas.condicoes: RespostaFalsa(
+        json: {
+          'count': 2,
+          'next': null,
+          'results': [
+            {
+              'key': 'charmed',
+              'name': 'Charmed',
+              'descriptions': [
+                {'desc': 'A charmed creature cant attack the charmer.'},
+              ],
+            },
+            cego,
+          ],
+        },
+      ),
+    });
+    await abrirGrimorio(tester, dio, rota: '${Rotas.grimorio}/condicoes');
+
+    expect(find.textContaining('Cego'), findsOneWidget);
+    expect(find.textContaining('Enfeitiçado'), findsOneWidget);
+    final cegoTexto = find.textContaining('blinded creature');
+    final enfeiticadoTexto = find.textContaining('charmed creature');
+    expect(enfeiticadoTexto, findsNothing);
+
+    await tocar(tester, find.textContaining('Enfeitiçado'));
+    expect(enfeiticadoTexto, findsOneWidget);
+
+    await tocar(tester, find.textContaining('Cego'));
+    expect(enfeiticadoTexto, findsNothing);
+    expect(cegoTexto, findsOneWidget);
+  });
+
+  testWidgets('erro de conexão mostra a mensagem amigável', (tester) async {
+    final dio = DioFalso({
+      ApiRotas.classes: const RespostaFalsa.falha(
+        DioExceptionType.connectionError,
+      ),
+    });
+    await abrirGrimorio(tester, dio, rota: '${Rotas.grimorio}/classes');
+
+    expect(find.text('Sem conexão. Confira a internet'), findsOneWidget);
+    expect(find.textContaining('Dio'), findsNothing);
+    expect(find.textContaining('Exception'), findsNothing);
   });
 }

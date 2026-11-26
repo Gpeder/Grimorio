@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/model/compendio.dart';
-import 'package:grimorio/model/compendio_mock.dart';
+import 'package:grimorio/controller/grimoire/compendio_provider.dart';
+import 'package:grimorio/controller/grimoire/traducao_srd.dart';
+import 'package:grimorio/model/srd/condicao_srd.dart';
 import 'package:grimorio/view/characters/new_hero/components/caixa_opcao.dart';
 import 'package:grimorio/view/grimoire/components/tela_lista.dart';
 import 'package:pixelarticons/pixel.dart';
+import 'package:provider/provider.dart';
 
 class Condicoes extends StatefulWidget {
   const Condicoes({super.key});
@@ -18,22 +20,36 @@ class _CondicoesState extends State<Condicoes> {
   String? _aberta;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _compendio.carregarCondicoes(),
+    );
+  }
+
+  CompendioProvider get _compendio => context.read<CompendioProvider>();
+
+  @override
   Widget build(BuildContext context) {
-    return TelaLista(
+    final c = context.watch<CompendioProvider>();
+
+    return TelaLista<CondicaoSrd>(
       titulo: 'Condições',
-      contagem: condicoesMock.length,
-      itens: [
-        for (final c in condicoesMock)
-          Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.small),
-            child: _CondicaoCard(
-              condicao: c,
-              aberta: _aberta == c.nome,
-              onTap: () =>
-                  setState(() => _aberta = _aberta == c.nome ? null : c.nome),
-            ),
+      estado: c.condicoes,
+      onCarregarMais: () => _compendio.carregarMaisCondicoes(),
+      onTentarDeNovo: () => _compendio.carregarCondicoes(),
+      onAtualizar: () => _compendio.carregarCondicoes(forcar: true),
+      vazioTitulo: 'Nenhuma condição encontrada',
+      itemBuilder: (_, condicao) => Padding(
+        padding: const EdgeInsets.only(bottom: AppSpacing.small),
+        child: _CondicaoCard(
+          condicao: condicao,
+          aberta: _aberta == condicao.key,
+          onTap: () => setState(
+            () => _aberta = _aberta == condicao.key ? null : condicao.key,
           ),
-      ],
+        ),
+      ),
     );
   }
 }
@@ -45,7 +61,7 @@ class _CondicaoCard extends StatelessWidget {
     required this.onTap,
   });
 
-  final CondicaoInfo condicao;
+  final CondicaoSrd condicao;
   final bool aberta;
   final VoidCallback onTap;
 
@@ -68,11 +84,23 @@ class _CondicaoCard extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: Text(
-                    condicao.nome,
-                    style: textTheme.titleMedium?.copyWith(
-                      color: AppColors.onSurface,
-                      fontWeight: FontWeight.bold,
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: TraducaoSrd.condicao(condicao.nome),
+                          style: textTheme.titleMedium?.copyWith(
+                            color: AppColors.onSurface,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        TextSpan(
+                          text: '  ${condicao.nome}',
+                          style: textTheme.bodySmall?.copyWith(
+                            color: AppColors.onSurface.withValues(alpha: 0.5),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -86,11 +114,6 @@ class _CondicaoCard extends StatelessWidget {
             if (aberta) ...[
               const SizedBox(height: 6),
               Text(condicao.descricao, style: corpo),
-              for (final n in condicao.niveis)
-                Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Text(n, style: corpo),
-                ),
             ],
           ],
         ),

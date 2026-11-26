@@ -11,6 +11,7 @@ class CompendioTile extends StatelessWidget {
     required this.titulo,
     required this.subtitulo,
     required this.onTap,
+    this.imagemUrl,
     this.tags,
     this.trailing,
     this.corBorda,
@@ -18,6 +19,9 @@ class CompendioTile extends StatelessWidget {
   });
 
   final String imagem;
+
+  // da api, com a pixel art de reserva
+  final String? imagemUrl;
   final String titulo;
   final String subtitulo;
   final VoidCallback onTap;
@@ -42,6 +46,7 @@ class CompendioTile extends StatelessWidget {
               children: [
                 ImageFrame(
                   imagePath: imagem,
+                  imagemUrl: imagemUrl,
                   width: lado,
                   height: lado,
                   borderColor: corBorda,

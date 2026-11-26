@@ -16,6 +16,10 @@ class ItemService {
         ApiRotas.filtroCategoria: ApiRotas.categoriasEquipamento,
       });
 
+  // todas as categorias, para a busca geral
+  Future<Paginado<ItemSrd>> listarTodos({int pagina = 1, String? busca}) =>
+      _listar(ApiRotas.itens, pagina, busca, const {});
+
   Future<Paginado<ItemSrd>> listarMagicos({
     int pagina = 1,
     String? busca,

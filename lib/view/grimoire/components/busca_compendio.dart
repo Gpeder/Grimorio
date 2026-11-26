@@ -6,14 +6,19 @@ class BuscaCompendio extends StatelessWidget {
     super.key,
     required this.dica,
     required this.onChanged,
+    this.inicial,
   });
 
   final String dica;
   final ValueChanged<String> onChanged;
 
+  // texto ao voltar para a tela
+  final String? inicial;
+
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
+      initialValue: inicial,
       onChanged: onChanged,
       textInputAction: TextInputAction.search,
       decoration: InputDecoration(
