@@ -51,6 +51,18 @@ App Flutter de apoio a campanhas de D&D 5e na mesa. Dados da API Open5e v2 (SRD 
 - O usuário só vê mensagem amigável: `mensagemDeErro(e)` (loga o original), `mostrarErro` para ação que falhou, `EstadoCarregando`, `EstadoErro`, `EstadoVazio` e `ListaPaginada` para listas. Nunca `e.toString()` na tela.
 - `test/` espelha o `lib/`: `test/view/`, `test/controller/`, `test/model/`.
 
+### Grimório e SRD
+
+- O Grimório (listas e detalhes) lê da API pelo `CompendioProvider`. Inventário, missões e "dar item" ainda usam `compendio_mock`; Ficha, Novo Herói e Campanha usam os mocks de sempre.
+- Nome e descrição do SRD ficam em inglês. Campo fixo (escola, tipo, tamanho, raridade, dano, atributo, condição, tempo, alcance…) é traduzido só pelo `TraducaoSrd`, na tela. Model do SRD não traduz.
+- Descrição da API passa por `textoLimpo`/`TextoSrd` (sem pacote de markdown).
+- Filtro vai na query, com o nome em `ApiRotas`. Nunca filtrar a página no front (quebra com paginação). Filtro que a API não aceita sai da tela.
+- Filtros da Open5e que funcionam: magias `level`, `level__gte`, `concentration`, `classes__key`, `school__key`; criaturas `type` (key minúscula), `challenge_rating__gte`/`__lte`; itens mágicos `rarity` (key, ex `very-rare`); `/items/` `category__in`; classes `is_subclass`, `subclass_of`; espécies `subspecies_of__isnull`. Ordem com `ordering` (`level,name`, `challenge_rating,name`, `name`).
+- Não funcionam (a API ignora): `ritual` nas magias, `name__icontains` em `/weapons/` e `/armor/` (por isso armas e armaduras saem de `/items/` pela categoria), `subspecies_of=<key>`.
+- Lista pronta com a mesma busca e filtro não chama a API de novo; puxar para atualizar passa `forcar`. Detalhe usa o item da lista se já veio.
+- Component não importa mock nem provider: recebe por parâmetro. Quem importa é a tela.
+- Testes com API usam `DioFalso` + `appDeTeste(rota, dio: ...)`. Resposta acima de 50 KB trava o teste (o Dio decodifica num isolate); use `paginaFalsa` ou fixture pequena.
+
 ### Nomes
 
 - Domínio em português, termo de UI em inglês no fim: `PersonagemCard`, `PassoHeader`, `OpcoesSheet` (também `DetalhesItem`, `GerenciadorExp`, `ListaPersonagens`).
