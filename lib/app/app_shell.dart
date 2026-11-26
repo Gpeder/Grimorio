@@ -4,11 +4,11 @@ import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
 import 'package:grimorio/app/components/barra_navegacao.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/campaign/campaign.dart';
-import 'package:grimorio/characters/characters.dart';
-import 'package:grimorio/grimoire/grimoire.dart';
-import 'package:grimorio/home/home.dart';
-import 'package:grimorio/settings/settings.dart';
+import 'package:grimorio/view/campaign/campaign.dart';
+import 'package:grimorio/view/characters/characters.dart';
+import 'package:grimorio/view/grimoire/grimoire.dart';
+import 'package:grimorio/view/home/home.dart';
+import 'package:grimorio/view/settings/settings.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
