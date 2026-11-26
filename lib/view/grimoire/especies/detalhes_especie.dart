@@ -1,29 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/model/opcoes_heroi.dart';
-import 'package:grimorio/model/personagem.dart';
+import 'package:grimorio/controller/grimoire/compendio_provider.dart';
+import 'package:grimorio/controller/grimoire/estado_detalhe.dart';
+import 'package:grimorio/model/srd/especie.dart';
+import 'package:grimorio/model/srd/monstro_srd.dart';
 import 'package:grimorio/view/characters/ficha/components/titulo_secao.dart';
 import 'package:grimorio/view/characters/new_hero/components/alternador.dart';
-import 'package:grimorio/view/grimoire/components/caixa_dados.dart';
+import 'package:grimorio/view/grimoire/components/tela_detalhe.dart';
 import 'package:grimorio/view/grimoire/components/tela_lista.dart';
+import 'package:grimorio/view/grimoire/components/texto_srd.dart';
+import 'package:grimorio/view/grimoire/components/visual_srd.dart';
 import 'package:grimorio/widgets/appcard.dart';
-import 'package:grimorio/widgets/etiqueta.dart';
 import 'package:grimorio/widgets/image_frame.dart';
-import 'package:pixelarticons/pixel.dart';
-
-String _metros(num m) =>
-    '${m == m.roundToDouble() ? m.round() : '$m'.replaceAll('.', ',')} m';
-
-String _bonus(Map<Atributo, int> bonus) => [
-  for (final MapEntry(:key, :value) in bonus.entries)
-    '${sinal(value)} ${key.sigla}',
-].join(', ');
+import 'package:provider/provider.dart';
 
 class DetalhesEspecie extends StatefulWidget {
-  const DetalhesEspecie({super.key, required this.especie});
+  const DetalhesEspecie({super.key, required this.srdKey});
 
-  final OpcaoEspecie especie;
+  final String srdKey;
 
   @override
   State<DetalhesEspecie> createState() => _DetalhesEspecieState();
@@ -33,21 +28,37 @@ class _DetalhesEspecieState extends State<DetalhesEspecie> {
   bool _feminino = true;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _carregar());
+  }
+
+  void _carregar() {
+    final c = context.read<CompendioProvider>();
+    c.carregarDetalhe(TipoSrd.especie, widget.srdKey);
+    c.carregarSubespecies();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final c = context.watch<CompendioProvider>();
+
+    return TelaDetalhe<Especie>(
+      estado: c.detalhe<Especie>(TipoSrd.especie, widget.srdKey),
+      onTentarDeNovo: _carregar,
+      builder: (_, e) => _conteudo(e, c.subespeciesDe(e.key)),
+    );
+  }
+
+  Widget _conteudo(Especie e, List<Especie> subespecies) {
     final textTheme = Theme.of(context).textTheme;
-    final e = widget.especie;
-    final suave = AppColors.onSurface.withValues(alpha: 0.75);
-    final bonus = [
-      if (e.bonus.isNotEmpty) _bonus(e.bonus),
-      if (e.bonusLivres > 0) '+1 em ${e.bonusLivres} à escolha',
-    ].join(', ');
 
     return Scaffold(
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            VoltarHeader(titulo: e.nomePara(feminino: _feminino)),
+            VoltarHeader(titulo: e.nome),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(
@@ -59,9 +70,13 @@ class _DetalhesEspecieState extends State<DetalhesEspecie> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // retrato
                     Center(
                       child: ImageFrame(
-                        imagePath: e.retratoPara(feminino: _feminino),
+                        imagePath: VisualSrd.especie(
+                          e.key,
+                          feminino: _feminino,
+                        ),
                         width: 180,
                         height: 210,
                         selected: true,
@@ -73,64 +88,24 @@ class _DetalhesEspecieState extends State<DetalhesEspecie> {
                       valor: _feminino,
                       onChanged: (v) => setState(() => _feminino = v),
                     ),
-                    const SizedBox(height: AppSpacing.medium),
-                    Text(
-                      e.descricao,
-                      style: textTheme.bodyLarge?.copyWith(color: suave),
-                    ),
-                    const SizedBox(height: AppSpacing.medium),
-                    CaixaDados(
-                      dados: [
-                        Dado('Tamanho', e.tamanho),
-                        Dado('Deslocamento', _metros(e.deslocamentoM)),
-                        Dado(
-                          'Visão no escuro',
-                          e.visaoNoEscuroM == null
-                              ? '—'
-                              : _metros(e.visaoNoEscuroM!),
-                        ),
-                        Dado('Bônus', bonus.isEmpty ? '—' : bonus),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.large),
-                    const TituloSecao('Traços'),
-                    for (final t in e.tracos)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 6),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Pixel.chevronright,
-                              size: 14,
-                              color: AppColors.alerta,
-                            ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                t,
-                                style: textTheme.bodyLarge?.copyWith(
-                                  color: AppColors.onSurface,
-                                ),
-                              ),
-                            ),
-                          ],
+                    if (e.descricao.trim().isNotEmpty) ...[
+                      const SizedBox(height: AppSpacing.medium),
+                      TextoSrd(
+                        e.descricao,
+                        estilo: textTheme.bodyLarge?.copyWith(
+                          color: AppColors.onSurface.withValues(alpha: 0.75),
                         ),
                       ),
-                    const SizedBox(height: AppSpacing.medium),
-                    const TituloSecao('Idiomas'),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      children: [
-                        for (final i in e.idiomas) Etiqueta(i),
-                        if (e.idiomasExtras > 0)
-                          Etiqueta('+${e.idiomasExtras} à escolha'),
-                      ],
-                    ),
-                    if (e.subespecies.isNotEmpty) ...[
+                    ],
+                    if (e.tracos.isNotEmpty) ...[
+                      const SizedBox(height: AppSpacing.large),
+                      const TituloSecao('Traços'),
+                      for (final t in e.tracos) _Traco(traco: t),
+                    ],
+                    if (subespecies.isNotEmpty) ...[
                       const SizedBox(height: AppSpacing.large),
                       const TituloSecao('Sub-espécies'),
-                      for (final s in e.subespecies)
+                      for (final s in subespecies)
                         Padding(
                           padding: const EdgeInsets.only(
                             bottom: AppSpacing.small,
@@ -140,7 +115,7 @@ class _DetalhesEspecieState extends State<DetalhesEspecie> {
                               AppSpacing.medium - 4,
                             ),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Text(
                                   s.nome,
@@ -149,16 +124,7 @@ class _DetalhesEspecieState extends State<DetalhesEspecie> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Text(
-                                  [
-                                    if (s.bonus.isNotEmpty) _bonus(s.bonus),
-                                    if (s.hpPorNivel > 0)
-                                      '+${s.hpPorNivel} PV por nível',
-                                  ].join(' · '),
-                                  style: textTheme.bodyMedium?.copyWith(
-                                    color: AppColors.alerta,
-                                  ),
-                                ),
+                                for (final t in s.tracos) _Traco(traco: t),
                               ],
                             ),
                           ),
@@ -170,6 +136,37 @@ class _DetalhesEspecieState extends State<DetalhesEspecie> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _Traco extends StatelessWidget {
+  const _Traco({required this.traco});
+
+  final AcaoSrd traco;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.small),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            traco.nome,
+            style: textTheme.titleSmall?.copyWith(
+              color: AppColors.alerta,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          TextoSrd(
+            traco.descricao,
+            estilo: textTheme.bodyMedium?.copyWith(color: AppColors.onSurface),
+          ),
+        ],
       ),
     );
   }

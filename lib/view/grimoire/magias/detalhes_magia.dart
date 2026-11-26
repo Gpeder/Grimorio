@@ -1,41 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
-import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/model/opcoes_heroi.dart';
+import 'package:grimorio/controller/grimoire/compendio_provider.dart';
+import 'package:grimorio/controller/grimoire/estado_detalhe.dart';
+import 'package:grimorio/controller/grimoire/traducao_srd.dart';
+import 'package:grimorio/model/srd/magia.dart';
 import 'package:grimorio/view/grimoire/components/caixa_dados.dart';
+import 'package:grimorio/view/grimoire/components/tela_detalhe.dart';
 import 'package:grimorio/view/grimoire/components/tela_lista.dart';
+import 'package:grimorio/view/grimoire/components/texto_srd.dart';
+import 'package:grimorio/view/grimoire/components/visual_srd.dart';
 import 'package:grimorio/widgets/appcard.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
 import 'package:grimorio/widgets/image_frame.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
+import 'package:provider/provider.dart';
 
-const _imagemEscola = {
-  'Abjuração': AppImages.magoAbjuracao,
-  'Adivinhação': AppImages.magoAdivinhacao,
-  'Conjuração': AppImages.magoConjuracao,
-  'Encantamento': AppImages.magoEncantamento,
-  'Evocação': AppImages.magoEvocacao,
-  'Ilusão': AppImages.magoIlusao,
-  'Necromancia': AppImages.magoNecromancia,
-  'Transmutação': AppImages.magoTransmutacao,
-};
+class DetalhesMagia extends StatefulWidget {
+  const DetalhesMagia({super.key, required this.srdKey});
 
-String imagemDaEscola(String escola) =>
-    _imagemEscola[escola] ?? AppImages.pergMagia;
+  final String srdKey;
 
-String nomeDoCirculo(int circulo) =>
-    circulo == 0 ? 'Truque' : '$circuloº círculo';
+  @override
+  State<DetalhesMagia> createState() => _DetalhesMagiaState();
+}
 
-class DetalhesMagia extends StatelessWidget {
-  const DetalhesMagia({super.key, required this.magia});
+class _DetalhesMagiaState extends State<DetalhesMagia> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _carregar());
+  }
 
-  final OpcaoMagia magia;
+  void _carregar() => context.read<CompendioProvider>().carregarDetalhe(
+    TipoSrd.magia,
+    widget.srdKey,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.watch<CompendioProvider>();
+
+    return TelaDetalhe<Magia>(
+      estado: c.detalhe<Magia>(TipoSrd.magia, widget.srdKey),
+      onTentarDeNovo: _carregar,
+      builder: (_, m) => _Conteudo(magia: m),
+    );
+  }
+}
+
+class _Conteudo extends StatelessWidget {
+  const _Conteudo({required this.magia});
+
+  final Magia magia;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final m = magia;
+    final material = m.materialDetalhe;
+    final superior = m.superior ?? '';
 
     return Scaffold(
       bottomNavigationBar: RodapeButton(
@@ -67,10 +91,11 @@ class DetalhesMagia extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // nome e circulo
                     Row(
                       children: [
                         ImageFrame(
-                          imagePath: imagemDaEscola(m.escola),
+                          imagePath: VisualSrd.escola(m.escola),
                           width: 64,
                           height: 64,
                         ),
@@ -87,7 +112,8 @@ class DetalhesMagia extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                '${nomeDoCirculo(m.circulo)} · ${m.escola}',
+                                '${VisualSrd.nivel(m.nivel)} · '
+                                '${TraducaoSrd.escola(m.escola)}',
                                 style: textTheme.bodyMedium?.copyWith(
                                   color: AppColors.alerta,
                                 ),
@@ -112,21 +138,23 @@ class DetalhesMagia extends StatelessWidget {
                     const SizedBox(height: AppSpacing.medium),
                     CaixaDados(
                       dados: [
-                        Dado('Conjuração', _ou(m.tempo)),
-                        Dado('Alcance', _ou(m.alcance)),
-                        ..._componentes(m.componentes),
-                        Dado('Duração', _ou(m.duracao)),
+                        Dado('Conjuração', TraducaoSrd.tempo(m.tempo)),
+                        Dado('Alcance', TraducaoSrd.alcance(m.alcance)),
+                        Dado(
+                          'Componentes',
+                          m.componentes.isEmpty
+                              ? TraducaoSrd.vazio
+                              : m.componentes,
+                          detalhe: material == null || material.isEmpty
+                              ? null
+                              : material,
+                        ),
+                        Dado('Duração', TraducaoSrd.duracao(m.duracao)),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.medium),
-                    Text(
-                      m.descricao.isEmpty ? m.resumo : m.descricao,
-                      style: textTheme.bodyLarge?.copyWith(
-                        color: AppColors.onSurface,
-                        height: 1.5,
-                      ),
-                    ),
-                    if (m.superior.isNotEmpty) ...[
+                    TextoSrd(m.descricao),
+                    if (superior.trim().isNotEmpty) ...[
                       const SizedBox(height: AppSpacing.medium),
                       AppCard(
                         innerBorder: false,
@@ -142,9 +170,9 @@ class DetalhesMagia extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              m.superior,
-                              style: textTheme.bodyMedium?.copyWith(
+                            TextoSrd(
+                              superior,
+                              estilo: textTheme.bodyMedium?.copyWith(
                                 color: AppColors.onSurface,
                               ),
                             ),
@@ -160,20 +188,5 @@ class DetalhesMagia extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  static String _ou(String v) => v.isEmpty ? '—' : v;
-
-  // material vai embaixo dos componentes
-  static List<Dado> _componentes(String texto) {
-    final i = texto.indexOf(' (');
-    if (i < 0) return [Dado('Componentes', _ou(texto))];
-    return [
-      Dado(
-        'Componentes',
-        texto.substring(0, i),
-        detalhe: texto.substring(i + 2, texto.length - 1),
-      ),
-    ];
   }
 }

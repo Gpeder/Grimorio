@@ -17,10 +17,57 @@ class TraducaoSrd {
   static String siglaAtributo(String? valor) => _traduzir(_siglas, valor);
   static String alinhamento(String? valor) => _traduzir(_alinhamentos, valor);
   static String categoriaItem(String? valor) => _traduzir(_categorias, valor);
-  static String propriedadeArma(String? valor) =>
-      _traduzir(_propriedades, valor);
+  // Special (Lance) traduz o comeco e mantem o resto
+  static String propriedadeArma(String? valor) {
+    final v = valor?.trim() ?? '';
+    final i = v.indexOf(' (');
+    if (i < 0) return _traduzir(_propriedades, v);
+    return '${_traduzir(_propriedades, v.substring(0, i))}${v.substring(i)}';
+  }
+
+  // bludgeoning, piercing, and slashing from nonmagical attacks
+  static String defesa(String? valor) {
+    final v = valor?.trim() ?? '';
+    if (v.isEmpty) return vazio;
+    final exato = _tiposDano[_chave(v)] ?? _condicoes[_chave(v)];
+    if (exato != null) return exato;
+    var t = v;
+    for (final MapEntry(:key, :value) in _frasesDefesa.entries) {
+      t = t.replaceAll(key, value);
+    }
+    t = t.replaceAllMapped(
+      RegExp(r'[a-z]+'),
+      (m) => _tiposDano[m.group(0)] ?? m.group(0) ?? '',
+    );
+    if (t == v && _avisados.add(v)) AppLog.aviso(TagLog.ui, 'sem traducao: $v');
+    return t;
+  }
+
   static String sentido(String? valor) => _traduzir(_sentidos, valor);
   static String movimento(String? valor) => _traduzir(_movimentos, valor);
+  static String pericia(String? valor) => _traduzir(_pericias, valor);
+  static String idioma(String? valor) => _traduzir(_idiomas, valor);
+
+  // 1 lb vira 0,5 kg, como no livro em portugues
+  static String quilos(num? libras) =>
+      libras == null || libras <= 0 ? vazio : '${_decimal(libras * 0.5)} kg';
+
+  // 15.00 vira 15 po, 0.50 vira 5 pp, 0.01 vira 1 pc
+  static String custo(String? valor) {
+    final po = double.tryParse(valor ?? '');
+    if (po == null || po <= 0) return vazio;
+    if (po >= 1) return '${_decimal(po)} po';
+    final pp = po * 10;
+    if (pp >= 1 && pp == pp.roundToDouble()) return '${pp.round()} pp';
+    return '${(po * 100).round()} pc';
+  }
+
+  // 14 + Dex modifier (max 2) vira 14 + mod. Des (máx. 2)
+  static String caArmadura(String? valor) {
+    final v = valor?.trim() ?? '';
+    if (v.isEmpty) return vazio;
+    return v.replaceAll('Dex modifier', 'mod. Des').replaceAll('max ', 'máx. ');
+  }
 
   // action, 1minute, bonus-action
   static String tempo(String? valor) => _traduzir(_tempos, valor);
@@ -72,6 +119,22 @@ class TraducaoSrd {
       _ => null,
     };
   }
+
+  // trechos fixos das resistencias do srd, do mais longo ao mais curto
+  static const _frasesDefesa = {
+    'from nonmagical attacks not made with adamantine weapons':
+        'de ataques não mágicos sem armas de adamante',
+    'from nonmagical attacks not made with silvered weapons':
+        'de ataques não mágicos sem armas prateadas',
+    'from nonmagical/nonsilver weapons': 'de armas não mágicas nem prateadas',
+    'from nonmagical attacks': 'de ataques não mágicos',
+    'from magic weapons wielded by good creatures':
+        'de armas mágicas de criaturas boas',
+    'damage from spells': 'dano de magias',
+    'non magical': 'não mágico',
+    '(from stoneskin)': '(de pele de pedra)',
+    'and ': 'e ',
+  };
 
   static const _escolas = {
     'abjuration': 'Abjuração',
@@ -240,6 +303,54 @@ class TraducaoSrd {
     'swim': 'Natação',
     'climb': 'Escalada',
     'burrow': 'Escavação',
+  };
+
+  static const _pericias = {
+    'acrobatics': 'Acrobacia',
+    'animal handling': 'Adestrar Animais',
+    'arcana': 'Arcanismo',
+    'athletics': 'Atletismo',
+    'deception': 'Enganação',
+    'history': 'História',
+    'insight': 'Intuição',
+    'intimidation': 'Intimidação',
+    'investigation': 'Investigação',
+    'medicine': 'Medicina',
+    'nature': 'Natureza',
+    'perception': 'Percepção',
+    'performance': 'Atuação',
+    'persuasion': 'Persuasão',
+    'religion': 'Religião',
+    'sleight of hand': 'Prestidigitação',
+    'stealth': 'Furtividade',
+    'survival': 'Sobrevivência',
+  };
+
+  static const _idiomas = {
+    'common': 'Comum',
+    'dwarvish': 'Anão',
+    'elvish': 'Élfico',
+    'giant': 'Gigante',
+    'gnomish': 'Gnômico',
+    'goblin': 'Goblin',
+    'halfling': 'Halfling',
+    'orc': 'Orc',
+    'abyssal': 'Abissal',
+    'celestial': 'Celestial',
+    'draconic': 'Dracônico',
+    'deep speech': 'Dialeto Obscuro',
+    'infernal': 'Infernal',
+    'primordial': 'Primordial',
+    'sylvan': 'Silvestre',
+    'undercommon': 'Dialeto Subterrâneo',
+    'aquan': 'Aquan',
+    'auran': 'Auran',
+    'ignan': 'Ignan',
+    'terran': 'Terran',
+    'gnoll': 'Gnoll',
+    'sahuagin': 'Sahuagin',
+    'druidic': 'Druídico',
+    "thieves' cant": 'Gíria dos Ladrões',
   };
 
   static const _tempos = {

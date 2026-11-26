@@ -7,8 +7,7 @@ import 'package:grimorio/controller/campaign/campanhas_provider.dart';
 import 'package:grimorio/controller/characters/personagens_provider.dart';
 import 'package:grimorio/controller/settings/usuario_provider.dart';
 import 'package:grimorio/model/campanha.dart';
-import 'package:grimorio/model/compendio_mock.dart';
-import 'package:grimorio/model/opcoes_heroi_mock.dart';
+import 'package:grimorio/controller/grimoire/estado_detalhe.dart';
 import 'package:grimorio/view/campaign/campaign.dart';
 import 'package:grimorio/view/campaign/heroi/campanha_heroi.dart';
 import 'package:grimorio/view/campaign/mestre/campanha_mestre.dart';
@@ -24,6 +23,7 @@ import 'package:grimorio/view/grimoire/condicoes/condicoes.dart';
 import 'package:grimorio/view/grimoire/especies/detalhes_especie.dart';
 import 'package:grimorio/view/grimoire/especies/especies.dart';
 import 'package:grimorio/view/grimoire/grimoire.dart';
+import 'package:grimorio/view/grimoire/itens/detalhes_item.dart';
 import 'package:grimorio/view/grimoire/itens/itens.dart';
 import 'package:grimorio/view/grimoire/magias/detalhes_magia.dart';
 import 'package:grimorio/view/grimoire/magias/magias.dart';
@@ -236,34 +236,24 @@ Widget _listaCompendio(BuildContext context, GoRouterState state) =>
       _ => _naoEncontrado(state),
     };
 
+// a tela busca pela key, que nao existe vira nao encontrado
 Widget _detalheCompendio(BuildContext context, GoRouterState state) {
-  final key = state.pathParameters[Rotas.key];
-  final tela = switch (state.pathParameters[Rotas.tipo]) {
-    TipoCompendio.magias => switch (magiasCompendio
-        .where((m) => m.key == key)
-        .firstOrNull) {
-      final m? => DetalhesMagia(magia: m),
-      null => null,
-    },
-    TipoCompendio.bestiario => switch (monstrosMock
-        .where((m) => m.key == key)
-        .firstOrNull) {
-      final m? => DetalhesMonstro(monstro: m),
-      null => null,
-    },
-    TipoCompendio.classes => switch (classesMock
-        .where((c) => c.key == key)
-        .firstOrNull) {
-      final c? => DetalhesClasse(classe: c),
-      null => null,
-    },
-    TipoCompendio.especies => switch (especiesMock
-        .where((e) => e.key == key)
-        .firstOrNull) {
-      final e? => DetalhesEspecie(especie: e),
-      null => null,
-    },
-    _ => null,
+  final key = state.pathParameters[Rotas.key] ?? '';
+  return switch (state.pathParameters[Rotas.tipo]) {
+    TipoCompendio.magias => DetalhesMagia(srdKey: key),
+    TipoCompendio.bestiario => DetalhesMonstro(srdKey: key),
+    TipoCompendio.classes => DetalhesClasse(srdKey: key),
+    TipoCompendio.especies => DetalhesEspecie(srdKey: key),
+    TipoCompendio.itens => DetalhesItem(tipo: TipoSrd.item, srdKey: key),
+    TipoCompendio.itensMagicos => DetalhesItem(
+      tipo: TipoSrd.itemMagico,
+      srdKey: key,
+    ),
+    TipoCompendio.armas => DetalhesItem(tipo: TipoSrd.arma, srdKey: key),
+    TipoCompendio.armaduras => DetalhesItem(
+      tipo: TipoSrd.armadura,
+      srdKey: key,
+    ),
+    _ => _naoEncontrado(state),
   };
-  return tela ?? _naoEncontrado(state);
 }

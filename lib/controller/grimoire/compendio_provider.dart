@@ -148,6 +148,12 @@ class CompendioProvider extends ChangeNotifier {
          null,
          (p, b, _) => itens.listarMagicos(pagina: p, busca: b),
        ),
+       _subespecies = _Lista(
+         'Subespecies',
+         (e) => e.key,
+         null,
+         (p, b, _) => especies.listar(pagina: p, busca: b, subespecie: true),
+       ),
        _buscaItens = _Lista(
          'BuscaItens',
          (i) => i.key,
@@ -172,6 +178,12 @@ class CompendioProvider extends ChangeNotifier {
   final _Lista<Especie, Object?> _especies;
   final _Lista<CondicaoSrd, Object?> _condicoes;
 
+  // subespecies todas juntas, a api ignora subspecies_of=key
+  final _Lista<Especie, Object?> _subespecies;
+
+  // subclasses por classe mae
+  final _subclasses = <String, _Lista<ClasseSrd, Object?>>{};
+
   // busca da home do grimorio, separada das listas das telas
   final _Lista<Magia, Object?> _buscaMagias;
   final _Lista<MonstroSrd, Object?> _buscaMonstros;
@@ -194,6 +206,17 @@ class CompendioProvider extends ChangeNotifier {
   EstadoLista<ClasseSrd> get classes => _classes.estado;
   EstadoLista<Especie> get especies => _especies.estado;
   EstadoLista<CondicaoSrd> get condicoes => _condicoes.estado;
+
+  EstadoLista<Especie> get subespecies => _subespecies.estado;
+
+  EstadoLista<ClasseSrd> subclasses(String classeKey) =>
+      _subclasses[classeKey]?.estado ?? EstadoLista<ClasseSrd>();
+
+  // a lista inteira cabe numa pagina, so separa pela mae
+  List<Especie> subespeciesDe(String especieKey) => [
+    for (final e in _subespecies.estado.itens)
+      if (e.subespecieDe == especieKey) e,
+  ];
 
   EstadoLista<Magia> get buscaMagias => _buscaMagias.estado;
   EstadoLista<MonstroSrd> get buscaMonstros => _buscaMonstros.estado;
@@ -253,6 +276,23 @@ class CompendioProvider extends ChangeNotifier {
   Future<void> carregarMaisClasses() => _carregarMais(_classes);
   Future<void> carregarMaisEspecies() => _carregarMais(_especies);
   Future<void> carregarMaisCondicoes() => _carregarMais(_condicoes);
+
+  Future<void> carregarSubespecies({bool forcar = false}) =>
+      _carregar(_subespecies, null, null, forcar: forcar);
+
+  Future<void> carregarSubclasses(String classeKey, {bool forcar = false}) {
+    final lista = _subclasses.putIfAbsent(
+      classeKey,
+      () => _Lista(
+        'Subclasses',
+        (c) => c.key,
+        null,
+        (p, b, _) =>
+            _classeService.listar(pagina: p, busca: b, subclasseDe: classeKey),
+      ),
+    );
+    return _carregar(lista, null, null, forcar: forcar);
+  }
 
   // uma pagina de cada, so quando a home busca
   Future<void> buscarTudo(String busca) => Future.wait([
@@ -330,8 +370,10 @@ class CompendioProvider extends ChangeNotifier {
       _itensMagicos.porKey(key) ?? _buscaItensMagicos.porKey(key),
     TipoSrd.arma => _armas.porKey(key) ?? _buscaItens.porKey(key),
     TipoSrd.armadura => _armaduras.porKey(key) ?? _buscaItens.porKey(key),
-    TipoSrd.classe => _classes.porKey(key),
-    TipoSrd.especie => _especies.porKey(key),
+    TipoSrd.classe =>
+      _classes.porKey(key) ??
+          _subclasses.values.map((l) => l.porKey(key)).nonNulls.firstOrNull,
+    TipoSrd.especie => _especies.porKey(key) ?? _subespecies.porKey(key),
     TipoSrd.condicao => _condicoes.porKey(key),
   };
 

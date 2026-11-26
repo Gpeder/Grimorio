@@ -17,13 +17,18 @@ class CondicaoSrd {
   // url completa do svg ou null
   final String? icone;
 
+  // core traz o texto de varios documentos, fica o do srd 2014
+  static String _descricao(Object? valor) {
+    final todas = lerLista(valor);
+    final srd = todas.where((d) => d['document'] == ApiRotas.documentoSrd);
+    final d = srd.firstOrNull ?? todas.firstOrNull;
+    return d?['desc'] as String? ?? '';
+  }
+
   factory CondicaoSrd.fromJson(Map<String, dynamic> json) => CondicaoSrd(
     key: json['key'] as String? ?? '',
     nome: json['name'] as String? ?? '—',
-    descricao: [
-      for (final d in lerLista(json['descriptions']))
-        if (d['desc'] case final String texto) texto,
-    ].join('\n\n'),
+    descricao: _descricao(json['descriptions']),
     icone: switch (json['icon']) {
       {'file_url': final String url} => ApiRotas.arquivo(url),
       _ => null,

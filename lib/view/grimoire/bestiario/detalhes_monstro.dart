@@ -1,43 +1,80 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/model/compendio.dart';
+import 'package:grimorio/controller/grimoire/compendio_provider.dart';
+import 'package:grimorio/controller/grimoire/estado_detalhe.dart';
+import 'package:grimorio/controller/grimoire/gerenciador_monstro.dart';
+import 'package:grimorio/controller/grimoire/texto_limpo.dart';
+import 'package:grimorio/controller/grimoire/traducao_srd.dart';
 import 'package:grimorio/model/personagem.dart';
+import 'package:grimorio/model/srd/monstro_srd.dart';
+import 'package:grimorio/view/grimoire/components/tela_detalhe.dart';
 import 'package:grimorio/view/grimoire/components/tela_lista.dart';
+import 'package:grimorio/view/grimoire/components/visual_srd.dart';
 import 'package:grimorio/widgets/appcard.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
 import 'package:grimorio/widgets/image_frame.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
+import 'package:provider/provider.dart';
 
-String milhar(int n) {
-  final d = n.toString();
-  final b = StringBuffer();
-  for (var i = 0; i < d.length; i++) {
-    if (i > 0 && (d.length - i) % 3 == 0) b.write('.');
-    b.write(d[i]);
+const _statblock = GerenciadorMonstro();
+
+class DetalhesMonstro extends StatefulWidget {
+  const DetalhesMonstro({super.key, required this.srdKey});
+
+  final String srdKey;
+
+  @override
+  State<DetalhesMonstro> createState() => _DetalhesMonstroState();
+}
+
+class _DetalhesMonstroState extends State<DetalhesMonstro> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _carregar());
   }
-  return b.toString();
+
+  void _carregar() => context.read<CompendioProvider>().carregarDetalhe(
+    TipoSrd.monstro,
+    widget.srdKey,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.watch<CompendioProvider>();
+
+    return TelaDetalhe<MonstroSrd>(
+      estado: c.detalhe<MonstroSrd>(TipoSrd.monstro, widget.srdKey),
+      onTentarDeNovo: _carregar,
+      builder: (_, m) => _Conteudo(monstro: m),
+    );
+  }
 }
 
-// sinal de statblock, +4 ou −1
-String _mod(int valor) {
-  final m = modificador(valor);
-  return m < 0 ? '−${-m}' : '+$m';
-}
+class _Conteudo extends StatelessWidget {
+  const _Conteudo({required this.monstro});
 
-class DetalhesMonstro extends StatelessWidget {
-  const DetalhesMonstro({super.key, required this.monstro});
-
-  final Monstro monstro;
+  final MonstroSrd monstro;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final m = monstro;
+    final atributos = m.atributos;
+    final xp = m.xp;
+    final nd = [
+      VisualSrd.nd(m.nd),
+      if (xp != null) '(${VisualSrd.milhar(xp)} XP)',
+    ].join(' ');
     final divisor = Divider(
       height: AppSpacing.large,
       color: AppColors.vida.withValues(alpha: 0.7),
     );
+    final sentidos = _statblock.sentidos(m);
+    final salvaguardas = _statblock.salvaguardas(m);
+    final pericias = _statblock.pericias(m);
+    final caDetalhe = m.caDetalhe;
 
     return Scaffold(
       bottomNavigationBar: RodapeButton(
@@ -51,7 +88,7 @@ class DetalhesMonstro extends StatelessWidget {
           children: [
             VoltarHeader(
               direita: Text(
-                'ND ${m.nd} · ${milhar(m.xp)} XP',
+                'ND $nd',
                 style: textTheme.labelLarge?.copyWith(
                   color: AppColors.secondary,
                   fontWeight: FontWeight.bold,
@@ -69,9 +106,15 @@ class DetalhesMonstro extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // nome e tipo
                     Row(
                       children: [
-                        ImageFrame(imagePath: m.imagem, width: 80, height: 80),
+                        ImageFrame(
+                          imagePath: VisualSrd.monstro,
+                          imagemUrl: m.imagem,
+                          width: 80,
+                          height: 80,
+                        ),
                         const SizedBox(width: AppSpacing.medium),
                         Expanded(
                           child: Column(
@@ -85,7 +128,7 @@ class DetalhesMonstro extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                '${m.tipo} ${m.tamanho}, ${m.alinhamento}',
+                                _statblock.linhaTipo(m),
                                 style: textTheme.bodyMedium?.copyWith(
                                   color: AppColors.onSurface.withValues(
                                     alpha: 0.7,
@@ -99,6 +142,7 @@ class DetalhesMonstro extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: AppSpacing.medium),
+                    // statblock
                     AppCard(
                       padding: const EdgeInsets.all(AppSpacing.medium - 4),
                       child: Column(
@@ -107,47 +151,91 @@ class DetalhesMonstro extends StatelessWidget {
                         children: [
                           _Linha(
                             'Classe de Armadura',
-                            m.caDetalhe.isEmpty
-                                ? '${m.ca}'
-                                : '${m.ca} (${m.caDetalhe})',
+                            [
+                              '${m.ca ?? TraducaoSrd.vazio}',
+                              if (caDetalhe != null) '($caDetalhe)',
+                            ].join(' '),
                           ),
-                          _Linha('Pontos de Vida', '${m.pv} (${m.pvDado})'),
-                          _Linha('Deslocamento', m.deslocamento),
-                          divisor,
-                          Row(
-                            children: [
-                              for (final a in Atributo.values)
-                                Expanded(
-                                  child: _Atributo(
-                                    sigla: a.sigla,
-                                    valor: m.atributos.valor(a),
+                          _Linha(
+                            'Pontos de Vida',
+                            [
+                              '${m.pv ?? TraducaoSrd.vazio}',
+                              if (m.pvDado case final dado?) '($dado)',
+                            ].join(' '),
+                          ),
+                          _Linha('Deslocamento', _statblock.deslocamento(m)),
+                          if (atributos != null) ...[
+                            divisor,
+                            Row(
+                              children: [
+                                for (final a in Atributo.values)
+                                  Expanded(
+                                    child: _Atributo(
+                                      sigla: a.sigla,
+                                      texto: _statblock.atributo(
+                                        atributos.valor(a),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                            ],
-                          ),
+                              ],
+                            ),
+                          ],
                           divisor,
-                          if (m.sentidos.isNotEmpty)
-                            _Linha('Sentidos', m.sentidos.join(', ')),
+                          if (salvaguardas.isNotEmpty)
+                            _Linha('Salvaguardas', salvaguardas),
+                          if (pericias.isNotEmpty) _Linha('Perícias', pericias),
+                          if (m.vulnerabilidades != null)
+                            _Linha(
+                              'Vulnerabilidades',
+                              _statblock.lista(
+                                m.vulnerabilidades,
+                                TraducaoSrd.defesa,
+                              ),
+                            ),
+                          if (m.resistencias != null)
+                            _Linha(
+                              'Resistências',
+                              _statblock.lista(
+                                m.resistencias,
+                                TraducaoSrd.defesa,
+                              ),
+                            ),
+                          if (m.imunidades != null)
+                            _Linha(
+                              'Imunidades',
+                              _statblock.lista(
+                                m.imunidades,
+                                TraducaoSrd.defesa,
+                              ),
+                            ),
+                          if (m.imunidadesCondicao != null)
+                            _Linha(
+                              'Imune a condições',
+                              _statblock.lista(
+                                m.imunidadesCondicao,
+                                TraducaoSrd.defesa,
+                              ),
+                            ),
+                          if (sentidos.isNotEmpty) _Linha('Sentidos', sentidos),
                           _Linha(
                             'Idiomas',
-                            m.idiomas.isEmpty ? '—' : m.idiomas.join(', '),
+                            _statblock.lista(m.idiomas, TraducaoSrd.idioma),
                           ),
-                          _Linha(
-                            'Nível de desafio',
-                            '${m.nd} (${milhar(m.xp)} XP)',
-                          ),
+                          _Linha('Nível de desafio', nd),
                         ],
                       ),
                     ),
                     if (m.tracos.isNotEmpty)
                       _Secao(titulo: 'Traços', acoes: m.tracos),
-                    if (m.acoes.isNotEmpty)
-                      _Secao(titulo: 'Ações', acoes: m.acoes),
-                    if (m.acoesLendarias.isNotEmpty)
-                      _Secao(
-                        titulo: 'Ações lendárias',
-                        acoes: m.acoesLendarias,
-                      ),
+                    for (final (titulo, tipo) in const [
+                      ('Ações', AcaoSrd.acao),
+                      ('Ações bônus', AcaoSrd.bonus),
+                      ('Reações', AcaoSrd.reacao),
+                      ('Ações lendárias', AcaoSrd.lendaria),
+                    ])
+                      if (m.acoesDo(tipo) case final acoes
+                          when acoes.isNotEmpty)
+                        _Secao(titulo: titulo, acoes: acoes),
                   ],
                 ),
               ),
@@ -190,39 +278,49 @@ class _Linha extends StatelessWidget {
 }
 
 class _Atributo extends StatelessWidget {
-  const _Atributo({required this.sigla, required this.valor});
+  const _Atributo({required this.sigla, required this.texto});
 
   final String sigla;
-  final int valor;
+
+  // 14 (+2)
+  final String texto;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final i = texto.indexOf(' ');
+    final valor = i < 0 ? texto : texto.substring(0, i);
+    final mod = i < 0 ? '' : texto.substring(i + 1);
 
-    return Column(
-      children: [
-        Text(
-          sigla,
-          style: textTheme.titleSmall?.copyWith(
-            color: AppColors.secondary,
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-          ),
+    return Semantics(
+      label: '$sigla $texto',
+      child: ExcludeSemantics(
+        child: Column(
+          children: [
+            Text(
+              sigla,
+              style: textTheme.titleSmall?.copyWith(
+                color: AppColors.secondary,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              valor,
+              style: textTheme.bodyLarge?.copyWith(
+                color: AppColors.onSurface,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              mod,
+              style: textTheme.labelSmall?.copyWith(
+                color: AppColors.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
+          ],
         ),
-        Text(
-          '$valor',
-          style: textTheme.bodyLarge?.copyWith(
-            color: AppColors.onSurface,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Text(
-          _mod(valor),
-          style: textTheme.labelSmall?.copyWith(
-            color: AppColors.onSurface.withValues(alpha: 0.6),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -231,7 +329,7 @@ class _Secao extends StatelessWidget {
   const _Secao({required this.titulo, required this.acoes});
 
   final String titulo;
-  final List<AcaoMonstro> acoes;
+  final List<AcaoSrd> acoes;
 
   @override
   Widget build(BuildContext context) {
@@ -270,14 +368,14 @@ class _Secao extends StatelessWidget {
                     TextSpan(
                       children: [
                         TextSpan(
-                          text: '${a.nome}. ',
+                          text: '${_statblock.nomeAcao(a)}. ',
                           style: textTheme.titleSmall?.copyWith(
                             color: AppColors.onSurface,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         TextSpan(
-                          text: a.descricao,
+                          text: textoLimpo(a.descricao),
                           style: textTheme.bodyMedium?.copyWith(
                             color: AppColors.onSurface.withValues(alpha: 0.85),
                           ),
@@ -285,15 +383,20 @@ class _Secao extends StatelessWidget {
                       ],
                     ),
                   ),
-                  if (a.ataque != null || a.dano != null) ...[
+                  if (_statblock.bonus(a) case final bonus
+                      when bonus.isNotEmpty) ...[
                     const SizedBox(height: 6),
                     Wrap(
                       spacing: 6,
                       runSpacing: 6,
                       children: [
-                        if (a.ataque case final ataque?) Etiqueta(ataque),
-                        if (a.dano case final dano?)
-                          Etiqueta(dano, cor: AppColors.vida),
+                        for (final b in bonus)
+                          Etiqueta(
+                            b,
+                            cor: b.startsWith('Ataque')
+                                ? AppColors.alerta
+                                : AppColors.vida,
+                          ),
                       ],
                     ),
                   ],
