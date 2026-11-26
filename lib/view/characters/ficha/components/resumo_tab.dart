@@ -142,7 +142,7 @@ class ResumoTab extends StatelessWidget {
         const TituloSecao('Salvaguardas'),
         for (final a in salvaguardas)
           PericiaTile(
-            nome: nomeAtributo[a]!,
+            nome: nomeAtributo[a] ?? '—',
             sigla: a.sigla,
             bonus: p.salvaguarda(a),
             proficiente: p.salvaguardas.contains(a),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:grimorio/app/log/mensagem_erro.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:pixelarticons/pixel.dart';
@@ -92,3 +93,17 @@ void mostrarAviso(
     ),
   );
 }
+
+// acao que falhou, mostra so o texto amigavel e loga o erro
+void mostrarErro(
+  BuildContext context,
+  Object erro, {
+  StackTrace? stack,
+  String onde = 'acao',
+  bool acimaDaBarra = false,
+}) => mostrarAviso(
+  context,
+  mensagemDeErro(erro, stack: stack, onde: onde),
+  tipo: Snackbar.erro,
+  acimaDaBarra: acimaDaBarra,
+);

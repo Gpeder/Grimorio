@@ -48,7 +48,7 @@ class _ItensState extends State<Itens> {
           itens: [
             for (final t in FiltroItem.values)
               Filtro(
-                _rotulos[t]!,
+                _rotulos[t] ?? '—',
                 selecionado: _tipo == t,
                 onTap: () => setState(() => _tipo = _tipo == t ? null : t),
               ),

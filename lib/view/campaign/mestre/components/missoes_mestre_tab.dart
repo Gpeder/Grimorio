@@ -50,7 +50,7 @@ class _MissoesMestreTabState extends State<MissoesMestreTab> {
                 itens: [
                   for (final e in EstadoMissao.values)
                     Filtro(
-                      rotulosEstado[e]!,
+                      rotulosEstado[e] ?? '—',
                       selecionado: e == _estado,
                       onTap: () => setState(() => _estado = e),
                     ),

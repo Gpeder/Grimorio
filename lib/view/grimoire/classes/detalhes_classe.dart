@@ -79,7 +79,7 @@ class _DetalhesClasseState extends State<DetalhesClasse> {
                               Text(
                                 [
                                   ?papel,
-                                  nomeAtributo[c.principal]!,
+                                  nomeAtributo[c.principal] ?? '—',
                                 ].join(' · '),
                                 style: textTheme.bodyMedium?.copyWith(
                                   color: AppColors.alerta,
