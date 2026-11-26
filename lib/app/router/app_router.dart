@@ -32,7 +32,6 @@ import 'package:grimorio/view/settings/settings.dart';
 import 'package:grimorio/widgets/estado_nao_encontrado.dart';
 import 'package:provider/provider.dart';
 
-// um router novo por app, cada teste comeca limpo
 GoRouter criarAppRouter({String inicial = Rotas.inicio}) {
   final raiz = GlobalKey<NavigatorState>(debugLabel: 'raiz');
 

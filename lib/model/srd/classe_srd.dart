@@ -1,6 +1,6 @@
 import 'package:grimorio/model/json.dart';
 
-// classe ou subclasse de /classes/
+// classe subclasse de /classes/
 class ClasseSrd {
   const ClasseSrd({
     required this.key,

@@ -1,7 +1,7 @@
 import 'package:grimorio/model/json.dart';
 import 'package:grimorio/model/srd/monstro_srd.dart';
 
-// especie de /species/
+// especie
 class Especie {
   const Especie({
     required this.key,

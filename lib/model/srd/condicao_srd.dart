@@ -1,7 +1,7 @@
 import 'package:grimorio/model/json.dart';
 import 'package:grimorio/service/api/api_rotas.dart';
 
-// condicao de /conditions/
+// condicao
 class CondicaoSrd {
   const CondicaoSrd({
     required this.key,

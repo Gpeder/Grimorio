@@ -1,5 +1,3 @@
-// leitura tolerante do json
-
 T lerEnum<T extends Enum>(List<T> valores, Object? nome, T padrao) =>
     lerEnumOuNulo(valores, nome) ?? padrao;
 
@@ -18,7 +16,6 @@ DateTime lerData(Object? valor) =>
 DateTime? lerDataOuNulo(Object? valor) =>
     valor is String ? DateTime.tryParse(valor) : null;
 
-// campos da open5e que podem vir como objeto {name, key} ou texto
 String? lerNome(Object? valor) => switch (valor) {
   {'name': final String nome} => nome,
   final String texto => texto,
@@ -31,7 +28,6 @@ String? lerKey(Object? valor) => switch (valor) {
   _ => null,
 };
 
-// numero que pode vir como texto, ex "2.000"
 double? lerNumero(Object? valor) => switch (valor) {
   final num n => n.toDouble(),
   final String s => double.tryParse(s),

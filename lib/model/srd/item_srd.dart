@@ -1,6 +1,6 @@
 import 'package:grimorio/model/json.dart';
 
-// item de /items/, /magicitems/, /weapons/ ou /armor/
+// item
 class ItemSrd {
   const ItemSrd({
     required this.key,
@@ -24,15 +24,9 @@ class ItemSrd {
   final String? raridade;
   final bool sintonia;
   final double? pesoLb;
-
-  // em po, vem como texto
   final String? custo;
-
-  // arma
   final String? dano;
   final String? tipoDano;
-
-  // armadura
   final int? caBase;
   final String? caTexto;
 
