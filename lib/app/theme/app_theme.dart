@@ -145,6 +145,21 @@ abstract final class AppTheme {
           borderRadius: radius,
           borderSide: BorderSide(color: colorScheme.primary, width: 2),
         ),
+        errorBorder: const OutlineInputBorder(
+          borderRadius: radius,
+          borderSide: BorderSide(color: AppColors.vida),
+        ),
+        focusedErrorBorder: const OutlineInputBorder(
+          borderRadius: radius,
+          borderSide: BorderSide(color: AppColors.vida, width: 2),
+        ),
+        errorStyle: textTheme.bodySmall?.copyWith(color: AppColors.vida),
+        helperStyle: textTheme.bodySmall?.copyWith(
+          color: AppColors.onSurface.withValues(alpha: 0.6),
+        ),
+        hintStyle: textTheme.bodyLarge?.copyWith(
+          color: AppColors.onSurface.withValues(alpha: 0.45),
+        ),
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.surface,

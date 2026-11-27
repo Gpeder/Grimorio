@@ -25,6 +25,10 @@ abstract final class ValidadorAuth {
     return ok ? null : 'Mínimo 8 caracteres, com letra e número.';
   }
 
+  // no login so confere se digitou: conta antiga pode ter regra diferente
+  static String? senhaLogin(String valor) =>
+      valor.isEmpty ? 'Digite sua senha.' : null;
+
   static String? confirmar(String senha, String outra) =>
       senha == outra ? null : 'As senhas não batem.';
 
