@@ -5,12 +5,16 @@ import 'package:grimorio/controller/campaign/gerenciador_mesa.dart';
 import 'package:grimorio/controller/characters/personagens_provider.dart';
 import 'package:grimorio/model/campanha.dart';
 import 'package:grimorio/model/campanha_mock.dart';
+import 'package:grimorio/model/usuario_mock.dart';
 
 class CampanhasProvider extends ChangeNotifier {
   CampanhasProvider({List<Campanha>? campanhas})
     : _campanhas = [...campanhas ?? campanhasMock];
 
   List<Campanha> _campanhas;
+
+  // mestre atual das campanhas do mock
+  String _mestreMock = usuarioMock.id;
 
   static const _gerenciador = GerenciadorCampanhas();
 
@@ -43,6 +47,19 @@ class CampanhasProvider extends ChangeNotifier {
 
   void atualizar(Campanha c) {
     _campanhas = _gerenciador.trocar(_campanhas, c);
+    notifyListeners();
+  }
+
+  // ponte ate as campanhas irem para o banco: o mestre do mock vira o logado
+  void adotarMock(String usuarioId) {
+    if (usuarioId == _mestreMock) return;
+    final antigo = _mestreMock;
+    _mestreMock = usuarioId;
+    if (!_campanhas.any((c) => c.mestreId == antigo)) return;
+    _campanhas = [
+      for (final c in _campanhas)
+        c.mestreId == antigo ? c.copyWith(mestreId: usuarioId) : c,
+    ];
     notifyListeners();
   }
 

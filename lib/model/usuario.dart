@@ -49,6 +49,9 @@ class Usuario {
     this.compendioAtualizadoEm,
   });
 
+  // ninguem logado
+  static const vazio = Usuario(id: '', nome: '', email: '');
+
   final String id;
   final String nome;
   final String email;

@@ -8,6 +8,8 @@ import 'package:grimorio/app/router/app_router.dart';
 import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/app/theme/app_theme.dart';
 import 'package:grimorio/service/api/api_client.dart';
+import 'package:grimorio/service/supabase/auth_service.dart';
+import 'package:grimorio/service/supabase/perfil_service.dart';
 import 'package:grimorio/widgets/erro_widget_card.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -56,13 +58,23 @@ void configurarErros() {
 }
 
 class GrimorioApp extends StatefulWidget {
-  const GrimorioApp({super.key, this.inicial = Rotas.inicio, this.api});
+  const GrimorioApp({
+    super.key,
+    this.inicial = Rotas.inicio,
+    this.api,
+    this.auth,
+    this.perfis,
+  });
 
   // rota de abertura, os testes mudam
   final String inicial;
 
   // teste passa um cliente com dio falso
   final ApiClient? api;
+
+  // teste passa os falsos do supabase
+  final AuthService? auth;
+  final PerfilService? perfis;
 
   @override
   State<GrimorioApp> createState() => _GrimorioAppState();
@@ -81,6 +93,8 @@ class _GrimorioAppState extends State<GrimorioApp> {
   Widget build(BuildContext context) {
     return AppProviders(
       api: widget.api,
+      auth: widget.auth,
+      perfis: widget.perfis,
       child: MaterialApp.router(
         title: 'Grimório RPG',
         debugShowCheckedModeBanner: false,

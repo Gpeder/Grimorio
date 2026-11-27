@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/app/components/navegacao_bottom_bar.dart';
-import 'package:grimorio/main.dart';
+import 'package:grimorio/app/router/rotas.dart';
 import 'package:pixelarticons/pixel.dart';
+
+import '../helpers/app_teste.dart';
 
 void main() {
   Future<void> abrir(WidgetTester tester) async {
@@ -11,7 +13,7 @@ void main() {
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
 
-    await tester.pumpWidget(const GrimorioApp());
+    await tester.pumpWidget(appDeTeste(Rotas.inicio));
     await tester.pumpAndSettle();
   }
 
@@ -24,7 +26,7 @@ void main() {
   );
 
   testWidgets('GrimorioApp usa o tema escuro', (tester) async {
-    await tester.pumpWidget(const GrimorioApp());
+    await tester.pumpWidget(appDeTeste(Rotas.inicio));
 
     final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
     expect(app.themeMode, ThemeMode.dark);

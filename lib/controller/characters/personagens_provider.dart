@@ -4,6 +4,7 @@ import 'package:grimorio/controller/characters/gerenciador_personagens.dart';
 import 'package:grimorio/model/campanha.dart';
 import 'package:grimorio/model/personagem.dart';
 import 'package:grimorio/model/personagem_mock.dart';
+import 'package:grimorio/model/usuario_mock.dart';
 
 // todos os herois do app, os do usuario e os das campanhas
 class PersonagensProvider extends ChangeNotifier {
@@ -15,6 +16,9 @@ class PersonagensProvider extends ChangeNotifier {
 
   List<Personagem> _todos;
   final Set<String> _meusIds;
+
+  // dono atual dos herois do mock
+  String _donoMock = usuarioMock.id;
 
   static const _personagens = GerenciadorPersonagens();
   static const _campanhas = GerenciadorCampanhas();
@@ -42,6 +46,18 @@ class PersonagensProvider extends ChangeNotifier {
   void atualizar(Personagem p) {
     _todos = _personagens.trocar(_todos, p);
     notifyListeners();
+  }
+
+  // ponte ate os herois irem para o banco: o mock passa a ser do logado
+  void adotarMock(String usuarioId) {
+    if (usuarioId == _donoMock) return;
+    final antigo = _donoMock;
+    _donoMock = usuarioId;
+    final alterados = [
+      for (final p in _todos)
+        if (p.donoId == antigo) p.copyWith(donoId: usuarioId),
+    ];
+    if (alterados.isNotEmpty) atualizarVarios(alterados);
   }
 
   void atualizarVarios(List<Personagem> alterados) {

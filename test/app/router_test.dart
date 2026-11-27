@@ -3,22 +3,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:grimorio/app/components/navegacao_bottom_bar.dart';
 import 'package:grimorio/app/router/rotas.dart';
-import 'package:grimorio/main.dart';
 import 'package:grimorio/model/campanha_mock.dart';
 import 'package:grimorio/model/personagem_mock.dart';
 import 'package:grimorio/view/characters/ficha/ficha.dart';
 import 'package:grimorio/view/grimoire/magias/magias.dart';
 
-import '../helpers/dio_falso.dart';
+import '../helpers/app_teste.dart';
 
 void main() {
   Future<void> abrir(WidgetTester tester, [String rota = Rotas.inicio]) async {
     tester.view.physicalSize = const Size(1800, 2796);
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
-    await tester.pumpWidget(
-      GrimorioApp(inicial: rota, api: clienteFalso(DioFalso())),
-    );
+    await tester.pumpWidget(appDeTeste(rota));
     await tester.pumpAndSettle();
   }
 
