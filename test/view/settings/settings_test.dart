@@ -7,8 +7,12 @@ import 'package:grimorio/model/usuario.dart';
 import 'package:grimorio/model/usuario_mock.dart';
 import 'package:grimorio/view/settings/components/ajuste_tile.dart';
 import 'package:grimorio/view/settings/components/perfil_card.dart';
+import 'package:grimorio/view/settings/settings.dart';
+import 'package:grimorio/view/auth/login.dart';
+import 'package:grimorio/service/api/api_erro.dart';
 
 import '../../helpers/app_teste.dart';
+import '../../helpers/perfil_falso.dart';
 
 void main() {
   Future<void> abrir(WidgetTester tester) async {
@@ -95,27 +99,80 @@ void main() {
     expect(tester.widget<Switch>(chave).value, isFalse);
   });
 
-  testWidgets('editar perfil valida o e-mail e atualiza o nome', (
+  testWidgets('editar perfil valida o nome e salva só o que mudou', (
     tester,
   ) async {
-    await abrir(tester);
+    final perfis = PerfilServiceFalso();
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(appDeTeste(Rotas.ajustes, perfis: perfis));
 
     await tocar(tester, find.byTooltip('Editar perfil'));
 
+    // e-mail so leitura
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('perfil-email')),
+        matching: find.byType(EditableText),
+      ),
+      findsNothing,
+    );
+    expect(find.byKey(const ValueKey('perfil-email')), findsOneWidget);
+
     final nome = find.byKey(const ValueKey('perfil-nome'));
-    final email = find.byKey(const ValueKey('perfil-email'));
-
-    await tester.enterText(nome, 'Aragorn');
-    await tester.enterText(email, 'sem-arroba');
+    await tester.enterText(nome, 'A');
     await tocar(tester, find.text('Salvar'));
-    expect(find.text('E-mail inválido.'), findsOneWidget);
-    expect(noPerfil('Aragorn'), findsNothing);
+    expect(find.text('Nome entre 2 e 40 letras.'), findsOneWidget);
+    expect(noPerfil('A'), findsNothing);
 
-    await tester.enterText(email, 'aragorn@email.com');
+    await tester.enterText(nome, '  Aragorn ');
     await tocar(tester, find.text('Salvar'));
 
     expect(noPerfil('Aragorn'), findsOneWidget);
-    expect(noPerfil('aragorn@email.com'), findsOneWidget);
+    expect(noPerfil(usuarioMock.email), findsOneWidget);
     expect(find.text('Perfil atualizado'), findsOneWidget);
+    expect(perfis.atualizacoes, [
+      {'nome': 'Aragorn'},
+    ]);
+  });
+
+  testWidgets('salvar que falha volta o valor e mostra o erro', (tester) async {
+    final perfis = PerfilServiceFalso();
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(appDeTeste(Rotas.ajustes, perfis: perfis));
+
+    perfis.proximoErro = ApiErro(TipoErroApi.semConexao);
+    final chave = find.descendant(
+      of: await rolarAte(tester, 'Mostrar dicas de bônus'),
+      matching: find.byType(Switch),
+    );
+    await tocar(tester, chave);
+
+    expect(tester.widget<Switch>(chave).value, isTrue);
+    expect(find.text('Sem conexão. Confira a internet'), findsOneWidget);
+  });
+
+  testWidgets('Sair pede confirmação e volta para o login', (tester) async {
+    await abrir(tester);
+    await tocar(tester, await rolarAte(tester, 'Sair'));
+
+    expect(find.text('Sair da conta?'), findsOneWidget);
+    await tocar(tester, find.text('Cancelar'));
+    expect(find.byType(Settings), findsOneWidget);
+
+    await tocar(tester, await rolarAte(tester, 'Sair'));
+    await tocar(
+      tester,
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.text('Sair'),
+      ),
+    );
+
+    expect(find.byType(Login), findsOneWidget);
+    expect(find.byType(Settings), findsNothing);
   });
 }

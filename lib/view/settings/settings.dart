@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
+import 'package:grimorio/controller/auth/auth_provider.dart';
 import 'package:grimorio/controller/campaign/campanhas_provider.dart';
 import 'package:grimorio/controller/characters/personagens_provider.dart';
+import 'package:grimorio/controller/grimoire/estado_lista.dart';
 import 'package:grimorio/controller/settings/usuario_provider.dart';
 import 'package:grimorio/model/usuario.dart';
 import 'package:grimorio/view/characters/ficha/components/titulo_secao.dart';
@@ -11,6 +13,8 @@ import 'package:grimorio/view/settings/components/grupo_ajustes.dart';
 import 'package:grimorio/view/settings/components/opcoes_sheet.dart';
 import 'package:grimorio/view/settings/components/perfil_card.dart';
 import 'package:grimorio/view/settings/components/perfil_sheet.dart';
+import 'package:grimorio/widgets/estado_carregando.dart';
+import 'package:grimorio/widgets/estado_erro.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
 import 'package:pixelarticons/pixel.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +29,24 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   Usuario get _u => context.read<UsuarioProvider>().usuario;
 
-  void _salvar(Usuario u) => context.read<UsuarioProvider>().atualizar(u);
+  // salva no banco; se falhar o provider volta e o erro aparece
+  Future<bool> _salvar(Usuario u) async {
+    try {
+      await context.read<UsuarioProvider>().atualizar(u);
+      return true;
+    } catch (e, stack) {
+      if (mounted) {
+        mostrarErro(
+          context,
+          e,
+          stack: stack,
+          onde: 'salvar perfil',
+          acimaDaBarra: true,
+        );
+      }
+      return false;
+    }
+  }
 
   static const _versao = '0.1.0';
 
@@ -57,12 +78,44 @@ class _SettingsState extends State<Settings> {
   Future<void> _editarPerfil() async {
     final novo = await mostrarPerfilSheet(context, _u);
     if (novo == null || !mounted) return;
-    _salvar(novo);
-    _aviso('Perfil atualizado', tipo: Snackbar.sucesso);
+    if (await _salvar(novo)) {
+      _aviso('Perfil atualizado', tipo: Snackbar.sucesso);
+    }
   }
 
-  void _atualizarCompendio() {
-    _salvar(_u.copyWith(compendioAtualizadoEm: DateTime.now()));
+  Future<void> _sair() async {
+    final confirmou = await showDialog<bool>(
+      context: context,
+      useRootNavigator: true,
+      builder: (context) => AlertDialog(
+        title: const Text('Sair da conta?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          const SizedBox(width: AppSpacing.small),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Sair'),
+          ),
+        ],
+      ),
+    );
+    if (confirmou != true || !mounted) return;
+    try {
+      // saiu: os providers limpam e o router leva para o login
+      await context.read<AuthProvider>().sair();
+    } catch (e, stack) {
+      if (mounted) {
+        mostrarErro(context, e, stack: stack, onde: 'sair', acimaDaBarra: true);
+      }
+    }
+  }
+
+  Future<void> _atualizarCompendio() async {
+    await _salvar(_u.copyWith(compendioAtualizadoEm: DateTime.now()));
+    if (!mounted) return;
     _aviso('Compêndio atualizado', tipo: Snackbar.sucesso);
   }
 
@@ -111,7 +164,7 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
-    context.watch<UsuarioProvider>();
+    final usuarios = context.watch<UsuarioProvider>();
     final textTheme = Theme.of(context).textTheme;
 
     final secoes = <Widget>[
@@ -122,13 +175,20 @@ class _SettingsState extends State<Settings> {
           fontWeight: FontWeight.bold,
         ),
       ),
-      PerfilCard(
-        usuario: _u,
-        herois: context.watch<PersonagensProvider>().meus.length,
-        campanhas: context.watch<CampanhasProvider>().campanhas.length,
-        onEditar: _editarPerfil,
-        onEntrar: () => _aviso('Login em breve'),
-      ),
+      switch (usuarios.carregamento) {
+        Carregamento.carregando => const EstadoCarregando(compacto: true),
+        Carregamento.erro => EstadoErro(
+          mensagem: usuarios.mensagemErro ?? 'Algo deu errado',
+          onTentarDeNovo: usuarios.carregar,
+          compacto: true,
+        ),
+        _ => PerfilCard(
+          usuario: _u,
+          herois: context.watch<PersonagensProvider>().meus.length,
+          campanhas: context.watch<CampanhasProvider>().campanhas.length,
+          onEditar: _editarPerfil,
+        ),
+      },
       GrupoAjustes(
         titulo: 'Regras',
         linhas: [
@@ -227,6 +287,10 @@ class _SettingsState extends State<Settings> {
             onTap: _apagarTudo,
           ),
         ],
+      ),
+      GrupoAjustes(
+        titulo: 'Conta',
+        linhas: [AjusteTile(icone: Pixel.logout, titulo: 'Sair', onTap: _sair)],
       ),
       GrupoAjustes(
         titulo: 'Sobre',

@@ -15,7 +15,6 @@ class PerfilCard extends StatelessWidget {
     required this.campanhas,
     this.sessoes,
     required this.onEditar,
-    required this.onEntrar,
   });
 
   final Usuario usuario;
@@ -23,7 +22,6 @@ class PerfilCard extends StatelessWidget {
   final int campanhas;
   final int? sessoes;
   final VoidCallback onEditar;
-  final VoidCallback onEntrar;
 
   @override
   Widget build(BuildContext context) {
@@ -86,8 +84,6 @@ class PerfilCard extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: AppSpacing.medium),
-          _AvisoPerfilLocal(onEntrar: onEntrar),
         ],
       ),
     );
@@ -137,56 +133,6 @@ class _Separador extends StatelessWidget {
     return VerticalDivider(
       width: 1,
       color: AppColors.secondary.withValues(alpha: 0.3),
-    );
-  }
-}
-
-class _AvisoPerfilLocal extends StatelessWidget {
-  const _AvisoPerfilLocal({required this.onEntrar});
-
-  final VoidCallback onEntrar;
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
-      child: Row(
-        children: [
-          const Icon(Pixel.lock, size: 18, color: AppColors.secondary),
-          const SizedBox(width: AppSpacing.small + 4),
-          Expanded(
-            flex: 3,
-            child: Text(
-              'Perfil local: tudo fica salvo só neste aparelho.',
-              style: textTheme.bodySmall?.copyWith(color: AppColors.onSurface),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.small),
-          Flexible(
-            flex: 2,
-            child: InkWell(
-              onTap: onEntrar,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-              child: Padding(
-                padding: const EdgeInsets.all(4),
-                child: Text(
-                  'Entrar · em breve',
-                  textAlign: TextAlign.end,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: AppColors.onSurface.withValues(alpha: 0.45),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
