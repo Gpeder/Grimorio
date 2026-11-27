@@ -26,7 +26,7 @@ App Flutter de apoio a campanhas de D&D 5e na mesa. Dados da API Open5e v2 (SRD 
 - `lib/app/` (tema, shell, barra, `router/`, `providers/`, `log/`) e `lib/widgets/` (AppCard, ImageFrame, Etiqueta, mostrarAviso…) ficam fixos.
 - `lib/view/<feature>/`: telas, com `components/` e subtelas na mesma ideia (`characters/ficha/`, `characters/new_hero/`). Features: `home`, `characters`, `campaign`, `grimoire`, `settings`.
 - `lib/controller/<feature>/`: espelha o `view/`. Classe Dart pura, um arquivo por responsabilidade (`GerenciadorExp`, `GerenciadorHp`, `GerenciadorMesa`…). Sem `material.dart`, sem `BuildContext`, sem aviso. Gerenciadores são puros; os providers (`*_provider.dart`, `ChangeNotifier`) ficam na mesma pasta e usam os gerenciadores, sem copiar a lógica. Nada de riverpod ou bloc.
-- `lib/model/`: dados + getters calculados. Cada model tem `fromJson`, `toJson` e `copyWith` escritos à mão, chaves em `snake_case`, enum salvo como `name` e lido com `lerEnum` (`model/json.dart`). Mock do lado: `x.dart` + `x_mock.dart`.
+- `lib/model/`: dados + getters calculados. Cada model tem `fromJson`, `toJson` e `copyWith` escritos à mão, chaves em `snake_case`, enum salvo como `name` e lido com `lerEnum` (`model/json.dart`). Dados de usuário (heróis, campanhas, usuário) vêm do banco; os mocks deles ficam só em `test/fixtures/`. `compendio_mock` e `opcoes_heroi_mock` são catálogos fixos e continuam em `lib/model/`.
 - Lógica visual (abrir sheet, trocar aba, animação) fica na view.
 - `lib/service/`: `api/` (`ApiClient`, `ApiErro`, `ApiRotas`, `Paginado`) e `open5e/` (um service por recurso). Models da API em `lib/model/srd/`.
 
@@ -55,16 +55,20 @@ App Flutter de apoio a campanhas de D&D 5e na mesa. Dados da API Open5e v2 (SRD 
 
 - Login obrigatório. Rotas de auth (`/entrar`, `/cadastro`, `/cadastro/confirmar`, `/recuperar-senha`) ficam fora do shell; o redirect está em `app_router.dart` (`redirecionarAuth`), ouvindo o `AuthProvider`. Durante `recuperandoSenha` o logado não é mandado para `/inicio`.
 - Confirmação de e-mail e recuperação de senha por código de 6 números (sem link, sem deep link). Telas em `lib/view/auth/`.
-- Supabase só por service (`lib/service/supabase/`): interface + implementação (`AuthService`/`SupabaseAuthService`, `PerfilService`/`SupabasePerfilService`). Testes usam `AuthServiceFalso` e `PerfilServiceFalso` (`test/helpers/`); `telaDeTeste`/`appDeTeste` já abrem logados (`logado: false` para testar auth).
+- Supabase só por service (`lib/service/supabase/`): interface + implementação (`AuthService`, `PerfilService`, `PersonagemService`, `CampanhaService`, `MissaoService`, `NpcService`, `MesaService`, `RealtimeService`). Os do banco vão juntos em `ServicosBanco` (o `AppProviders` aceita de fora). Testes usam `AuthServiceFalso`, `PerfilServiceFalso` e `BancoFalso` (`test/helpers/`, dados de `test/fixtures/`); `telaDeTeste`/`appDeTeste` já abrem logados (`logado: false` para testar auth).
+- Dados só pelos services do Supabase. Nome de tabela, coluna de filtro, select e RPC só em `BancoRotas` (nada de `.from('...')` solto fora de `lib/service/supabase/`). Todo `PostgrestException` sai do service como `BancoErro`.
+- Ação em herói de outra pessoa (XP, item, desfazer, concluir/falhar missão, sessão, entrar/sair/remover) só por RPC, pelo `CampanhasProvider`; depois recarrega a campanha. Nunca update direto.
+- Update só das colunas que mudaram: o gerenciador calcula o valor novo e o `camposMudados` (`model/json.dart`, colunas nos gerenciadores) escolhe o que vai.
+- Toques rápidos na ficha (HP, espaço de magia, condição) e notas do mestre: tela muda na hora, salva depois de 600 ms parado (`PersonagensProvider.esperaToque`); se falhar, volta o valor e `mostrarErro`.
+- Realtime por tela de campanha: `CampanhaMestre`/`CampanhaHeroi` chamam `ouvir(id)` ao abrir e cancelam no `dispose`; evento → recarrega a campanha (a RLS corta o que foi escondido). Puxar para atualizar também recarrega. Os heróis do usuário são ouvidos pelo `PersonagensProvider` depois do login.
 - Chaves no `env.json` (fora do git, modelo em `env.example.json`), rodar com `--dart-define-from-file=env.json`. Nunca `service_role` no app.
 - Erros do Supabase viram `AuthErro` (auth) ou `ApiErro` (banco). Tudo que o usuário vê implementa `ErroAmigavel`.
 - Atualizar no banco só os campos que mudaram (`GerenciadorPerfil.camposMudados`), nunca a linha inteira.
 - Migrations em `supabase/migrations/`, testes SQL (pgTAP) em `supabase/tests/`.
-- Heróis e campanhas ainda são mock: `adotarMock(usuarioId)` troca o `u_gustavo` pelo id logado.
 
 ### Grimório e SRD
 
-- O Grimório (listas e detalhes) lê da API pelo `CompendioProvider`. Inventário, missões e "dar item" ainda usam `compendio_mock`; Ficha, Novo Herói e Campanha usam os mocks de sempre.
+- O Grimório (listas e detalhes) lê da API pelo `CompendioProvider`. Inventário, missões e "dar item" ainda usam `compendio_mock` (o banco guarda só a `key`); Novo Herói usa `opcoes_heroi_mock`.
 - Nome e descrição do SRD ficam em inglês. Campo fixo (escola, tipo, tamanho, raridade, dano, atributo, condição, tempo, alcance…) é traduzido só pelo `TraducaoSrd`, na tela. Model do SRD não traduz.
 - Descrição da API passa por `textoLimpo`/`TextoSrd` (sem pacote de markdown).
 - Filtro vai na query, com o nome em `ApiRotas`. Nunca filtrar a página no front (quebra com paginação). Filtro que a API não aceita sai da tela.
