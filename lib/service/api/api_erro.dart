@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:grimorio/app/log/erro_amigavel.dart';
 
 enum TipoErroApi {
   semConexao('Sem conexão. Confira a internet'),
@@ -13,7 +14,7 @@ enum TipoErroApi {
   final String mensagem;
 }
 
-class ApiErro implements Exception {
+class ApiErro implements Exception, ErroAmigavel {
   ApiErro(this.tipo, {this.status, String? mensagem})
     : mensagem = mensagem ?? tipo.mensagem;
 
@@ -21,6 +22,7 @@ class ApiErro implements Exception {
   final int? status;
 
   // em portugues, pronta para o mostrarAviso
+  @override
   final String mensagem;
 
   // traduz o erro do dio

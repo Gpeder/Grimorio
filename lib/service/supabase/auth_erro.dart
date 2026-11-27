@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:grimorio/app/log/erro_amigavel.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 enum TipoErroAuth {
@@ -18,7 +19,7 @@ enum TipoErroAuth {
   final String mensagem;
 }
 
-class AuthErro implements Exception {
+class AuthErro implements Exception, ErroAmigavel {
   const AuthErro(this.tipo, {this.codigo});
 
   final TipoErroAuth tipo;
@@ -27,6 +28,7 @@ class AuthErro implements Exception {
   final String? codigo;
 
   // em portugues, pronta para o mostrarAviso
+  @override
   String get mensagem => tipo.mensagem;
 
   // traduz qualquer erro do supabase ou da rede
