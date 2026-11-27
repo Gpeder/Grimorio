@@ -51,6 +51,17 @@ App Flutter de apoio a campanhas de D&D 5e na mesa. Dados da API Open5e v2 (SRD 
 - O usuário só vê mensagem amigável: `mensagemDeErro(e)` (loga o original), `mostrarErro` para ação que falhou, `EstadoCarregando`, `EstadoErro`, `EstadoVazio` e `ListaPaginada` para listas. Nunca `e.toString()` na tela.
 - `test/` espelha o `lib/`: `test/view/`, `test/controller/`, `test/model/`.
 
+### Login e Supabase
+
+- Login obrigatório. Rotas de auth (`/entrar`, `/cadastro`, `/cadastro/confirmar`, `/recuperar-senha`) ficam fora do shell; o redirect está em `app_router.dart` (`redirecionarAuth`), ouvindo o `AuthProvider`. Durante `recuperandoSenha` o logado não é mandado para `/inicio`.
+- Confirmação de e-mail e recuperação de senha por código de 6 números (sem link, sem deep link). Telas em `lib/view/auth/`.
+- Supabase só por service (`lib/service/supabase/`): interface + implementação (`AuthService`/`SupabaseAuthService`, `PerfilService`/`SupabasePerfilService`). Testes usam `AuthServiceFalso` e `PerfilServiceFalso` (`test/helpers/`); `telaDeTeste`/`appDeTeste` já abrem logados (`logado: false` para testar auth).
+- Chaves no `env.json` (fora do git, modelo em `env.example.json`), rodar com `--dart-define-from-file=env.json`. Nunca `service_role` no app.
+- Erros do Supabase viram `AuthErro` (auth) ou `ApiErro` (banco). Tudo que o usuário vê implementa `ErroAmigavel`.
+- Atualizar no banco só os campos que mudaram (`GerenciadorPerfil.camposMudados`), nunca a linha inteira.
+- Migrations em `supabase/migrations/`, testes SQL (pgTAP) em `supabase/tests/`.
+- Heróis e campanhas ainda são mock: `adotarMock(usuarioId)` troca o `u_gustavo` pelo id logado.
+
 ### Grimório e SRD
 
 - O Grimório (listas e detalhes) lê da API pelo `CompendioProvider`. Inventário, missões e "dar item" ainda usam `compendio_mock`; Ficha, Novo Herói e Campanha usam os mocks de sempre.
@@ -80,7 +91,8 @@ App Flutter de apoio a campanhas de D&D 5e na mesa. Dados da API Open5e v2 (SRD 
 - Tema: `lib/app/theme/`
 - Shell e barra: `lib/app/app_shell.dart`
 - Rotas: `lib/app/router/` · providers: `lib/app/providers/app_providers.dart` · log: `lib/app/log/`
-- API: `lib/service/`
+- API: `lib/service/` (Open5e em `open5e/`, Supabase em `supabase/`)
+- Login: `lib/view/auth/`, `lib/controller/auth/`
 - Models: `lib/model/` (valores calculados ficam como getters no model)
 - Regras e alterações: `lib/controller/`
 - Assets: `images/` — **não abrir**, os nomes estão todos em `app_images.dart`
@@ -104,5 +116,7 @@ Não usar `flutter-setup-localization` nem `test-driven-development` sem pedido.
 ```sh
 dart format lib test && flutter analyze && flutter test
 ```
+
+Mexeu no banco: `supabase db reset && supabase test db`.
 
 Respostas curtas, em português.
