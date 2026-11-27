@@ -20,6 +20,7 @@ class TagLog {
   static const flutter = 'FLUTTER';
   static const app = 'APP';
   static const auth = 'AUTH';
+  static const banco = 'BANCO';
 }
 
 typedef RelatorioErro = void Function(
