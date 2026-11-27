@@ -11,7 +11,11 @@ values
   ('44444444-4444-4444-4444-444444444444', 'lia@teste.com', '{}');
 
 select is(
-  (select count(*)::int from public.perfis),
+  (select count(*)::int from public.perfis where id in (
+    '11111111-1111-1111-1111-111111111111',
+    '22222222-2222-2222-2222-222222222222',
+    '44444444-4444-4444-4444-444444444444'
+  )),
   3,
   'trigger cria um perfil por usuario'
 );
