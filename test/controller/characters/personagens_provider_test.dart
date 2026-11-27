@@ -1,53 +1,142 @@
+import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:grimorio/model/usuario_mock.dart';
+import 'package:grimorio/controller/characters/gerenciador_hp.dart';
 import 'package:grimorio/controller/characters/personagens_provider.dart';
+import 'package:grimorio/controller/grimoire/estado_lista.dart';
+import 'package:grimorio/model/personagem.dart';
 import 'package:grimorio/model/personagem_mock.dart';
+import 'package:grimorio/model/usuario_mock.dart';
+import 'package:grimorio/service/supabase/banco_erro.dart';
 
-import 'personagem_teste.dart';
+import '../../helpers/banco_falso.dart';
 
 void main() {
-  test('começa com os mocks', () {
-    final p = PersonagensProvider();
-    expect(p.meus.map((x) => x.id), personagensMock.map((x) => x.id));
-    expect(p.todos, hasLength(todosPersonagensMock.length));
+  late BancoFalso banco;
+  late PersonagensProvider p;
+
+  void criar() {
+    banco = BancoFalso();
+    p = PersonagensProvider(
+      banco.servicos.personagens,
+      realtime: banco.realtime,
+    );
+    addTearDown(p.dispose);
+  }
+
+  test('carrega depois do login e limpa no sair', () {
+    criar();
+    expect(p.carregamento, Carregamento.inicial);
+    expect(p.todos, isEmpty);
+
+    p.carregar(usuarioMock.id);
+    expect(p.carregamento, Carregamento.pronto);
+    expect(p.meus.map((x) => x.id), [personagemAtivoMock.id]);
+    expect(p.ativo?.id, personagemAtivoMock.id);
+    expect(p.porId(personagemAtivoMock.id)!.notas, hasLength(2));
+    expect(banco.realtime.abertas, 1);
+
+    p.limpar();
+    expect(p.todos, isEmpty);
+    expect(p.carregamento, Carregamento.inicial);
+    expect(banco.realtime.abertas, 0);
   });
 
-  test('adicionar notifica e o novo vira o único ativo', () {
-    final p = PersonagensProvider();
-    var avisos = 0;
-    p.addListener(() => avisos++);
+  test('erro na carga vira mensagem amigável e tentar de novo carrega', () {
+    criar();
+    banco.proximoErro = const BancoErro(TipoErroBanco.semConexao);
+    p.carregar(usuarioMock.id);
+    expect(p.carregamento, Carregamento.erro);
+    expect(p.mensagemErro, 'Sem conexão. Confira a internet.');
 
-    final novo = personagemTeste().copyWith(id: 'novo', ativo: true);
-    p.adicionar(novo);
-
-    expect(avisos, 1);
-    expect(p.meus.last.id, 'novo');
-    expect(p.meus.where((x) => x.ativo).single.id, 'novo');
-    expect(p.porId('novo'), isNotNull);
+    p.tentarDeNovo();
+    expect(p.carregamento, Carregamento.pronto);
   });
 
-  test('atualizar troca pelo id', () {
-    final p = PersonagensProvider();
-    final elyndra = p.porId(personagemAtivoMock.id)!;
-    p.atualizar(elyndra.copyWith(xp: 1));
-    expect(p.porId(elyndra.id)!.xp, 1);
+  test('5 toques rápidos no HP salvam uma vez, só hp_atual e hp_temp', () {
+    fakeAsync((tempo) {
+      criar();
+      p.carregar(usuarioMock.id);
+      const hp = GerenciadorHp();
+      final id = personagemAtivoMock.id;
+
+      for (var i = 0; i < 5; i++) {
+        p.editar(hp.receberDano(p.porId(id)!, 1));
+        tempo.elapse(const Duration(milliseconds: 200));
+      }
+      expect(p.porId(id)!.hpAtual, personagemAtivoMock.hpAtual - 5);
+      expect(banco.vezes('personagens.atualizar'), 0);
+
+      tempo.elapse(PersonagensProvider.esperaToque);
+      expect(banco.vezes('personagens.atualizar'), 1);
+      final (salvo, campos) = banco.atualizacoes.single;
+      expect(salvo, id);
+      expect(campos.keys.toSet().difference({'hp_atual', 'hp_temp'}), isEmpty);
+      expect(campos['hp_atual'], personagemAtivoMock.hpAtual - 5);
+    });
   });
 
-  test('id que não existe volta null', () {
-    expect(PersonagensProvider().porId('nao-existe'), isNull);
+  test('erro ao salvar volta o valor e o futuro termina com o erro', () {
+    fakeAsync((tempo) {
+      criar();
+      p.carregar(usuarioMock.id);
+      final id = personagemAtivoMock.id;
+      Object? erro;
+
+      p
+          .editar(p.porId(id)!.copyWith(hpAtual: 1))
+          .catchError((Object e) => erro = e);
+      expect(p.porId(id)!.hpAtual, 1);
+
+      banco.proximoErro = const BancoErro(TipoErroBanco.semConexao);
+      tempo.elapse(PersonagensProvider.esperaToque);
+      tempo.flushMicrotasks();
+
+      expect(p.porId(id)!.hpAtual, personagemAtivoMock.hpAtual);
+      expect(erro, isA<BancoErro>());
+    });
   });
 
-  test('adotarMock passa os heróis do mock para o usuário logado', () {
-    final p = PersonagensProvider();
-    final antes = p.todos.where((x) => x.donoId == usuarioMock.id).length;
-    expect(antes, greaterThan(0));
+  test('criar nasce sem campanha e vira o ativo', () async {
+    criar();
+    p.carregar(usuarioMock.id);
+    final novo = await p.criar(kaelMock.copyWith(id: 'x', nome: 'Novo'));
 
-    p.adotarMock('uuid-real');
-    expect(p.todos.where((x) => x.donoId == usuarioMock.id), isEmpty);
-    expect(p.todos.where((x) => x.donoId == 'uuid-real'), hasLength(antes));
+    expect(novo.ativo, isTrue);
+    expect(novo.campanhaId, isNull);
+    expect(novo.donoId, usuarioMock.id);
+    expect(p.ativo?.nome, 'Novo');
+    expect(p.meus.where((x) => x.ativo), hasLength(1));
+    expect(banco.vezes('personagens.ativar'), 1);
+  });
 
-    // outra conta logada herda de novo
-    p.adotarMock('outra');
-    expect(p.todos.where((x) => x.donoId == 'outra'), hasLength(antes));
+  test('diário salva na tabela de notas', () async {
+    criar();
+    p.carregar(usuarioMock.id);
+    final id = personagemAtivoMock.id;
+
+    await p.adicionarNota(
+      id,
+      Nota(id: '', titulo: 'Novo', texto: 'x', data: DateTime(2026)),
+    );
+    expect(p.porId(id)!.notas.map((n) => n.titulo), contains('Novo'));
+    expect(banco.notas[id]!.map((n) => n.titulo), contains('Novo'));
+
+    final nota = p.porId(id)!.notas.firstWhere((n) => n.titulo == 'Novo');
+    await p.removerNota(id, nota.id);
+    expect(p.porId(id)!.notas.map((n) => n.titulo), isNot(contains('Novo')));
+  });
+
+  test('evento dos meus heróis recarrega', () {
+    fakeAsync((tempo) {
+      criar();
+      p.carregar(usuarioMock.id);
+      final id = personagemAtivoMock.id;
+      banco.trocarHerois([banco.personagem(id)!.copyWith(xp: 9999)]);
+
+      banco.realtime.emitirHerois(usuarioMock.id);
+      tempo.elapse(const Duration(milliseconds: 300));
+
+      expect(p.porId(id)!.xp, 9999);
+    });
   });
 }

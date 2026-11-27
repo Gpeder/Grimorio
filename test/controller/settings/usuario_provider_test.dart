@@ -10,8 +10,8 @@ import '../../helpers/auth_falso.dart';
 import '../../helpers/perfil_falso.dart';
 
 void main() {
-  test('sem login começa com o usuário do mock', () {
-    expect(UsuarioProvider().usuario.id, usuarioMock.id);
+  test('sem login começa vazio', () {
+    expect(UsuarioProvider().usuario.id, isEmpty);
   });
 
   test('atualizar troca e notifica', () {

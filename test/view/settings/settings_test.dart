@@ -21,6 +21,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(appDeTeste(Rotas.ajustes));
+    await tester.pump();
   }
 
   Future<void> tocar(WidgetTester tester, Finder alvo) async {

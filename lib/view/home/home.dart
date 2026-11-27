@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
-import 'package:grimorio/model/personagem.dart';
-import 'package:grimorio/model/personagem_mock.dart';
+import 'package:grimorio/controller/characters/personagens_provider.dart';
 import 'package:grimorio/view/home/components/acoes_menu.dart';
 import 'package:grimorio/view/home/components/campanha_ativa.dart';
 import 'package:grimorio/view/home/components/home_app_bar.dart';
 import 'package:grimorio/view/home/components/missao_ativa_card.dart';
 import 'package:grimorio/view/home/components/personagem_ativo_card.dart';
 import 'package:grimorio/view/home/components/sem_heroi_card.dart';
+import 'package:provider/provider.dart';
 
 class Home extends StatelessWidget {
-  const Home({super.key, this.personagem = personagemAtivoMock});
-
-  final Personagem? personagem;
+  const Home({super.key});
 
   static const _espacoEntreSecoes = AppSpacing.large;
 
   @override
   Widget build(BuildContext context) {
-    final personagem = this.personagem;
+    final personagem = context.watch<PersonagensProvider>().ativo;
 
     final secoes = <Widget>[
       if (personagem == null)

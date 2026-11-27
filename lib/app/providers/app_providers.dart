@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:grimorio/controller/auth/auth_provider.dart';
 import 'package:grimorio/controller/campaign/campanhas_provider.dart';
@@ -13,6 +15,7 @@ import 'package:grimorio/service/open5e/magia_service.dart';
 import 'package:grimorio/service/open5e/monstro_service.dart';
 import 'package:grimorio/service/supabase/auth_service.dart';
 import 'package:grimorio/service/supabase/perfil_service.dart';
+import 'package:grimorio/service/supabase/servicos_banco.dart';
 import 'package:provider/provider.dart';
 
 class AppProviders extends StatelessWidget {
@@ -22,6 +25,7 @@ class AppProviders extends StatelessWidget {
     this.api,
     this.auth,
     this.perfis,
+    this.banco,
   });
 
   final Widget child;
@@ -32,6 +36,7 @@ class AppProviders extends StatelessWidget {
   // teste passa os falsos do supabase
   final AuthService? auth;
   final PerfilService? perfis;
+  final ServicosBanco? banco;
 
   @override
   Widget build(BuildContext context) {
@@ -70,20 +75,50 @@ class AppProviders extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => AuthProvider(context.read()),
         ),
+        // tabelas do banco
+        Provider<ServicosBanco>(
+          create: (_) => banco ?? ServicosBanco.supabase(),
+        ),
         // herois
-        ChangeNotifierProvider(create: (_) => PersonagensProvider()),
+        ChangeNotifierProvider(
+          create: (context) {
+            final banco = context.read<ServicosBanco>();
+            return PersonagensProvider(
+              banco.personagens,
+              realtime: banco.realtime,
+            );
+          },
+        ),
         // campanhas
-        ChangeNotifierProvider(create: (_) => CampanhasProvider()),
-        // usuario e preferencias, segue o login
+        ChangeNotifierProvider(
+          create: (context) {
+            final banco = context.read<ServicosBanco>();
+            return CampanhasProvider(
+              campanhas: banco.campanhas,
+              mesa: banco.mesa,
+              missoes: banco.missoes,
+              npcs: banco.npcs,
+              personagens: context.read(),
+              perfis: context.read(),
+              realtime: banco.realtime,
+            );
+          },
+        ),
+        // usuario e preferencias, segue o login; herois e campanhas juntos
         ChangeNotifierProvider(
           lazy: false,
           create: (context) => UsuarioProvider(
             auth: context.read(),
             perfis: context.read(),
-            aoEntrar: (id) {
-              context.read<PersonagensProvider>().adotarMock(id);
-              context.read<CampanhasProvider>().adotarMock(id);
-            },
+            // fora do build: o login pode chegar enquanto a arvore monta
+            aoEntrar: (id) => scheduleMicrotask(() {
+              context.read<PersonagensProvider>().carregar(id);
+              context.read<CampanhasProvider>().carregar(id);
+            }),
+            aoSair: () => scheduleMicrotask(() {
+              context.read<PersonagensProvider>().limpar();
+              context.read<CampanhasProvider>().limpar();
+            }),
           ),
         ),
         // listas do srd

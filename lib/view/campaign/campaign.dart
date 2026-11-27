@@ -5,6 +5,7 @@ import 'package:grimorio/app/theme/app_colors.dart';
 import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/controller/campaign/campanhas_provider.dart';
+import 'package:grimorio/controller/campaign/gerenciador_campanhas.dart';
 import 'package:grimorio/controller/characters/personagens_provider.dart';
 import 'package:grimorio/controller/settings/usuario_provider.dart';
 import 'package:grimorio/model/campanha.dart';
@@ -33,28 +34,57 @@ class _CampanhaState extends State<Campaign> {
   List<Personagem> _heroisDe(Campanha c) =>
       context.read<PersonagensProvider>().daCampanha(c);
 
-  String get _usuarioId => context.read<UsuarioProvider>().usuario.id;
-
   Future<void> _entrarComCodigo() async {
+    final livres = const GerenciadorCampanhas().semCampanha(
+      context.read<PersonagensProvider>().meus,
+    );
     final codigo = await pedirCodigo(context);
     if (codigo == null || !mounted) return;
-    final campanha = context.read<CampanhasProvider>().buscarPorCodigo(codigo);
-    if (campanha == null) {
-      _aviso('Código não encontrado', tipo: Snackbar.erro);
-    } else {
-      _aviso('Você entrou em ${campanha.nome}', tipo: Snackbar.sucesso);
+    if (livres.isEmpty) {
+      _aviso('Crie um herói sem campanha para entrar.', tipo: Snackbar.erro);
+      return;
+    }
+    try {
+      final campanha = await context.read<CampanhasProvider>().entrarComCodigo(
+        codigo,
+        livres.first.id,
+      );
+      if (mounted) {
+        _aviso('Você entrou em ${campanha.nome}', tipo: Snackbar.sucesso);
+      }
+    } catch (e, stack) {
+      if (mounted) {
+        mostrarErro(
+          context,
+          e,
+          stack: stack,
+          onde: 'entrar com codigo',
+          acimaDaBarra: true,
+        );
+      }
     }
   }
 
   Future<void> _novaCampanha() async {
     final nova = await pedirNovaCampanha(context);
     if (nova == null || !mounted) return;
-    final campanha = context.read<CampanhasProvider>().criar(
-      nome: nova.nome,
-      capitulo: nova.capitulo,
-      mestreId: _usuarioId,
-    );
-    _aviso('${campanha.nome} criada', tipo: Snackbar.sucesso);
+    try {
+      final campanha = await context.read<CampanhasProvider>().criar(
+        nome: nova.nome,
+        capitulo: nova.capitulo,
+      );
+      if (mounted) _aviso('${campanha.nome} criada', tipo: Snackbar.sucesso);
+    } catch (e, stack) {
+      if (mounted) {
+        mostrarErro(
+          context,
+          e,
+          stack: stack,
+          onde: 'nova campanha',
+          acimaDaBarra: true,
+        );
+      }
+    }
   }
 
   void _abrir(Campanha c) => context.pushNamed(

@@ -1,19 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/app/router/rotas.dart';
+import 'package:grimorio/model/campanha.dart';
+import 'package:grimorio/model/personagem.dart';
+import 'package:grimorio/model/personagem_mock.dart';
+import 'package:grimorio/model/usuario_mock.dart';
 import 'package:grimorio/view/campaign/components/campanha_card.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
 
 import '../../helpers/app_teste.dart';
+import '../../helpers/banco_falso.dart';
 
 void main() {
-  Future<void> abrir(WidgetTester tester) async {
+  Future<void> abrir(WidgetTester tester, {BancoFalso? banco}) async {
     tester.view.physicalSize = const Size(1290, 2796);
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
 
-    await tester.pumpWidget(appDeTeste(Rotas.campanhas));
+    await tester.pumpWidget(appDeTeste(Rotas.campanhas, banco: banco));
     await tester.pumpAndSettle();
+  }
+
+  // gustavo com um heroi livre e uma campanha da lia para entrar
+  BancoFalso comHeroiLivre() {
+    final banco = BancoFalso();
+    banco.personagens = [
+      ...banco.personagens,
+      Personagem.fromJson({
+        ...kaelMock.toJson(),
+        'id': 'livre',
+        'nome': 'Bryn',
+        'dono_id': usuarioMock.id,
+        'campanha_id': null,
+      }),
+    ];
+    banco.campanhas = [
+      ...banco.campanhas,
+      Campanha(
+        id: 'ruinas',
+        nome: 'Ruínas de Ébano',
+        mestreId: 'u_lia',
+        codigoConvite: 'RUIN-1234',
+      ),
+    ];
+    return banco;
   }
 
   Future<void> tocar(WidgetTester tester, Finder alvo) async {
@@ -65,13 +95,14 @@ void main() {
   });
 
   testWidgets('código válido entra, inválido mostra erro', (tester) async {
-    await abrir(tester);
+    await abrir(tester, banco: comHeroiLivre());
 
-    await usarCodigo(tester, 'valf-42');
-    expect(find.text('Você entrou em Sombras de Valfenda'), findsOneWidget);
+    await usarCodigo(tester, 'XXXX-0000');
+    expect(find.text('Código não encontrado.'), findsOneWidget);
 
-    await usarCodigo(tester, 'XXXX-00');
-    expect(find.text('Código não encontrado'), findsOneWidget);
+    await usarCodigo(tester, ' ruin-1234 ');
+    expect(find.text('Você entrou em Ruínas de Ébano'), findsOneWidget);
+    expect(card('Ruínas de Ébano'), findsOneWidget);
   });
 
   testWidgets('Valfenda abre na visão do herói, sem botões de mestre', (

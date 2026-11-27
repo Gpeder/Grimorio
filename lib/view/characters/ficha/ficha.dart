@@ -6,8 +6,8 @@ import 'package:grimorio/controller/characters/gerenciador_condicoes.dart';
 import 'package:grimorio/controller/characters/gerenciador_hp.dart';
 import 'package:grimorio/controller/characters/gerenciador_inventario.dart';
 import 'package:grimorio/controller/characters/gerenciador_magias.dart';
-import 'package:grimorio/controller/characters/gerenciador_notas.dart';
 import 'package:grimorio/controller/characters/personagens_provider.dart';
+import 'package:grimorio/controller/grimoire/estado_lista.dart';
 import 'package:grimorio/model/opcoes_heroi_mock.dart';
 import 'package:grimorio/model/personagem.dart';
 import 'package:grimorio/view/characters/ficha/components/combate_tab.dart';
@@ -20,22 +20,26 @@ import 'package:grimorio/view/characters/ficha/components/inventario_tab.dart';
 import 'package:grimorio/view/characters/ficha/components/magias_tab.dart';
 import 'package:grimorio/view/characters/ficha/components/pericias_tab.dart';
 import 'package:grimorio/view/characters/ficha/components/resumo_tab.dart';
+import 'package:grimorio/widgets/estado_carregando.dart';
+import 'package:grimorio/widgets/estado_nao_encontrado.dart';
 import 'package:grimorio/widgets/image_frame.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
 import 'package:pixelarticons/pixel.dart';
 import 'package:provider/provider.dart';
 
 class Ficha extends StatefulWidget {
-  const Ficha({super.key, required this.personagem});
+  const Ficha({super.key, required this.personagemId});
 
-  final Personagem personagem;
+  final String personagemId;
 
   @override
   State<Ficha> createState() => _FichaState();
 }
 
 class _FichaState extends State<Ficha> {
-  late Personagem _p = widget.personagem;
+  // sempre do provider: o xp que o mestre der aparece aqui
+  Personagem get _p =>
+      context.read<PersonagensProvider>().porId(widget.personagemId)!;
   int _aba = 0;
 
   final _rolagem = ScrollController();
@@ -47,7 +51,6 @@ class _FichaState extends State<Ficha> {
   static const _magias = GerenciadorMagias();
   static const _inventario = GerenciadorInventario();
   static const _condicoes = GerenciadorCondicoes();
-  static const _notas = GerenciadorNotas();
 
   @override
   void initState() {
@@ -64,16 +67,27 @@ class _FichaState extends State<Ficha> {
     super.dispose();
   }
 
+  // a tela muda na hora; o provider salva so o que mudou quando os
+  // toques param. se falhar o valor volta e aparece o erro
   void _atualizar(Personagem Function(Personagem p) acao) {
     if (!mounted) return;
-    setState(() => _p = acao(_p));
+    context.read<PersonagensProvider>().editar(acao(_p)).catchError((
+      Object e,
+      StackTrace stack,
+    ) {
+      if (mounted) mostrarErro(context, e, stack: stack, onde: 'salvar ficha');
+    });
   }
 
-  // salva no provider e volta
-  void _sair() {
-    context.read<PersonagensProvider>().atualizar(_p);
-    context.pop();
+  Future<void> _nota(Future<void> Function(PersonagensProvider p) acao) async {
+    try {
+      await acao(context.read<PersonagensProvider>());
+    } catch (e, stack) {
+      if (mounted) mostrarErro(context, e, stack: stack, onde: 'diario');
+    }
   }
+
+  void _sair() => context.pop();
 
   void _usarItem(String id) {
     final item = _p.inventario.where((i) => i.id == id).firstOrNull;
@@ -114,13 +128,20 @@ class _FichaState extends State<Ficha> {
     ),
     _ => DiarioTab(
       notas: _p.notas,
-      onAdicionar: (n) => _atualizar((p) => _notas.adicionar(p, n)),
-      onRemover: (id) => _atualizar((p) => _notas.remover(p, id)),
+      onAdicionar: (n) => _nota((p) => p.adicionarNota(widget.personagemId, n)),
+      onRemover: (id) => _nota((p) => p.removerNota(widget.personagemId, id)),
     ),
   };
 
   @override
   Widget build(BuildContext context) {
+    final personagens = context.watch<PersonagensProvider>();
+    if (personagens.porId(widget.personagemId) == null) {
+      return personagens.carregamento == Carregamento.carregando
+          ? const Scaffold(body: EstadoCarregando())
+          : const EstadoNaoEncontrado();
+    }
+
     return PopScope<void>(
       canPop: false,
       onPopInvokedWithResult: (saiu, _) {

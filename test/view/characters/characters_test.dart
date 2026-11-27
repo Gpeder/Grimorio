@@ -7,6 +7,7 @@ import '../../helpers/app_teste.dart';
 void main() {
   Future<void> abrir(WidgetTester tester) async {
     await tester.pumpWidget(appDeTeste(Rotas.herois));
+    await tester.pump();
   }
 
   testWidgets('mostra o personagem ativo com a campanha', (tester) async {

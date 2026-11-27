@@ -10,7 +10,6 @@ import 'package:grimorio/controller/characters/personagens_provider.dart';
 import 'package:grimorio/controller/settings/usuario_provider.dart';
 import 'package:grimorio/model/campanha.dart';
 import 'package:grimorio/model/personagem.dart';
-import 'package:grimorio/model/usuario_mock.dart';
 import 'package:grimorio/view/campaign/components/campanha_header.dart';
 import 'package:grimorio/view/campaign/heroi/components/aviso_sessao.dart';
 import 'package:grimorio/view/campaign/heroi/components/diario_heroi_tab.dart';
@@ -19,6 +18,7 @@ import 'package:grimorio/view/campaign/heroi/components/meu_heroi_card.dart';
 import 'package:grimorio/view/campaign/heroi/components/missoes_heroi_tab.dart';
 import 'package:grimorio/view/characters/ficha/components/ficha_tabs.dart';
 import 'package:grimorio/widgets/estado_nao_encontrado.dart';
+import 'package:grimorio/widgets/snack_bar.dart';
 import 'package:pixelarticons/pixel.dart';
 import 'package:provider/provider.dart';
 
@@ -62,6 +62,35 @@ class _CampanhaHeroiState extends State<CampanhaHeroi> {
           context.read<UsuarioProvider>().usuario.id,
         );
 
+  // tela aberta ouve o banco; a previa do mestre nao precisa
+  Future<void> Function()? _pararEscuta;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!widget.modoPrevia) {
+      _pararEscuta = context.read<CampanhasProvider>().ouvir(widget.campanhaId);
+      WidgetsBinding.instance.addPostFrameCallback((_) => _recarregar());
+    }
+  }
+
+  @override
+  void dispose() {
+    _pararEscuta?.call();
+    super.dispose();
+  }
+
+  // o que o mestre esconder some aqui so na recarga (a rls corta o evento)
+  Future<void> _recarregar() async {
+    try {
+      await context.read<CampanhasProvider>().recarregar(widget.campanhaId);
+    } catch (e, stack) {
+      if (mounted) {
+        mostrarErro(context, e, stack: stack, onde: 'recarregar campanha');
+      }
+    }
+  }
+
   void _sair() => context.pop();
 
   void _abrirFicha(Personagem heroi) => context.pushNamed(
@@ -97,13 +126,15 @@ class _CampanhaHeroiState extends State<CampanhaHeroi> {
   @override
   Widget build(BuildContext context) {
     // reconstroi quando campanha ou herois mudam
-    final c = context.watch<CampanhasProvider>().porId(widget.campanhaId);
+    final campanhas = context.watch<CampanhasProvider>();
+    final c = campanhas.porId(widget.campanhaId);
     context.watch<PersonagensProvider>();
     if (c == null) return const EstadoNaoEncontrado();
     final heroi = _heroi;
     final previa = widget.modoPrevia;
 
     final rolagem = CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       slivers: [
         SliverToBoxAdapter(
           // topo
@@ -124,7 +155,7 @@ class _CampanhaHeroiState extends State<CampanhaHeroi> {
                 if (_c.emSessao) ...[
                   AvisoSessao(
                     sessao: _c.sessaoAtual,
-                    mestre: nomesUsuariosMock[_c.mestreId] ?? 'Mestre',
+                    mestre: campanhas.nomeDe(_c.mestreId) ?? 'Mestre',
                   ),
                   const SizedBox(height: AppSpacing.medium),
                 ],
@@ -171,7 +202,9 @@ class _CampanhaHeroiState extends State<CampanhaHeroi> {
       onPopInvokedWithResult: (saiu, _) {
         if (!saiu) _sair();
       },
-      child: Scaffold(body: rolagem),
+      child: Scaffold(
+        body: RefreshIndicator(onRefresh: _recarregar, child: rolagem),
+      ),
     );
   }
 }

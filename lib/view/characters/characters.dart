@@ -29,13 +29,26 @@ class _CharactersState extends State<Characters> {
     final novo = await context.pushNamed<Personagem>(Rotas.nomeNovoHeroi);
     if (novo == null || !mounted) return;
 
-    context.read<PersonagensProvider>().adicionar(novo);
-    mostrarAviso(
-      context,
-      '${novo.nome} despertou!',
-      tipo: Snackbar.sucesso,
-      acimaDaBarra: true,
-    );
+    try {
+      final criado = await context.read<PersonagensProvider>().criar(novo);
+      if (!mounted) return;
+      mostrarAviso(
+        context,
+        '${criado.nome} despertou!',
+        tipo: Snackbar.sucesso,
+        acimaDaBarra: true,
+      );
+    } catch (e, stack) {
+      if (mounted) {
+        mostrarErro(
+          context,
+          e,
+          stack: stack,
+          onde: 'criar heroi',
+          acimaDaBarra: true,
+        );
+      }
+    }
   }
 
   void _abrirFicha(Personagem p) =>

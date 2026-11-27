@@ -11,6 +11,7 @@ import 'package:grimorio/controller/auth/auth_provider.dart';
 import 'package:grimorio/service/api/api_client.dart';
 import 'package:grimorio/service/supabase/auth_service.dart';
 import 'package:grimorio/service/supabase/perfil_service.dart';
+import 'package:grimorio/service/supabase/servicos_banco.dart';
 import 'package:grimorio/widgets/erro_widget_card.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -66,6 +67,7 @@ class GrimorioApp extends StatelessWidget {
     this.api,
     this.auth,
     this.perfis,
+    this.banco,
   });
 
   // rota de abertura, os testes mudam
@@ -77,6 +79,7 @@ class GrimorioApp extends StatelessWidget {
   // teste passa os falsos do supabase
   final AuthService? auth;
   final PerfilService? perfis;
+  final ServicosBanco? banco;
 
   @override
   Widget build(BuildContext context) {
@@ -84,6 +87,7 @@ class GrimorioApp extends StatelessWidget {
       api: api,
       auth: auth,
       perfis: perfis,
+      banco: banco,
       child: _AppComRotas(inicial: inicial),
     );
   }

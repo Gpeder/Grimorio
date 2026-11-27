@@ -5,10 +5,10 @@ import 'package:grimorio/app/log/app_log.dart';
 import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/controller/auth/auth_provider.dart';
 import 'package:grimorio/controller/campaign/campanhas_provider.dart';
-import 'package:grimorio/controller/characters/personagens_provider.dart';
 import 'package:grimorio/controller/settings/usuario_provider.dart';
 import 'package:grimorio/model/campanha.dart';
 import 'package:grimorio/controller/grimoire/estado_detalhe.dart';
+import 'package:grimorio/controller/grimoire/estado_lista.dart';
 import 'package:grimorio/view/auth/cadastro.dart';
 import 'package:grimorio/view/auth/confirmar_email.dart';
 import 'package:grimorio/view/auth/login.dart';
@@ -34,6 +34,7 @@ import 'package:grimorio/view/grimoire/magias/detalhes_magia.dart';
 import 'package:grimorio/view/grimoire/magias/magias.dart';
 import 'package:grimorio/view/home/home.dart';
 import 'package:grimorio/view/settings/settings.dart';
+import 'package:grimorio/widgets/estado_carregando.dart';
 import 'package:grimorio/widgets/estado_nao_encontrado.dart';
 import 'package:provider/provider.dart';
 
@@ -222,52 +223,82 @@ Widget _naoEncontrado(GoRouterState state) {
   return const EstadoNaoEncontrado();
 }
 
-// telas por id
+// telas por id; a tela busca no provider
 
-Widget _ficha(BuildContext context, GoRouterState state) {
-  final id = state.pathParameters[Rotas.heroiId] ?? '';
-  final p = context.read<PersonagensProvider>().porId(id);
-  return p == null ? _naoEncontrado(state) : Ficha(personagem: p);
-}
+Widget _ficha(BuildContext context, GoRouterState state) =>
+    Ficha(personagemId: state.pathParameters[Rotas.heroiId] ?? '');
 
-// mestre ou heroi pelo papel do usuario
 Widget _campanha(
   BuildContext context,
   GoRouterState state, {
   bool previa = false,
-}) {
-  final id = state.pathParameters[Rotas.campanhaId] ?? '';
-  final c = context.read<CampanhasProvider>().porId(id);
-  if (c == null) return _naoEncontrado(state);
-  if (previa) return CampanhaHeroi(campanhaId: id, modoPrevia: true);
-  final usuarioId = context.read<UsuarioProvider>().usuario.id;
-  return c.papelDe(usuarioId) == PapelCampanha.mestre
-      ? CampanhaMestre(campanhaId: id)
-      : CampanhaHeroi(campanhaId: id);
-}
+}) => _TelaCampanha(
+  campanhaId: state.pathParameters[Rotas.campanhaId] ?? '',
+  previa: previa,
+);
 
 Widget _missao(
   BuildContext context,
   GoRouterState state, {
   PapelCampanha? papel,
-}) {
-  final c = context.read<CampanhasProvider>().porId(
-    state.pathParameters[Rotas.campanhaId] ?? '',
-  );
-  final id = state.pathParameters[Rotas.missaoId];
-  final m = c?.missoes.where((x) => x.id == id).firstOrNull;
-  if (c == null || m == null) return _naoEncontrado(state);
-  final usuarioId = context.read<UsuarioProvider>().usuario.id;
-  final p = papel ?? c.papelDe(usuarioId);
-  return DetalhesMissao(
-    missao: m,
-    papel: p,
-    npcs: c.npcs,
-    herois: p == PapelCampanha.mestre
-        ? context.read<PersonagensProvider>().daCampanha(c)
-        : const [],
-    sessaoAtual: c.sessaoAtual,
-  );
+}) => _TelaMissao(
+  campanhaId: state.pathParameters[Rotas.campanhaId] ?? '',
+  missaoId: state.pathParameters[Rotas.missaoId] ?? '',
+  papel: papel,
+);
+
+// mestre ou heroi pelo papel do usuario; espera a carga das campanhas
+class _TelaCampanha extends StatelessWidget {
+  const _TelaCampanha({required this.campanhaId, required this.previa});
+
+  final String campanhaId;
+  final bool previa;
+
+  @override
+  Widget build(BuildContext context) {
+    final campanhas = context.watch<CampanhasProvider>();
+    final c = campanhas.porId(campanhaId);
+    if (c == null) return _semCampanha(campanhas, campanhaId);
+    if (previa) return CampanhaHeroi(campanhaId: campanhaId, modoPrevia: true);
+    final usuarioId = context.watch<UsuarioProvider>().usuario.id;
+    return c.papelDe(usuarioId) == PapelCampanha.mestre
+        ? CampanhaMestre(campanhaId: campanhaId)
+        : CampanhaHeroi(campanhaId: campanhaId);
+  }
+}
+
+class _TelaMissao extends StatelessWidget {
+  const _TelaMissao({
+    required this.campanhaId,
+    required this.missaoId,
+    this.papel,
+  });
+
+  final String campanhaId;
+  final String missaoId;
+  final PapelCampanha? papel;
+
+  @override
+  Widget build(BuildContext context) {
+    final campanhas = context.watch<CampanhasProvider>();
+    final c = campanhas.porId(campanhaId);
+    if (c == null) return _semCampanha(campanhas, campanhaId);
+    final usuarioId = context.watch<UsuarioProvider>().usuario.id;
+    return DetalhesMissao(
+      campanhaId: campanhaId,
+      missaoId: missaoId,
+      papel: papel ?? c.papelDe(usuarioId),
+    );
+  }
+}
+
+Widget _semCampanha(CampanhasProvider campanhas, String id) {
+  if (campanhas.carregamento
+      case Carregamento.carregando || Carregamento.inicial) {
+    return const Scaffold(body: EstadoCarregando());
+  }
+  AppLog.aviso(TagLog.rota, 'campanha nao existe: $id');
+  return const EstadoNaoEncontrado();
 }
 
 // grimorio

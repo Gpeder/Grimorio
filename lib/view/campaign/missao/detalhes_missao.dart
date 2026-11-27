@@ -18,6 +18,7 @@ import 'package:grimorio/view/campaign/missao/components/entrada_tile.dart';
 import 'package:grimorio/view/campaign/missao/components/nova_entrada_sheet.dart';
 import 'package:grimorio/view/campaign/missao/components/recompensa_card.dart';
 import 'package:grimorio/view/characters/ficha/components/numero_dialog.dart';
+import 'package:grimorio/widgets/estado_nao_encontrado.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
 import 'package:pixelarticons/pixel.dart';
@@ -26,51 +27,71 @@ import 'package:provider/provider.dart';
 class DetalhesMissao extends StatefulWidget {
   const DetalhesMissao({
     super.key,
-    required this.missao,
+    required this.campanhaId,
+    required this.missaoId,
     required this.papel,
-    this.npcs = const [],
-    this.herois = const [],
-    this.sessaoAtual = 0,
   });
 
-  final Missao missao;
+  final String campanhaId;
+  final String missaoId;
   final PapelCampanha papel;
-  final List<Npc> npcs;
-  final List<Personagem> herois;
-  final int sessaoAtual;
 
   @override
   State<DetalhesMissao> createState() => _DetalhesMissaoState();
 }
 
 class _DetalhesMissaoState extends State<DetalhesMissao> {
-  late final _missoes = GerenciadorMissoes(
-    missao: widget.missao,
-    herois: widget.herois,
-  );
-
   static const _visibilidade = GerenciadorVisibilidade();
 
-  Missao get _m => _missoes.missao;
+  // sempre do provider: o que o mestre mudar aparece aqui
+  Campanha get _c =>
+      context.read<CampanhasProvider>().porId(widget.campanhaId)!;
+  Missao get _m => _c.missoes.firstWhere((m) => m.id == widget.missaoId);
 
   bool get _mestre => widget.papel == PapelCampanha.mestre;
 
-  // mestre grava a missao e os herois na mesa
-  void _sair() {
-    if (_mestre) {
-      context.read<CampanhasProvider>().naMesa(
-        _m.campanhaId,
-        context.read<PersonagensProvider>(),
-        (mesa) => mesa.aplicarMissao(_missoes.retorno),
-      );
+  // so o mestre ve os herois para distribuir a recompensa
+  List<Personagem> get _herois =>
+      _mestre ? context.read<PersonagensProvider>().daCampanha(_c) : const [];
+
+  List<ItemCompendio> get _itensRecompensa => [
+    for (final key in _m.recompensaItens)
+      ?itensMock.where((i) => i.key == key).firstOrNull,
+  ];
+
+  CampanhasProvider get _campanhas => context.read<CampanhasProvider>();
+
+  void _sair() => context.pop();
+
+  // roda no banco; se falhar a tela volta e mostra o erro
+  Future<bool> _acao(String onde, Future<void> Function() acao) async {
+    try {
+      await acao();
+      return true;
+    } catch (e, stack) {
+      if (mounted) mostrarErro(context, e, stack: stack, onde: onde);
+      return false;
     }
-    context.pop();
+  }
+
+  // o gerenciador calcula a missao nova, o provider salva o que mudou
+  Future<void> _mudar(void Function(GerenciadorMissoes g) f) {
+    final antes = _m;
+    final g = GerenciadorMissoes(missao: antes);
+    f(g);
+    return _acao(
+      'editar missao',
+      () => _campanhas.editarMissao(antes, g.missao),
+    );
   }
 
   Future<void> _acaoEntrada(EntradaMissao e, AcaoEntrada acao) async {
     switch (acao) {
       case AcaoEntrada.concluir:
-        setState(() => _missoes.concluirEntrada(e));
+        await _acao(
+          'concluir entrada',
+          () => _campanhas.editarEntrada(_m, e, e.copyWith(concluida: true)),
+        );
       case AcaoEntrada.apagar:
         final ok = await confirmar(
           context,
@@ -79,14 +100,19 @@ class _DetalhesMissaoState extends State<DetalhesMissao> {
           sim: 'Apagar',
         );
         if (!ok || !mounted) return;
-        setState(() => _missoes.apagarEntrada(e));
+        await _acao('apagar entrada', () => _campanhas.apagarEntrada(_m, e));
     }
   }
 
+  Future<void> _alternarEntrada(EntradaMissao e) => _acao(
+    'revelar entrada',
+    () => _campanhas.editarEntrada(_m, e, e.copyWith(revelada: !e.revelada)),
+  );
+
   Future<void> _novaEntrada() async {
-    final e = await pedirEntrada(context, sessao: widget.sessaoAtual);
+    final e = await pedirEntrada(context, sessao: _c.sessaoAtual);
     if (e == null || !mounted) return;
-    setState(() => _missoes.adicionarEntrada(e));
+    await _acao('nova entrada', () => _campanhas.criarEntrada(_m, e));
   }
 
   Future<void> _editar() async {
@@ -96,10 +122,10 @@ class _DetalhesMissaoState extends State<DetalhesMissao> {
       missao: _m,
     );
     if (editada == null || !mounted) return;
-    setState(() => _missoes.editar(editada));
+    await _mudar((g) => g.editar(editada));
   }
 
-  void _alternarRevelada() => setState(_missoes.alternarRevelada);
+  Future<void> _alternarRevelada() => _mudar((g) => g.alternarRevelada());
 
   Future<void> _editarXp() async {
     final xp = await pedirNumero(
@@ -108,16 +134,16 @@ class _DetalhesMissaoState extends State<DetalhesMissao> {
       inicial: _m.recompensaXp,
     );
     if (xp == null || !mounted) return;
-    setState(() => _missoes.definirXp(xp));
+    await _mudar((g) => g.definirXp(xp));
   }
 
   Future<void> _adicionarItem() async {
     final escolha = await pedirItem(context, itens: itensMock);
     if (escolha == null || !mounted) return;
-    setState(() => _missoes.adicionarItem(escolha.item.key));
+    await _mudar((g) => g.adicionarItem(escolha.item.key));
   }
 
-  void _removerItem(String key) => setState(() => _missoes.removerItem(key));
+  Future<void> _removerItem(String key) => _mudar((g) => g.removerItem(key));
 
   Future<void> _falhou() async {
     final ok = await confirmar(
@@ -127,30 +153,47 @@ class _DetalhesMissaoState extends State<DetalhesMissao> {
       sim: 'Falhou',
     );
     if (!ok || !mounted) return;
-    setState(_missoes.falhar);
+    await _acao(
+      'falhar missao',
+      () => _campanhas.falharMissao(widget.campanhaId, _m.id),
+    );
   }
 
+  // xp para todos e cada item para quem o mestre escolher, pela rpc
   Future<void> _concluir() async {
+    final itens = _itensRecompensa;
     final destinos = await showDialog<Map<String, String>>(
       context: context,
-      builder: (_) => _ConcluirDialog(
-        xp: _m.recompensaXp,
-        itens: _missoes.itensRecompensa,
-        herois: _missoes.herois,
-      ),
+      builder: (_) =>
+          _ConcluirDialog(xp: _m.recompensaXp, itens: itens, herois: _herois),
     );
     if (destinos == null || !mounted) return;
-    setState(() => _missoes.concluir(destinos));
-    mostrarAviso(context, 'Missão concluída!', tipo: Snackbar.sucesso);
+    final ok = await _acao(
+      'concluir missao',
+      () => _campanhas.concluirMissao(
+        widget.campanhaId,
+        _m.id,
+        destinos: destinos,
+        itens: itens,
+      ),
+    );
+    if (ok && mounted) {
+      mostrarAviso(context, 'Missão concluída!', tipo: Snackbar.sucesso);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final c = context.watch<CampanhasProvider>().porId(widget.campanhaId);
+    context.watch<PersonagensProvider>();
+    if (c == null || !c.missoes.any((m) => m.id == widget.missaoId)) {
+      return const EstadoNaoEncontrado();
+    }
     final textTheme = Theme.of(context).textTheme;
     final papel = widget.papel;
     final entradas = _visibilidade.entradas(_m, papel);
     final atual = _visibilidade.objetivoAtual(_m, papel);
-    final envolvidos = _visibilidade.envolvidos(_m, widget.npcs, papel);
+    final envolvidos = _visibilidade.envolvidos(_m, c.npcs, papel);
     final rodape = _mestre && _m.ativa;
 
     return PopScope<void>(
@@ -276,9 +319,7 @@ class _DetalhesMissaoState extends State<DetalhesMissao> {
                         entrada: e,
                         atual: e.id == atual?.id && _m.ativa,
                         onAlternarRevelada: _mestre
-                            ? () => setState(
-                                () => _missoes.alternarEntradaRevelada(e),
-                              )
+                            ? () => _alternarEntrada(e)
                             : null,
                         onAcao: _mestre ? (a) => _acaoEntrada(e, a) : null,
                       ),
@@ -338,10 +379,7 @@ class _DetalhesMissaoState extends State<DetalhesMissao> {
                     RecompensaCard(
                       missao: _m,
                       papel: papel,
-                      itens: [
-                        for (final key in _m.recompensaItens)
-                          ?itensMock.where((i) => i.key == key).firstOrNull,
-                      ],
+                      itens: _itensRecompensa,
                       onEditarXp: _editarXp,
                       onAdicionarItem: _adicionarItem,
                       onRemoverItem: _removerItem,

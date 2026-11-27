@@ -4,11 +4,11 @@ import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/controller/campaign/campanhas_provider.dart';
 import 'package:grimorio/controller/campaign/formatos.dart';
-import 'package:grimorio/controller/campaign/gerenciador_mesa.dart';
 import 'package:grimorio/controller/characters/personagens_provider.dart';
 import 'package:grimorio/model/campanha.dart';
 import 'package:grimorio/model/compendio_mock.dart';
 import 'package:grimorio/model/personagem.dart';
+
 import 'package:grimorio/view/campaign/components/campanha_header.dart';
 import 'package:grimorio/view/campaign/components/missao_sheet.dart';
 import 'package:grimorio/view/campaign/mestre/components/codigo_convite.dart';
@@ -48,21 +48,57 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
   List<Personagem> get _herois =>
       context.read<PersonagensProvider>().daCampanha(_c);
 
-  void _naMesa(void Function(GerenciadorMesa mesa) acao) => context
-      .read<CampanhasProvider>()
-      .naMesa(widget.campanhaId, context.read<PersonagensProvider>(), acao);
+  CampanhasProvider get _campanhas => context.read<CampanhasProvider>();
+
+  // tela aberta ouve o banco; sai da tela, para de ouvir
+  Future<void> Function()? _pararEscuta;
+
+  @override
+  void initState() {
+    super.initState();
+    _pararEscuta = _campanhas.ouvir(widget.campanhaId);
+    // dados frescos (registros e notas so vem para o mestre)
+    WidgetsBinding.instance.addPostFrameCallback((_) => _recarregar());
+  }
+
+  @override
+  void dispose() {
+    _pararEscuta?.call();
+    super.dispose();
+  }
+
+  Future<void> _recarregar() => _acao(
+    'recarregar campanha',
+    () => _campanhas.recarregar(widget.campanhaId),
+  );
 
   void _sair() => context.pop();
 
   void _aviso(String texto, {Snackbar tipo = Snackbar.info}) =>
       mostrarAviso(context, texto, tipo: tipo);
 
+  // roda no banco; se falhar mostra o erro amigavel
+  Future<bool> _acao(String onde, Future<void> Function() acao) async {
+    try {
+      await acao();
+      return true;
+    } catch (e, stack) {
+      if (mounted) mostrarErro(context, e, stack: stack, onde: onde);
+      return false;
+    }
+  }
+
   // sessao
 
-  void _iniciarSessao() {
+  Future<void> _iniciarSessao() async {
     var numero = 0;
-    _naMesa((mesa) => numero = mesa.iniciarSessao());
-    _aviso('Sessão $numero iniciada', tipo: Snackbar.sucesso);
+    final ok = await _acao(
+      'iniciar sessao',
+      () async => numero = await _campanhas.iniciarSessao(widget.campanhaId),
+    );
+    if (ok && mounted) {
+      _aviso('Sessão $numero iniciada', tipo: Snackbar.sucesso);
+    }
   }
 
   Future<void> _encerrarSessao() async {
@@ -74,17 +110,27 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
       builder: (_) => _EncerrarSheet(numero: numero),
     );
     if (resumo == null || !mounted) return;
-    _naMesa((mesa) => mesa.encerrarSessao(resumo));
-    _aviso('Sessão $numero encerrada', tipo: Snackbar.sucesso);
+    final ok = await _acao(
+      'encerrar sessao',
+      () => _campanhas.encerrarSessao(widget.campanhaId, resumo),
+    );
+    if (ok && mounted) {
+      _aviso('Sessão $numero encerrada', tipo: Snackbar.sucesso);
+    }
   }
 
-  // xp e itens
+  // xp e itens: sempre pela rpc
 
   Future<void> _darXp(Set<String> marcados) async {
     final r = await pedirXp(context, herois: _herois, marcados: marcados);
     if (r == null || !mounted) return;
-    _naMesa((mesa) => mesa.darXp(r.valor, r.heroiIds));
-    _aviso('+${formatarMilhar(r.valor)} XP entregue', tipo: Snackbar.sucesso);
+    final ok = await _acao(
+      'dar xp',
+      () => _campanhas.darXp(widget.campanhaId, r.heroiIds, r.valor),
+    );
+    if (ok && mounted) {
+      _aviso('+${formatarMilhar(r.valor)} XP entregue', tipo: Snackbar.sucesso);
+    }
   }
 
   Future<void> _darItem(Personagem heroi) async {
@@ -96,14 +142,22 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
     );
     final destino = r?.heroiId;
     if (r == null || destino == null || !mounted) return;
-    _naMesa((mesa) => mesa.darItem(r.item, destino));
-    _aviso('${r.item.nome} entregue', tipo: Snackbar.sucesso);
+    final ok = await _acao(
+      'dar item',
+      () => _campanhas.darItem(widget.campanhaId, destino, r.item),
+    );
+    if (ok && mounted) {
+      _aviso('${r.item.nome} entregue', tipo: Snackbar.sucesso);
+    }
   }
 
-  void _desfazer(RegistroMesa r) {
+  Future<void> _desfazer(RegistroMesa r) async {
     if (r.personagemId == null) return;
-    _naMesa((mesa) => mesa.desfazer(r));
-    _aviso('Desfeito');
+    final ok = await _acao(
+      'desfazer',
+      () => _campanhas.desfazer(widget.campanhaId, r),
+    );
+    if (ok && mounted) _aviso('Desfeito');
   }
 
   // missoes e mundo
@@ -116,18 +170,20 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
   Future<void> _novaMissao() async {
     final m = await pedirMissao(context, campanhaId: _c.id);
     if (m == null || !mounted) return;
-    _naMesa((mesa) => mesa.adicionarMissao(m));
-    _aviso('Missão criada', tipo: Snackbar.sucesso);
+    final ok = await _acao('nova missao', () => _campanhas.criarMissao(m));
+    if (ok && mounted) _aviso('Missão criada', tipo: Snackbar.sucesso);
   }
 
   Future<void> _novoNpc() async {
     final npc = await pedirNpc(context, _c.id);
     if (npc == null || !mounted) return;
-    _naMesa((mesa) => mesa.adicionarNpc(npc));
+    await _acao('novo npc', () => _campanhas.criarNpc(npc));
   }
 
-  void _revelarNpc(Npc npc, bool revelado) =>
-      _naMesa((mesa) => mesa.revelarNpc(npc, revelado));
+  Future<void> _revelarNpc(Npc npc, bool revelado) => _acao(
+    'revelar npc',
+    () => _campanhas.editarNpc(npc, npc.copyWith(revelado: revelado)),
+  );
 
   void _verComoHeroi() => context.pushNamed(
     Rotas.nomePrevia,
@@ -155,7 +211,7 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
     3 => SessoesTab(sessoes: _c.sessoes),
     _ => NotasTab(
       texto: _c.notasMestre,
-      onChanged: (t) => _naMesa((mesa) => mesa.editarNotas(t)),
+      onChanged: (t) => _campanhas.editarNotas(widget.campanhaId, t),
     ),
   };
 
@@ -172,72 +228,76 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
         if (!saiu) _sair();
       },
       child: Scaffold(
-        body: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              // topo
-              child: CampanhaHeader(
-                campanha: _c,
-                papel: _papel,
-                trailing: _c.codigoConvite.isEmpty
-                    ? null
-                    : CodigoConvite(codigo: _c.codigoConvite),
-              ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.medium,
-                0,
-                AppSpacing.medium,
-                AppSpacing.medium,
-              ),
-              sliver: SliverToBoxAdapter(
-                child: Row(
-                  children: [
-                    Expanded(
-                      // iniciar ou encerrar sessao
-                      child: _c.emSessao
-                          ? ElevatedButton.icon(
-                              onPressed: _encerrarSessao,
-                              icon: const Icon(Pixel.stop),
-                              label: const Text('Encerrar sessão'),
-                            )
-                          : ElevatedButton.icon(
-                              onPressed: _iniciarSessao,
-                              icon: const Icon(Pixel.play),
-                              label: Text(
-                                'Iniciar sessão ${_c.sessaoAtual + 1}',
-                              ),
-                            ),
-                    ),
-                    const SizedBox(width: AppSpacing.small),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: _verComoHeroi,
-                        icon: const Icon(Pixel.eye),
-                        label: const Text('Ver como herói'),
-                      ),
-                    ),
-                  ],
+        body: RefreshIndicator(
+          onRefresh: _recarregar,
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              SliverToBoxAdapter(
+                // topo
+                child: CampanhaHeader(
+                  campanha: _c,
+                  papel: _papel,
+                  trailing: _c.codigoConvite.isEmpty
+                      ? null
+                      : CodigoConvite(codigo: _c.codigoConvite),
                 ),
               ),
-            ),
-            // abas
-            FichaTabs(
-              aba: _aba,
-              onAba: (i) => setState(() => _aba = i),
-              abas: _abas,
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.medium,
-                AppSpacing.medium,
-                AppSpacing.medium,
-                AppSpacing.large * 2,
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.medium,
+                  0,
+                  AppSpacing.medium,
+                  AppSpacing.medium,
+                ),
+                sliver: SliverToBoxAdapter(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        // iniciar ou encerrar sessao
+                        child: _c.emSessao
+                            ? ElevatedButton.icon(
+                                onPressed: _encerrarSessao,
+                                icon: const Icon(Pixel.stop),
+                                label: const Text('Encerrar sessão'),
+                              )
+                            : ElevatedButton.icon(
+                                onPressed: _iniciarSessao,
+                                icon: const Icon(Pixel.play),
+                                label: Text(
+                                  'Iniciar sessão ${_c.sessaoAtual + 1}',
+                                ),
+                              ),
+                      ),
+                      const SizedBox(width: AppSpacing.small),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: _verComoHeroi,
+                          icon: const Icon(Pixel.eye),
+                          label: const Text('Ver como herói'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              sliver: SliverToBoxAdapter(child: _conteudoAba()),
-            ),
-          ],
+              // abas
+              FichaTabs(
+                aba: _aba,
+                onAba: (i) => setState(() => _aba = i),
+                abas: _abas,
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.medium,
+                  AppSpacing.medium,
+                  AppSpacing.medium,
+                  AppSpacing.large * 2,
+                ),
+                sliver: SliverToBoxAdapter(child: _conteudoAba()),
+              ),
+            ],
+          ),
         ),
       ),
     );

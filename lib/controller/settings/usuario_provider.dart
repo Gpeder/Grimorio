@@ -7,13 +7,17 @@ import 'package:grimorio/controller/auth/auth_provider.dart';
 import 'package:grimorio/controller/grimoire/estado_lista.dart';
 import 'package:grimorio/controller/settings/gerenciador_perfil.dart';
 import 'package:grimorio/model/usuario.dart';
-import 'package:grimorio/model/usuario_mock.dart';
 import 'package:grimorio/service/supabase/perfil_service.dart';
 
 // usuario logado e preferencias, o perfil vem do banco
 class UsuarioProvider extends ChangeNotifier {
-  UsuarioProvider({Usuario? usuario, this._perfis, this._auth, this.aoEntrar})
-    : _usuario = usuario ?? (_auth == null ? usuarioMock : Usuario.vazio) {
+  UsuarioProvider({
+    Usuario? usuario,
+    this._perfis,
+    this._auth,
+    this.aoEntrar,
+    this.aoSair,
+  }) : _usuario = usuario ?? Usuario.vazio {
     _auth?.addListener(_sincronizar);
     _sincronizar();
   }
@@ -21,8 +25,11 @@ class UsuarioProvider extends ChangeNotifier {
   final PerfilService? _perfis;
   final AuthProvider? _auth;
 
-  // ponte do mock: herois e campanhas adotam o id logado
+  // herois e campanhas carregam depois do login
   final void Function(String usuarioId)? aoEntrar;
+
+  // herois e campanhas limpam junto
+  final void Function()? aoSair;
 
   static const _gerenciador = GerenciadorPerfil();
 
@@ -46,6 +53,7 @@ class UsuarioProvider extends ChangeNotifier {
     if (id == null) {
       AppLog.info(TagLog.provider, 'usuario saiu, perfil limpo');
       _usuario = Usuario.vazio;
+      aoSair?.call();
       _carregamento = Carregamento.inicial;
       _mensagemErro = null;
       notifyListeners();

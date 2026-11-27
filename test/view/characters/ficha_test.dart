@@ -16,8 +16,9 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      telaDeTeste(const Ficha(personagem: personagemAtivoMock)),
+      telaDeTeste(Ficha(personagemId: personagemAtivoMock.id)),
     );
+    await tester.pump();
   }
 
   testWidgets('mostra nome, nível e a aba Resumo', (tester) async {
@@ -99,6 +100,7 @@ void main() {
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(appDeTeste(Rotas.herois));
+    await tester.pump();
 
     Future<void> abrirMagias() async {
       await tester.tap(find.text('Elyndra'));
