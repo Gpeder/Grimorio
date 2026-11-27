@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/app/theme/app_colors.dart';
-import 'package:grimorio/app/theme/app_images.dart';
 import 'package:grimorio/app/theme/app_spacing.dart';
 import 'package:grimorio/controller/campaign/campanhas_provider.dart';
 import 'package:grimorio/controller/campaign/gerenciador_campanhas.dart';
@@ -13,7 +12,10 @@ import 'package:grimorio/model/personagem.dart';
 import 'package:grimorio/view/campaign/components/campanha_card.dart';
 import 'package:grimorio/view/campaign/components/codigo_dialog.dart';
 import 'package:grimorio/view/campaign/components/nova_campanha_sheet.dart';
-import 'package:grimorio/widgets/image_frame.dart';
+import 'package:grimorio/controller/grimoire/estado_lista.dart';
+import 'package:grimorio/widgets/estado_carregando.dart';
+import 'package:grimorio/widgets/estado_erro.dart';
+import 'package:grimorio/widgets/estado_vazio.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
 import 'package:pixelarticons/pixel.dart';
 import 'package:provider/provider.dart';
@@ -34,20 +36,21 @@ class _CampanhaState extends State<Campaign> {
   List<Personagem> _heroisDe(Campanha c) =>
       context.read<PersonagensProvider>().daCampanha(c);
 
+  // so herois sem campanha podem entrar
   Future<void> _entrarComCodigo() async {
     final livres = const GerenciadorCampanhas().semCampanha(
       context.read<PersonagensProvider>().meus,
     );
-    final codigo = await pedirCodigo(context);
-    if (codigo == null || !mounted) return;
     if (livres.isEmpty) {
       _aviso('Crie um herói sem campanha para entrar.', tipo: Snackbar.erro);
       return;
     }
+    final entrada = await pedirCodigo(context, herois: livres);
+    if (entrada == null || !mounted) return;
     try {
       final campanha = await context.read<CampanhasProvider>().entrarComCodigo(
-        codigo,
-        livres.first.id,
+        entrada.codigo,
+        entrada.personagemId,
       );
       if (mounted) {
         _aviso('Você entrou em ${campanha.nome}', tipo: Snackbar.sucesso);
@@ -95,19 +98,24 @@ class _CampanhaState extends State<Campaign> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final campanhas = context.watch<CampanhasProvider>().campanhas;
+    final provider = context.watch<CampanhasProvider>();
+    final campanhas = provider.campanhas;
     context.watch<PersonagensProvider>();
     final usuarioId = context.watch<UsuarioProvider>().usuario.id;
 
     return Scaffold(
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: _acimaDaBarra),
-        child: ElevatedButton.icon(
-          onPressed: _novaCampanha,
-          icon: const Icon(Pixel.plus),
-          label: const Text('Nova campanha'),
-        ),
-      ),
+      // vazio ja tem o botao no meio da tela
+      floatingActionButton:
+          provider.carregamento == Carregamento.pronto && campanhas.isEmpty
+          ? null
+          : Padding(
+              padding: const EdgeInsets.only(bottom: _acimaDaBarra),
+              child: ElevatedButton.icon(
+                onPressed: _novaCampanha,
+                icon: const Icon(Pixel.plus),
+                label: const Text('Nova campanha'),
+              ),
+            ),
       body: SafeArea(
         bottom: false,
         child: ListView(
@@ -132,46 +140,43 @@ class _CampanhaState extends State<Campaign> {
               label: const Text('Entrar com código do Mestre'),
             ),
             const SizedBox(height: AppSpacing.large),
-            if (campanhas.isEmpty)
-              const _Vazio()
-            else
-              for (final c in campanhas) ...[
-                CampanhaCard(
-                  campanha: c,
-                  papel: c.papelDe(usuarioId),
-                  herois: _heroisDe(c),
-                  onTap: () => _abrir(c),
-                ),
-                const SizedBox(height: AppSpacing.medium),
-              ],
+            switch (provider.carregamento) {
+              Carregamento.inicial ||
+              Carregamento.carregando => const EstadoCarregando(),
+              Carregamento.erro => EstadoErro(
+                mensagem: provider.mensagemErro ?? 'Algo deu errado',
+                onTentarDeNovo: provider.tentarDeNovo,
+              ),
+              Carregamento.pronto when campanhas.isEmpty => EstadoVazio(
+                titulo: 'Nenhuma campanha',
+                mensagem: 'Crie a sua ou entre com o código do Mestre.',
+                acoes: [
+                  ElevatedButton(
+                    onPressed: _novaCampanha,
+                    child: const Text('Criar campanha'),
+                  ),
+                  OutlinedButton(
+                    onPressed: _entrarComCodigo,
+                    child: const Text('Entrar com código'),
+                  ),
+                ],
+              ),
+              Carregamento.pronto => Column(
+                children: [
+                  for (final c in campanhas) ...[
+                    CampanhaCard(
+                      campanha: c,
+                      papel: c.papelDe(usuarioId),
+                      herois: _heroisDe(c),
+                      onTap: () => _abrir(c),
+                    ),
+                    const SizedBox(height: AppSpacing.medium),
+                  ],
+                ],
+              ),
+            },
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _Vazio extends StatelessWidget {
-  const _Vazio();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.large),
-      child: Column(
-        children: [
-          const ImageFrame(
-            imagePath: AppImages.menuMapa,
-            width: 96,
-            height: 96,
-          ),
-          const SizedBox(height: AppSpacing.medium),
-          Text(
-            'Nenhuma campanha ainda',
-            style: Theme.of(context).textTheme.titleMedium
-                ?.copyWith(color: AppColors.onSurface.withValues(alpha: 0.7)),
-          ),
-        ],
       ),
     );
   }

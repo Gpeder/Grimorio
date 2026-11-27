@@ -9,6 +9,10 @@ import 'package:grimorio/model/personagem.dart';
 import 'package:grimorio/view/characters/components/lista_personagens.dart';
 import 'package:grimorio/view/characters/components/novo_heroi_button.dart';
 import 'package:grimorio/view/characters/components/personagens_header.dart';
+import 'package:grimorio/controller/grimoire/estado_lista.dart';
+import 'package:grimorio/widgets/estado_carregando.dart';
+import 'package:grimorio/widgets/estado_erro.dart';
+import 'package:grimorio/widgets/estado_vazio.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -56,20 +60,49 @@ class _CharactersState extends State<Characters> {
 
   @override
   Widget build(BuildContext context) {
-    final personagens = context.watch<PersonagensProvider>().meus;
+    final provider = context.watch<PersonagensProvider>();
+    final personagens = provider.meus;
     final campanhas = context.watch<CampanhasProvider>().campanhas;
 
-    final secoes = <Widget>[
-      PersonagensHeader(onBusca: (v) => setState(() => _busca = v)),
-      ListaPersonagens(
+    final lista = switch (provider.carregamento) {
+      Carregamento.inicial || Carregamento.carregando =>
+        const SliverToBoxAdapter(child: EstadoCarregando()),
+      Carregamento.erro => SliverToBoxAdapter(
+        child: EstadoErro(
+          mensagem: provider.mensagemErro ?? 'Algo deu errado',
+          onTentarDeNovo: provider.tentarDeNovo,
+        ),
+      ),
+      Carregamento.pronto when personagens.isEmpty => SliverToBoxAdapter(
+        child: EstadoVazio(
+          titulo: 'Nenhum herói ainda',
+          mensagem: 'Crie o primeiro e leve para a mesa.',
+          acoes: [
+            ElevatedButton(
+              onPressed: _abrirNovoHeroi,
+              child: const Text('Criar herói'),
+            ),
+          ],
+        ),
+      ),
+      Carregamento.pronto => ListaPersonagens(
         personagens: _gerenciador.filtrar(personagens, _busca),
         campanhas: campanhas,
         onAbrir: _abrirFicha,
       ),
+    };
+
+    final secoes = <Widget>[
+      PersonagensHeader(onBusca: (v) => setState(() => _busca = v)),
+      lista,
     ];
 
     return Scaffold(
-      floatingActionButton: NovoHeroiButton(onPressed: _abrirNovoHeroi),
+      // vazio ja tem o botao no meio da tela
+      floatingActionButton:
+          provider.carregamento == Carregamento.pronto && personagens.isEmpty
+          ? null
+          : NovoHeroiButton(onPressed: _abrirNovoHeroi),
       body: CustomScrollView(
         slivers: [
           SliverSafeArea(

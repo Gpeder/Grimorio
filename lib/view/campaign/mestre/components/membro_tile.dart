@@ -9,13 +9,20 @@ import 'package:grimorio/widgets/progress_bar.dart';
 import 'package:pixelarticons/pixel.dart';
 
 class MembroTile extends StatelessWidget {
-  const MembroTile({super.key, required this.heroi, this.onXp, this.onItem});
+  const MembroTile({
+    super.key,
+    required this.heroi,
+    this.onXp,
+    this.onItem,
+    this.onRemover,
+  });
 
   final Personagem heroi;
 
   // sem callback fica so leitura
   final VoidCallback? onXp;
   final VoidCallback? onItem;
+  final VoidCallback? onRemover;
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +31,7 @@ class MembroTile extends StatelessWidget {
     final classe = h.classes.isEmpty ? '' : h.classes.first.nome;
     final onXp = this.onXp;
     final onItem = this.onItem;
+    final onRemover = this.onRemover;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.small),
@@ -98,6 +106,14 @@ class MembroTile extends StatelessWidget {
               tooltip: 'Dar item a ${h.nome}',
               onPressed: onItem,
               icon: const Icon(Pixel.gift),
+            ),
+          ],
+          if (onRemover != null) ...[
+            const SizedBox(width: 6),
+            IconButton(
+              tooltip: 'Remover ${h.nome} da campanha',
+              onPressed: onRemover,
+              icon: const Icon(Pixel.userminus, color: AppColors.vida),
             ),
           ],
         ],

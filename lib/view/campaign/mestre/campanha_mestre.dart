@@ -20,6 +20,7 @@ import 'package:grimorio/view/campaign/mestre/components/mundo_tab.dart';
 import 'package:grimorio/view/campaign/mestre/components/notas_tab.dart';
 import 'package:grimorio/view/campaign/mestre/components/sessoes_tab.dart';
 import 'package:grimorio/view/characters/ficha/components/ficha_tabs.dart';
+import 'package:grimorio/view/characters/ficha/components/numero_dialog.dart';
 import 'package:grimorio/view/characters/ficha/components/titulo_secao.dart';
 import 'package:grimorio/widgets/estado_nao_encontrado.dart';
 import 'package:grimorio/widgets/snack_bar.dart';
@@ -160,6 +161,41 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
     if (ok && mounted) _aviso('Desfeito');
   }
 
+  // grupo e convite
+
+  Future<void> _removerHeroi(Personagem heroi) async {
+    final ok = await confirmar(
+      context,
+      titulo: 'Remover ${heroi.nome}?',
+      texto: 'O herói sai da campanha e pode entrar de novo com o código.',
+      sim: 'Remover',
+    );
+    if (!ok || !mounted) return;
+    final removido = await _acao(
+      'remover heroi',
+      () => _campanhas.removerHeroi(widget.campanhaId, heroi.id),
+    );
+    if (removido && mounted) _aviso('${heroi.nome} saiu da campanha');
+  }
+
+  Future<void> _novoCodigo() async {
+    final ok = await confirmar(
+      context,
+      titulo: 'Gerar novo código?',
+      texto: 'O código atual para de funcionar.',
+      sim: 'Gerar',
+    );
+    if (!ok || !mounted) return;
+    var codigo = '';
+    final gerou = await _acao(
+      'novo codigo',
+      () async => codigo = await _campanhas.novoCodigo(widget.campanhaId),
+    );
+    if (gerou && mounted) {
+      _aviso('Novo código: $codigo', tipo: Snackbar.sucesso);
+    }
+  }
+
   // missoes e mundo
 
   void _abrirMissao(Missao m) => context.pushNamed(
@@ -200,6 +236,7 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
       onItem: _darItem,
       onAbrirMissao: _abrirMissao,
       onDesfazer: _desfazer,
+      onRemover: _removerHeroi,
     ),
     1 => MissoesMestreTab(
       missoes: _c.missoes,
@@ -240,7 +277,10 @@ class _CampanhaMestreState extends State<CampanhaMestre> {
                   papel: _papel,
                   trailing: _c.codigoConvite.isEmpty
                       ? null
-                      : CodigoConvite(codigo: _c.codigoConvite),
+                      : CodigoConvite(
+                          codigo: _c.codigoConvite,
+                          onNovo: _novoCodigo,
+                        ),
                 ),
               ),
               SliverPadding(

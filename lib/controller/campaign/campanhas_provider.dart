@@ -156,6 +156,12 @@ class CampanhasProvider extends ChangeNotifier {
     });
   }
 
+  // apaga a conta no banco (o resto vai por cascade) e limpa a tela
+  Future<void> apagarMinhaConta() async {
+    await _mesa.apagarMinhaConta();
+    limpar();
+  }
+
   void limpar() {
     _cancelarTimers();
     _lista = const [];

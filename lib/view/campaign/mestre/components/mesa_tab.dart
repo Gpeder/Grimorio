@@ -19,6 +19,7 @@ class MesaTab extends StatelessWidget {
     required this.onItem,
     required this.onAbrirMissao,
     required this.onDesfazer,
+    required this.onRemover,
   });
 
   final Campanha campanha;
@@ -28,6 +29,7 @@ class MesaTab extends StatelessWidget {
   final ValueChanged<Personagem> onItem;
   final ValueChanged<Missao> onAbrirMissao;
   final ValueChanged<RegistroMesa> onDesfazer;
+  final ValueChanged<Personagem> onRemover;
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +74,7 @@ class MesaTab extends StatelessWidget {
                         heroi: herois[i],
                         onXp: () => onXp(herois[i]),
                         onItem: () => onItem(herois[i]),
+                        onRemover: () => onRemover(herois[i]),
                       ),
                     ],
                   ],

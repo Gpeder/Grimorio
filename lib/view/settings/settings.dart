@@ -9,6 +9,7 @@ import 'package:grimorio/controller/settings/usuario_provider.dart';
 import 'package:grimorio/model/usuario.dart';
 import 'package:grimorio/view/characters/ficha/components/titulo_secao.dart';
 import 'package:grimorio/view/settings/components/ajuste_tile.dart';
+import 'package:grimorio/view/settings/components/apagar_conta_dialog.dart';
 import 'package:grimorio/view/settings/components/grupo_ajustes.dart';
 import 'package:grimorio/view/settings/components/opcoes_sheet.dart';
 import 'package:grimorio/view/settings/components/perfil_card.dart';
@@ -119,33 +120,24 @@ class _SettingsState extends State<Settings> {
     _aviso('Compêndio atualizado', tipo: Snackbar.sucesso);
   }
 
-  Future<void> _apagarTudo() async {
-    final confirmou = await showDialog<bool>(
-      context: context,
-      useRootNavigator: true,
-      builder: (context) => AlertDialog(
-        title: const Text('Apagar todos os dados?'),
-        content: const Text(
-          'Heróis, campanhas e ajustes deste aparelho somem para sempre.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancelar'),
-          ),
-          const SizedBox(width: AppSpacing.small),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(
-              'Apagar',
-              style: Theme.of(context).textTheme.labelLarge
-                  ?.copyWith(color: AppColors.vida),
-            ),
-          ),
-        ],
-      ),
-    );
-    if (confirmou == true && mounted) _emBreve();
+  // apaga no banco e sai; o router leva para o login
+  Future<void> _apagarConta() async {
+    if (!await confirmarApagarConta(context) || !mounted) return;
+    final auth = context.read<AuthProvider>();
+    try {
+      await context.read<CampanhasProvider>().apagarMinhaConta();
+      await auth.sair();
+    } catch (e, stack) {
+      if (mounted) {
+        mostrarErro(
+          context,
+          e,
+          stack: stack,
+          onde: 'apagar conta',
+          acimaDaBarra: true,
+        );
+      }
+    }
   }
 
   void _creditos() {
@@ -270,27 +262,19 @@ class _SettingsState extends State<Settings> {
             valor: _data(_u.compendioAtualizadoEm),
             onTap: _atualizarCompendio,
           ),
-          AjusteTile(
-            icone: Pixel.download,
-            titulo: 'Fazer backup',
-            onTap: _emBreve,
-          ),
-          AjusteTile(
-            icone: Pixel.upload,
-            titulo: 'Importar backup',
-            onTap: _emBreve,
-          ),
-          AjusteTile(
-            icone: Pixel.trash,
-            titulo: 'Apagar todos os dados',
-            perigoso: true,
-            onTap: _apagarTudo,
-          ),
         ],
       ),
       GrupoAjustes(
         titulo: 'Conta',
-        linhas: [AjusteTile(icone: Pixel.logout, titulo: 'Sair', onTap: _sair)],
+        linhas: [
+          AjusteTile(icone: Pixel.logout, titulo: 'Sair', onTap: _sair),
+          AjusteTile(
+            icone: Pixel.trash,
+            titulo: 'Apagar conta',
+            perigoso: true,
+            onTap: _apagarConta,
+          ),
+        ],
       ),
       GrupoAjustes(
         titulo: 'Sobre',

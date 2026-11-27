@@ -6,9 +6,12 @@ import 'package:grimorio/widgets/snack_bar.dart';
 import 'package:pixelarticons/pixel.dart';
 
 class CodigoConvite extends StatelessWidget {
-  const CodigoConvite({super.key, required this.codigo});
+  const CodigoConvite({super.key, required this.codigo, this.onNovo});
 
   final String codigo;
+
+  // gera outro codigo; o velho para de funcionar
+  final VoidCallback? onNovo;
 
   Future<void> _copiar(BuildContext context) async {
     await Clipboard.setData(ClipboardData(text: codigo));
@@ -21,7 +24,7 @@ class CodigoConvite extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final raio = BorderRadius.circular(AppSpacing.radiusSmall);
 
-    return Material(
+    final copiar = Material(
       color: AppColors.background.withValues(alpha: 0.8),
       shape: RoundedRectangleBorder(
         borderRadius: raio,
@@ -61,6 +64,20 @@ class CodigoConvite extends StatelessWidget {
           ),
         ),
       ),
+    );
+    final onNovo = this.onNovo;
+    if (onNovo == null) return copiar;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        copiar,
+        const SizedBox(width: 6),
+        IconButton(
+          tooltip: 'Gerar novo código',
+          onPressed: onNovo,
+          icon: const Icon(Pixel.reload, size: 18),
+        ),
+      ],
     );
   }
 }
