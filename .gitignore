@@ -49,3 +49,6 @@ app.*.map.json
 
 # Claude Code (configurações locais)
 .claude/settings.local.json
+
+# chaves do supabase (copiar de env.example.json)
+env.json

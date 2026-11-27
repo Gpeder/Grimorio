@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:grimorio/app/config/ambiente.dart';
 import 'package:grimorio/app/log/app_log.dart';
 import 'package:grimorio/app/providers/app_providers.dart';
 import 'package:grimorio/app/router/app_router.dart';
@@ -8,10 +9,29 @@ import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/app/theme/app_theme.dart';
 import 'package:grimorio/service/api/api_client.dart';
 import 'package:grimorio/widgets/erro_widget_card.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   configurarErros();
+  await iniciarSupabase();
   runApp(const GrimorioApp());
+}
+
+// sem env.json o app abre, mas o login falha
+Future<void> iniciarSupabase() async {
+  if (!Ambiente.configurado) {
+    AppLog.erro(
+      TagLog.app,
+      'env.json sem SUPABASE_URL/SUPABASE_ANON_KEY. '
+      'rode com --dart-define-from-file=env.json',
+    );
+    return;
+  }
+  await Supabase.initialize(
+    url: Ambiente.supabaseUrl,
+    publishableKey: Ambiente.supabaseAnonKey,
+  );
 }
 
 // todo erro vai para o log, o usuario nunca ve detalhe tecnico
