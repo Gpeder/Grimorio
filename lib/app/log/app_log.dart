@@ -19,6 +19,7 @@ class TagLog {
   static const ui = 'UI';
   static const flutter = 'FLUTTER';
   static const app = 'APP';
+  static const auth = 'AUTH';
 }
 
 typedef RelatorioErro = void Function(
