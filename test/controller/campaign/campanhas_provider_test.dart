@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:grimorio/model/campanha.dart';
+import 'package:grimorio/model/usuario_mock.dart';
 import 'package:grimorio/controller/campaign/campanhas_provider.dart';
 import 'package:grimorio/controller/characters/personagens_provider.dart';
 import 'package:grimorio/model/campanha_mock.dart';
@@ -33,5 +35,16 @@ void main() {
     var chamou = false;
     campanhas.naMesa('nao-existe', personagens, (_) => chamou = true);
     expect(chamou, isFalse);
+  });
+
+  test('adotarMock deixa o usuário logado de mestre da campanha dele', () {
+    final c = CampanhasProvider();
+    final dele = c.campanhas.where((x) => x.mestreId == usuarioMock.id);
+    expect(dele, isNotEmpty);
+    final id = dele.first.id;
+
+    c.adotarMock('uuid-real');
+    expect(c.porId(id)!.papelDe('uuid-real'), PapelCampanha.mestre);
+    expect(c.campanhas.where((x) => x.mestreId == usuarioMock.id), isEmpty);
   });
 }

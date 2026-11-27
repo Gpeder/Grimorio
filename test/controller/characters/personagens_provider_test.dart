@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:grimorio/model/usuario_mock.dart';
 import 'package:grimorio/controller/characters/personagens_provider.dart';
 import 'package:grimorio/model/personagem_mock.dart';
 
@@ -34,5 +35,19 @@ void main() {
 
   test('id que não existe volta null', () {
     expect(PersonagensProvider().porId('nao-existe'), isNull);
+  });
+
+  test('adotarMock passa os heróis do mock para o usuário logado', () {
+    final p = PersonagensProvider();
+    final antes = p.todos.where((x) => x.donoId == usuarioMock.id).length;
+    expect(antes, greaterThan(0));
+
+    p.adotarMock('uuid-real');
+    expect(p.todos.where((x) => x.donoId == usuarioMock.id), isEmpty);
+    expect(p.todos.where((x) => x.donoId == 'uuid-real'), hasLength(antes));
+
+    // outra conta logada herda de novo
+    p.adotarMock('outra');
+    expect(p.todos.where((x) => x.donoId == 'outra'), hasLength(antes));
   });
 }
