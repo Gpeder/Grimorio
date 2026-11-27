@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:grimorio/model/usuario.dart';
-import 'package:grimorio/model/usuario_mock.dart';
 import 'package:grimorio/service/supabase/perfil_service.dart';
+
+import '../fixtures/usuario_mock.dart';
 
 // tabela perfis em memoria, responde na hora
 class PerfilServiceFalso implements PerfilService {

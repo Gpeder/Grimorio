@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/app/router/rotas.dart';
-import 'package:grimorio/model/usuario_mock.dart';
 import 'package:grimorio/view/auth/components/campo_codigo.dart';
 import 'package:grimorio/view/auth/recuperar_senha.dart';
 import 'package:grimorio/view/home/home.dart';
 
+import '../../fixtures/usuario_mock.dart';
 import '../../helpers/auth_falso.dart';
 import '../../helpers/auth_teste.dart';
 

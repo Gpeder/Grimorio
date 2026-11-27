@@ -3,11 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/model/campanha.dart';
 import 'package:grimorio/model/personagem.dart';
-import 'package:grimorio/model/personagem_mock.dart';
-import 'package:grimorio/model/usuario_mock.dart';
 import 'package:grimorio/view/campaign/components/campanha_card.dart';
 import 'package:grimorio/widgets/etiqueta.dart';
 
+import '../../fixtures/personagem_mock.dart';
+import '../../fixtures/usuario_mock.dart';
 import '../../helpers/app_teste.dart';
 import '../../helpers/banco_falso.dart';
 

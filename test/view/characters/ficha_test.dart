@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart' hide Characters;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/app/router/rotas.dart';
-import 'package:grimorio/model/personagem_mock.dart';
 import 'package:grimorio/view/characters/ficha/components/ficha_tabs.dart';
 import 'package:grimorio/view/characters/ficha/ficha.dart';
-
-import '../../helpers/app_teste.dart';
-
 import 'package:pixelarticons/pixel.dart';
+
+import '../../fixtures/personagem_mock.dart';
+import '../../helpers/app_teste.dart';
 
 void main() {
   Future<void> abrir(WidgetTester tester) async {

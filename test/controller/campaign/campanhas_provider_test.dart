@@ -4,10 +4,10 @@ import 'package:grimorio/controller/campaign/campanhas_provider.dart';
 import 'package:grimorio/controller/characters/personagens_provider.dart';
 import 'package:grimorio/controller/grimoire/estado_lista.dart';
 import 'package:grimorio/model/compendio_mock.dart';
-import 'package:grimorio/model/personagem_mock.dart';
-import 'package:grimorio/model/usuario_mock.dart';
 import 'package:grimorio/service/supabase/banco_erro.dart';
 
+import '../../fixtures/personagem_mock.dart';
+import '../../fixtures/usuario_mock.dart';
 import '../../helpers/banco_falso.dart';
 import '../../helpers/perfil_falso.dart';
 

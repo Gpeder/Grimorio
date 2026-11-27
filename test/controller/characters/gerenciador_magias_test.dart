@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/controller/characters/gerenciador_magias.dart';
 import 'package:grimorio/model/personagem.dart';
-import 'package:grimorio/model/personagem_mock.dart';
 
+import '../../fixtures/personagem_mock.dart';
 import 'personagem_teste.dart';
 
 void main() {

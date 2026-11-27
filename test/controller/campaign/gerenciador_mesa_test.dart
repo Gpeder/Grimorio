@@ -1,10 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/controller/campaign/gerenciador_mesa.dart';
 import 'package:grimorio/model/campanha.dart';
-import 'package:grimorio/model/campanha_mock.dart';
 import 'package:grimorio/model/compendio_mock.dart';
 import 'package:grimorio/model/personagem.dart';
-import 'package:grimorio/model/personagem_mock.dart';
+
+import '../../fixtures/campanha_mock.dart';
+import '../../fixtures/personagem_mock.dart';
 
 void main() {
   final campanha = campanhasMock.first.copyWith(registros: const []);

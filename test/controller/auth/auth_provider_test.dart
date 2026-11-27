@@ -2,9 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/controller/auth/auth_provider.dart';
 import 'package:grimorio/controller/settings/usuario_provider.dart';
 import 'package:grimorio/model/usuario.dart';
-import 'package:grimorio/model/usuario_mock.dart';
 import 'package:grimorio/service/supabase/auth_erro.dart';
 
+import '../../fixtures/usuario_mock.dart';
 import '../../helpers/auth_falso.dart';
 import '../../helpers/perfil_falso.dart';
 

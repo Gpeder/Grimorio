@@ -3,11 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:grimorio/app/components/navegacao_bottom_bar.dart';
 import 'package:grimorio/app/router/rotas.dart';
-import 'package:grimorio/model/campanha_mock.dart';
-import 'package:grimorio/model/personagem_mock.dart';
 import 'package:grimorio/view/characters/ficha/ficha.dart';
 import 'package:grimorio/view/grimoire/magias/magias.dart';
 
+import '../fixtures/campanha_mock.dart';
+import '../fixtures/personagem_mock.dart';
 import '../helpers/app_teste.dart';
 
 void main() {

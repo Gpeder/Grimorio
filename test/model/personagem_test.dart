@@ -1,8 +1,8 @@
-import 'ida_e_volta.dart';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/model/personagem.dart';
-import 'package:grimorio/model/personagem_mock.dart';
+
+import '../fixtures/personagem_mock.dart';
+import 'ida_e_volta.dart';
 
 const _atributos = Atributos(
   forca: 10,

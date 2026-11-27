@@ -1,8 +1,8 @@
-import 'ida_e_volta.dart';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/model/campanha.dart';
-import 'package:grimorio/model/campanha_mock.dart';
+
+import '../fixtures/campanha_mock.dart';
+import 'ida_e_volta.dart';
 
 void main() {
   test('as campanhas do mock voltam iguais', () {

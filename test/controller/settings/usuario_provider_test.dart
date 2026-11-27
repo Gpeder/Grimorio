@@ -3,9 +3,9 @@ import 'package:grimorio/controller/auth/auth_provider.dart';
 import 'package:grimorio/controller/grimoire/estado_lista.dart';
 import 'package:grimorio/controller/settings/usuario_provider.dart';
 import 'package:grimorio/model/usuario.dart';
-import 'package:grimorio/model/usuario_mock.dart';
 import 'package:grimorio/service/api/api_erro.dart';
 
+import '../../fixtures/usuario_mock.dart';
 import '../../helpers/auth_falso.dart';
 import '../../helpers/perfil_falso.dart';
 

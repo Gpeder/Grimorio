@@ -15,9 +15,9 @@ import 'package:grimorio/service/supabase/personagem_service.dart';
 import 'package:grimorio/service/supabase/realtime_service.dart';
 import 'package:grimorio/service/supabase/servicos_banco.dart';
 
-import 'package:grimorio/model/campanha_mock.dart';
-import 'package:grimorio/model/personagem_mock.dart';
-import 'package:grimorio/model/usuario_mock.dart';
+import '../fixtures/campanha_mock.dart';
+import '../fixtures/personagem_mock.dart';
+import '../fixtures/usuario_mock.dart';
 
 // banco em memoria com os dados do mock; tudo responde na hora
 class BancoFalso {

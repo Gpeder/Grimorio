@@ -2,10 +2,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/app/router/app_router.dart';
 import 'package:grimorio/app/router/rotas.dart';
 import 'package:grimorio/controller/auth/auth_provider.dart';
-import 'package:grimorio/model/usuario_mock.dart';
 import 'package:grimorio/view/auth/login.dart';
 import 'package:grimorio/view/home/home.dart';
 
+import '../fixtures/usuario_mock.dart';
 import '../helpers/app_teste.dart';
 import '../helpers/auth_falso.dart';
 import '../helpers/auth_teste.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grimorio/model/usuario.dart';
-import 'package:grimorio/model/usuario_mock.dart';
 
+import '../fixtures/usuario_mock.dart';
 import 'ida_e_volta.dart';
 
 void main() {

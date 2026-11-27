@@ -1,8 +1,9 @@
 import 'dart:async';
 
-import 'package:grimorio/model/usuario_mock.dart';
 import 'package:grimorio/service/supabase/auth_erro.dart';
 import 'package:grimorio/service/supabase/auth_service.dart';
+
+import '../fixtures/usuario_mock.dart';
 
 // conta guardada no falso
 class ContaFalsa {
