@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 T lerEnum<T extends Enum>(List<T> valores, Object? nome, T padrao) =>
     lerEnumOuNulo(valores, nome) ?? padrao;
 
@@ -41,3 +43,13 @@ List<Map<String, dynamic>> lerLista(Object? valor) => [
     for (final e in valor)
       if (e is Map<String, dynamic>) e,
 ];
+
+// so as colunas que mudaram, listas e mapas comparados pelo valor
+Map<String, dynamic> camposMudados(
+  Map<String, dynamic> antes,
+  Map<String, dynamic> depois,
+  Iterable<String> colunas,
+) => {
+  for (final c in colunas)
+    if (jsonEncode(antes[c]) != jsonEncode(depois[c])) c: depois[c],
+};

@@ -39,6 +39,12 @@ class PerfilServiceFalso implements PerfilService {
     return SynchronousFuture(null);
   }
 
+  // nomes dos perfis guardados e dos outros usuarios do mock
+  @override
+  Future<Map<String, String>> nomes(Iterable<String> ids) => SynchronousFuture({
+    for (final id in ids) id: ?(perfis[id]?.nome ?? nomesUsuariosMock[id]),
+  });
+
   void _falhar() {
     final erro = proximoErro;
     if (erro == null) return;

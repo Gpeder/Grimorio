@@ -1,11 +1,6 @@
-import 'dart:async';
-import 'dart:io';
-
-import 'package:grimorio/app/config/ambiente.dart';
-import 'package:grimorio/app/log/app_log.dart';
 import 'package:grimorio/model/usuario.dart';
-import 'package:grimorio/service/api/api_erro.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:grimorio/service/supabase/banco.dart';
+import 'package:grimorio/service/supabase/banco_rotas.dart';
 
 // perfil do usuario na tabela perfis, os testes usam um falso
 abstract class PerfilService {
@@ -14,63 +9,49 @@ abstract class PerfilService {
 
   // so os campos que mudaram, nunca a linha inteira
   Future<void> atualizar(String id, Map<String, dynamic> campos);
+
+  // nome de quem divide campanha comigo (a rls filtra)
+  Future<Map<String, String>> nomes(Iterable<String> ids);
 }
 
 class SupabasePerfilService implements PerfilService {
-  SupabasePerfilService({this._cliente});
+  SupabasePerfilService([Banco? banco]) : _banco = banco ?? Banco();
 
-  final SupabaseClient? _cliente;
-
-  static const _tabela = 'perfis';
-
-  SupabaseClient? get _db =>
-      _cliente ?? (Ambiente.configurado ? Supabase.instance.client : null);
+  final Banco _banco;
 
   @override
-  Future<Usuario> buscar(String id) => _rodar('buscar', (db) async {
-    final linha = await db.from(_tabela).select().eq('id', id).single();
-    return Usuario.fromJson(linha);
-  });
+  Future<Usuario> buscar(String id) =>
+      _banco.rodar('buscar perfil', (db) async {
+        final linha = await db
+            .from(BancoRotas.perfis)
+            .select()
+            .eq(BancoRotas.id, id)
+            .single();
+        return Usuario.fromJson(linha);
+      });
 
   @override
   Future<void> atualizar(String id, Map<String, dynamic> campos) async {
     if (campos.isEmpty) return;
-    await _rodar(
-      'atualizar ${campos.keys.join(', ')}',
-      (db) => db.from(_tabela).update(campos).eq('id', id),
+    await _banco.rodar(
+      'atualizar perfil ${campos.keys.join(', ')}',
+      (db) => db.from(BancoRotas.perfis).update(campos).eq(BancoRotas.id, id),
     );
   }
 
-  // todo erro sai como ApiErro, logado com a stack
-  Future<T> _rodar<T>(
-    String onde,
-    Future<T> Function(SupabaseClient db) acao,
-  ) async {
-    final db = _db;
-    if (db == null) {
-      AppLog.erro(TagLog.api, 'perfil $onde: supabase nao configurado');
-      throw ApiErro(TipoErroApi.desconhecido);
-    }
-    try {
-      return await acao(db);
-    } catch (e, stack) {
-      AppLog.erro(TagLog.api, 'perfil $onde', erro: e, stack: stack);
-      throw _traduzir(e);
-    }
+  @override
+  Future<Map<String, String>> nomes(Iterable<String> ids) async {
+    final lista = ids.toSet().toList();
+    if (lista.isEmpty) return {};
+    return _banco.rodar('nomes dos perfis', (db) async {
+      final linhas = await db
+          .from(BancoRotas.perfis)
+          .select('${BancoRotas.id}, ${BancoRotas.nome}')
+          .inFilter(BancoRotas.id, lista);
+      return {
+        for (final l in linhas)
+          l[BancoRotas.id] as String: l[BancoRotas.nome] as String? ?? '',
+      };
+    });
   }
-
-  static ApiErro _traduzir(Object e) => switch (e) {
-    ApiErro() => e,
-    // nenhuma linha no single
-    PostgrestException(code: 'PGRST116') => ApiErro(TipoErroApi.naoEncontrado),
-    PostgrestException(code: '42501' || 'PGRST301') => ApiErro(
-      TipoErroApi.naoAutorizado,
-    ),
-    PostgrestException() => ApiErro(TipoErroApi.servidor),
-    AuthRetryableFetchException() ||
-    SocketException() ||
-    HttpException() => ApiErro(TipoErroApi.semConexao),
-    TimeoutException() => ApiErro(TipoErroApi.tempoEsgotado),
-    _ => ApiErro(TipoErroApi.desconhecido),
-  };
 }

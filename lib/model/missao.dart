@@ -48,7 +48,8 @@ class EntradaMissao {
     id: json['id'] as String? ?? '',
     texto: json['texto'] as String? ?? '',
     sessao: (json['sessao'] as num?)?.toInt() ?? 0,
-    criadaEm: lerData(json['criada_em']),
+    // no banco a coluna e criado_em
+    criadaEm: lerData(json['criada_em'] ?? json['criado_em']),
     objetivo: json['objetivo'] as bool? ?? false,
     concluida: json['concluida'] as bool? ?? false,
     revelada: json['revelada'] as bool? ?? true,
@@ -122,7 +123,8 @@ class Missao {
     id: json['id'] as String? ?? '',
     campanhaId: json['campanha_id'] as String? ?? '',
     titulo: json['titulo'] as String? ?? '',
-    atualizadaEm: lerData(json['atualizada_em']),
+    // no banco a coluna e atualizado_em
+    atualizadaEm: lerData(json['atualizada_em'] ?? json['atualizado_em']),
     tipo: lerEnum(TipoMissao.values, json['tipo'], TipoMissao.secundaria),
     regiao: json['regiao'] as String? ?? '',
     descricao: json['descricao'] as String? ?? '',
