@@ -3,11 +3,16 @@ import 'package:go_router/go_router.dart';
 import 'package:grimorio/app/app_shell.dart';
 import 'package:grimorio/app/log/app_log.dart';
 import 'package:grimorio/app/router/rotas.dart';
+import 'package:grimorio/controller/auth/auth_provider.dart';
 import 'package:grimorio/controller/campaign/campanhas_provider.dart';
 import 'package:grimorio/controller/characters/personagens_provider.dart';
 import 'package:grimorio/controller/settings/usuario_provider.dart';
 import 'package:grimorio/model/campanha.dart';
 import 'package:grimorio/controller/grimoire/estado_detalhe.dart';
+import 'package:grimorio/view/auth/cadastro.dart';
+import 'package:grimorio/view/auth/confirmar_email.dart';
+import 'package:grimorio/view/auth/login.dart';
+import 'package:grimorio/view/auth/recuperar_senha.dart';
 import 'package:grimorio/view/campaign/campaign.dart';
 import 'package:grimorio/view/campaign/heroi/campanha_heroi.dart';
 import 'package:grimorio/view/campaign/mestre/campanha_mestre.dart';
@@ -32,17 +37,45 @@ import 'package:grimorio/view/settings/settings.dart';
 import 'package:grimorio/widgets/estado_nao_encontrado.dart';
 import 'package:provider/provider.dart';
 
-GoRouter criarAppRouter({String inicial = Rotas.inicio}) {
+GoRouter criarAppRouter({
+  required AuthProvider auth,
+  String inicial = Rotas.inicio,
+}) {
   final raiz = GlobalKey<NavigatorState>(debugLabel: 'raiz');
 
   return GoRouter(
     navigatorKey: raiz,
     initialLocation: inicial,
+    refreshListenable: auth,
+    redirect: (_, state) => redirecionarAuth(auth, state.uri.path),
     errorBuilder: (context, state) {
       AppLog.aviso(TagLog.rota, 'rota nao existe: ${state.uri}');
       return EstadoNaoEncontrado(onVoltar: () => context.go(Rotas.inicio));
     },
     routes: [
+      // login, sem barra
+      GoRoute(
+        path: Rotas.entrar,
+        name: Rotas.nomeEntrar,
+        builder: (_, _) => const Login(),
+      ),
+      GoRoute(
+        path: Rotas.cadastro,
+        name: Rotas.nomeCadastro,
+        builder: (_, _) => const Cadastro(),
+        routes: [
+          GoRoute(
+            path: Rotas.confirmarEmail,
+            name: Rotas.nomeConfirmarEmail,
+            builder: (_, _) => const ConfirmarEmail(),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: Rotas.recuperarSenha,
+        name: Rotas.nomeRecuperarSenha,
+        builder: (_, _) => const RecuperarSenha(),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => AppShell(navigationShell: shell),
         branches: [
@@ -165,6 +198,23 @@ GoRouter criarAppRouter({String inicial = Rotas.inicio}) {
       ),
     ],
   );
+}
+
+// sem login so as telas de auth; logado nao volta para elas
+// a nao ser no meio da recuperacao de senha
+String? redirecionarAuth(AuthProvider auth, String rota) {
+  final deAuth = Rotas.deAuth.contains(rota);
+  final destino = switch (auth.logado) {
+    false when !deAuth => Rotas.entrar,
+    false
+        when rota == Rotas.confirmarEmailCompleto &&
+            auth.emailPendente == null =>
+      Rotas.entrar,
+    true when deAuth && !auth.recuperandoSenha => Rotas.inicio,
+    _ => null,
+  };
+  if (destino != null) AppLog.info(TagLog.rota, 'redirect $rota -> $destino');
+  return destino;
 }
 
 Widget _naoEncontrado(GoRouterState state) {

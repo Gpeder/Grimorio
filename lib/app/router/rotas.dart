@@ -1,4 +1,19 @@
 class Rotas {
+  // login, fora do shell
+  static const entrar = '/entrar';
+  static const cadastro = '/cadastro';
+  static const confirmarEmail = 'confirmar'; // /cadastro/confirmar
+  static const confirmarEmailCompleto = '$cadastro/$confirmarEmail';
+  static const recuperarSenha = '/recuperar-senha';
+
+  // abertas sem login
+  static const deAuth = {
+    entrar,
+    cadastro,
+    confirmarEmailCompleto,
+    recuperarSenha,
+  };
+
   // abas
   static const inicio = '/inicio';
   static const herois = '/herois';
@@ -27,6 +42,10 @@ class Rotas {
   static const key = 'key';
 
   // nomes
+  static const nomeEntrar = 'entrar';
+  static const nomeCadastro = 'cadastro';
+  static const nomeConfirmarEmail = 'confirmar-email';
+  static const nomeRecuperarSenha = 'recuperar-senha';
   static const nomeInicio = 'inicio';
   static const nomeHerois = 'herois';
   static const nomeCampanhas = 'campanhas';
