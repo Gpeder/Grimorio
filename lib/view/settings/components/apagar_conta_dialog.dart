@@ -30,7 +30,8 @@ class _ApagarContaDialogState extends State<ApagarContaDialog> {
     super.dispose();
   }
 
-  bool get _liberado => _controle.text.trim() == ApagarContaDialog.palavra;
+  bool get _liberado =>
+      _controle.text.trim().toUpperCase() == ApagarContaDialog.palavra;
 
   @override
   Widget build(BuildContext context) {

@@ -73,7 +73,8 @@ class BancoFalso {
     final erro = proximoErro;
     if (erro == null) return;
     proximoErro = null;
-    throw erro;
+    // igual ao service de verdade: nada de PostgrestException vaza
+    throw BancoErro.de(erro);
   }
 
   Campanha? campanha(String id) =>
