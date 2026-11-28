@@ -8,11 +8,13 @@ enum TipoErroAuth {
   credenciaisInvalidas('E-mail ou senha errados.'),
   emailNaoConfirmado('Confirme seu e-mail para entrar.'),
   emailJaUsado('Esse e-mail já tem conta. Tente entrar.'),
+  emailInvalido('Esse e-mail não é válido. Confira e tente de novo.'),
   senhaFraca('Use 8 ou mais caracteres, com letra e número.'),
   senhaIgual('A senha nova precisa ser diferente da antiga.'),
   codigoInvalido('Código errado ou vencido.'),
   muitasTentativas('Muitas tentativas. Espere um pouco.'),
   semConexao('Sem conexão. Confira a internet.'),
+  semConfiguracao('O app está sem a configuração do servidor.'),
   desconhecido('Algo deu errado. Tente de novo.');
 
   const TipoErroAuth(this.mensagem);
@@ -55,6 +57,7 @@ class AuthErro implements Exception, ErroAmigavel {
       'invalid_credentials' => TipoErroAuth.credenciaisInvalidas,
       'email_not_confirmed' => TipoErroAuth.emailNaoConfirmado,
       'user_already_exists' || 'email_exists' => TipoErroAuth.emailJaUsado,
+      'email_address_invalid' => TipoErroAuth.emailInvalido,
       'weak_password' => TipoErroAuth.senhaFraca,
       'same_password' => TipoErroAuth.senhaIgual,
       'otp_expired' => TipoErroAuth.codigoInvalido,

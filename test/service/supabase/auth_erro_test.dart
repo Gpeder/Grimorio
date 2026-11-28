@@ -12,6 +12,7 @@ void main() {
       'email_not_confirmed': TipoErroAuth.emailNaoConfirmado,
       'user_already_exists': TipoErroAuth.emailJaUsado,
       'email_exists': TipoErroAuth.emailJaUsado,
+      'email_address_invalid': TipoErroAuth.emailInvalido,
       'weak_password': TipoErroAuth.senhaFraca,
       'same_password': TipoErroAuth.senhaIgual,
       'otp_expired': TipoErroAuth.codigoInvalido,

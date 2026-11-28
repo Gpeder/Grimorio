@@ -99,7 +99,7 @@ class SupabaseAuthService implements AuthService {
     final auth = _auth;
     if (auth == null) {
       AppLog.erro(TagLog.auth, '$onde: supabase nao configurado (env.json)');
-      throw const AuthErro(TipoErroAuth.desconhecido);
+      throw const AuthErro(TipoErroAuth.semConfiguracao);
     }
     try {
       await acao(auth);

@@ -23,7 +23,6 @@ Future<void> main() async {
   runApp(const GrimorioApp());
 }
 
-// sem env.json o app abre, mas o login falha
 Future<void> iniciarSupabase() async {
   if (!Ambiente.configurado) {
     AppLog.erro(
